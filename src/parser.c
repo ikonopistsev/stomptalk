@@ -618,7 +618,7 @@ stlparser_new(void)
 }
 
 void
-stlparser_free(const stlparser *p)
+stlparser_free(stlparser *p)
 {
     free(p);
 }

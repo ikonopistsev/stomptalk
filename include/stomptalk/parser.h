@@ -138,7 +138,7 @@ STOMPTALK_EXPORT void*              stlparser_get_userdata(stlparser *);
 STOMPTALK_EXPORT void               stlparser_set_userdata(stlparser *, void *);
 STOMPTALK_EXPORT void               stlparser_init(stlparser *, stlp_type);
 STOMPTALK_EXPORT stlparser*         stlparser_new(void);
-STOMPTALK_EXPORT void               stlparser_free(const stlparser*);
+STOMPTALK_EXPORT void               stlparser_free(stlparser*);
 
 #ifdef __cplusplus
 }
