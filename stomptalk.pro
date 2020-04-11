@@ -5,11 +5,12 @@ CONFIG += object_parallel_to_source static
 CONFIG -= qt
 
 SOURCES += \
-    src/parser.c
+    src/parser.cpp
 
 HEADERS += include/stomptalk/parser.h \
     include/stomptalk/config.h \
-    src/internal.h
+    include/stomptalk/stomptalk.hpp \
+    src/memeq.hpp
 
 INCLUDEPATH += include
-DEFINES += STOMPTALK_DEBUG
+#DEFINES += STOMPTALK_DEBUG
