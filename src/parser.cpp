@@ -37,7 +37,8 @@ T get_max(T a, T b) noexcept
 enum eval_hdr_val
 {
     eval_hdr_val_none = 0,
-    eval_hdr_val_content_length
+    eval_hdr_val_content_length,
+    eval_hdr_val_content_type
 };
 
 enum parser_state
@@ -68,6 +69,7 @@ struct stlparser
     eval_hdr_val heval;
     stlp_method method;
 
+    stlp_content_type content_type;
     uint64_t content_len;      /* this gets decremented as data passes through */
     uint64_t orig_content_len; /* this contains the original length of the body */
     uint64_t bytes_read;
@@ -109,6 +111,16 @@ static const char * method_strmap[] = {
     "RECEIPT",
     "ERROR",
     "unknown"
+};
+
+static const char * type_strmap[] = {
+    "x-none",
+    "application/octet-stream",
+    "text/plain",
+    "text/html",
+    "application/json",
+    "application/xml",
+    "application/x-other"
 };
 
 static inline int call_hook(stlparser * p, stlparse_hook fn) noexcept
@@ -228,6 +240,21 @@ stlparser_get_content_length(stlparser * p)
     return p->orig_content_len;
 }
 
+stlp_content_type
+stlparser_get_content_type(stlparser* p)
+{
+    return p->content_type;
+}
+
+const char*
+stlparser_get_content_type_m(stlp_content_type typ)
+{
+    if (typ > stlp_content_type_other)
+        typ = stlp_content_type_other;
+
+    return type_strmap[typ];
+}
+
 uint64_t
 stlparser_get_bytes_read(stlparser * p)
 {
@@ -264,7 +291,7 @@ stlparser_free(stlparser *p)
 }
 
 static stlp_method
-get_method(const char * m, const size_t sz)
+get_method(const char * m, const size_t sz) noexcept
 {
     switch (sz)
     {
@@ -323,6 +350,44 @@ get_method(const char * m, const size_t sz)
     return stomp_method_UNKNOWN;
 }
 
+static stlp_content_type
+get_content_type(const char *value, const size_t sz) noexcept
+{
+    switch (sz)
+    {
+    case 8:
+        if (eqstr("text/xml", value))
+            return stlp_content_type_xml;
+        break;
+
+    case 10:
+        if (eqstr("text/plain", value))
+            return stlp_content_type_text;
+        if (eqstr("text/html", value))
+            return stlp_content_type_html;
+        break;
+
+
+    case 15:
+        if (eqstr("application/xml", value))
+            return stlp_content_type_xml;
+        break;
+
+    case 16:
+        if (eqstr("application/json", value))
+            return stlp_content_type_json;
+        break;
+
+    case 24:
+        if (eqstr("application/octet-stream", value))
+            return stlp_content_type_octet_stream;
+        break;
+    default:;
+    };
+
+    return stlp_content_type_other;
+}
+
 #define STLP_SET_BUF(CH) do {                                     \
         if (stlp_likely((p->buf_idx + 1) < PARSER_STACK_MAX)) { \
             p->buf[p->buf_idx++] = CH;                           \
@@ -370,6 +435,7 @@ stlparser_run(stlparser * p, stlparse_hooks * hooks,
             }
 
             p->error            = stlparse_error_none;
+            p->content_type     = stlp_content_type_none;
             p->method           = stomp_method_UNKNOWN;
             p->content_len      = 0;
             p->orig_content_len = 0;
@@ -490,6 +556,10 @@ hdrline_start:
 
                     switch (p->buf_idx + 1)
                     {
+                    case 13:
+                        if (eqstr("content-type", p->buf))
+                            p->heval = eval_hdr_val_content_type;
+                        break;
                     case 15:
                         if (eqstr("content-length", p->buf))
                             p->heval = eval_hdr_val_content_length;
@@ -587,6 +657,9 @@ hdrline_start:
                             return i + 1;
                         }
 
+                        break;
+                    case eval_hdr_val_content_type:
+                        p->content_type = get_content_type(p->buf, p->buf_idx);
                         break;
                     default:;
                     }
@@ -716,6 +789,9 @@ hdrline_start:
 
         case s_body_read:
         {
+            if (p->content_type == stlp_content_type_none)
+                p->content_type = stlp_content_type_octet_stream;
+
             res = 0;
             const char* pp = &data[i];
             const char* pe = data + len;
@@ -748,6 +824,11 @@ hdrline_start:
             // это будет следующий символ, после LF
             body_index = i;
 
+            if (stlp_unlikely(ch != '\0'))
+            {
+                if (p->content_type == stlp_content_type_none)
+                    p->content_type = stlp_content_type_text;
+            }
             // если не указана длинна контента
             // мыдолжны искать первый символ '\0'
             do

@@ -41,6 +41,16 @@ enum stlparse_error {
     stlparse_error_generic
 };
 
+enum stlp_content_type {
+    stlp_content_type_none,
+    stlp_content_type_octet_stream,
+    stlp_content_type_text,
+    stlp_content_type_html,
+    stlp_content_type_json,
+    stlp_content_type_xml,
+    stlp_content_type_other
+};
+
 typedef struct stlparser        stlparser;
 typedef struct stlparse_hooks   stlparse_hooks;
 typedef enum stlp_method        stlp_method;
@@ -69,6 +79,8 @@ STOMPTALK_EXPORT stlp_method        stlparser_get_method(stlparser *);
 STOMPTALK_EXPORT const char*        stlparser_get_methodstr(stlparser *);
 STOMPTALK_EXPORT const char*        stlparser_get_methodstr_m(stlp_method);
 STOMPTALK_EXPORT uint64_t           stlparser_get_content_length(stlparser *);
+STOMPTALK_EXPORT stlp_content_type  stlparser_get_content_type(stlparser *);
+STOMPTALK_EXPORT const char*        stlparser_get_content_type_m(stlp_content_type);
 STOMPTALK_EXPORT uint64_t           stlparser_get_bytes_read(stlparser *);
 STOMPTALK_EXPORT uint64_t           stlparser_get_total_bytes_read(stlparser *);
 STOMPTALK_EXPORT stlparse_error     stlparser_get_error(stlparser *);
