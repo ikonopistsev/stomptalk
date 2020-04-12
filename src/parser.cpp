@@ -10,7 +10,7 @@
 #error "You have somehow found a non-ASCII host. We can't build here."
 #endif
 
-#define PARSER_STACK_MAX 8192
+#define PARSER_STACK_MAX 2048
 #define LF               '\n'
 #define CR               '\r'
 
