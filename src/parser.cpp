@@ -10,7 +10,7 @@
 #error "You have somehow found a non-ASCII host. We can't build here."
 #endif
 
-#define PARSER_STACK_MAX 2048
+#define PARSER_STACK_MAX 1984
 #define LF               '\n'
 #define CR               '\r'
 
@@ -28,12 +28,20 @@ T get_min(T a, T b) noexcept
     return a < b ? a : b;
 }
 
-enum eval_hdr_val {
+template<class T>
+T get_max(T a, T b) noexcept
+{
+    return a > b ? a : b;
+}
+
+enum eval_hdr_val
+{
     eval_hdr_val_none = 0,
     eval_hdr_val_content_length
 };
 
-enum parser_state {
+enum parser_state
+{
     s_start = 0,
     s_method,
     s_almost_done,
@@ -53,19 +61,19 @@ enum parser_state {
 typedef enum eval_hdr_val eval_hdr_val;
 typedef enum parser_state parser_state;
 
-
-struct stlparser {
+struct stlparser
+{
     stlparse_error error;
-    parser_state    state;
-    eval_hdr_val    heval;
-    stlp_method     method;
+    parser_state state;
+    eval_hdr_val heval;
+    stlp_method method;
 
-    uint64_t      content_len;      /* this gets decremented as data passes through */
-    uint64_t      orig_content_len; /* this contains the original length of the body */
-    uint64_t      bytes_read;
-    uint64_t      total_bytes_read;
+    uint64_t content_len;      /* this gets decremented as data passes through */
+    uint64_t orig_content_len; /* this contains the original length of the body */
+    uint64_t bytes_read;
+    uint64_t total_bytes_read;
 
-    void * userdata;
+    void* userdata;
 
     size_t buf_idx;
     /* Must be last since stlparser_init memsets up to the offset of this buffer */
@@ -246,7 +254,7 @@ stlparser_init(stlparser * p)
 stlparser *
 stlparser_new(void)
 {
-    return static_cast<stlparser *>(malloc(sizeof(stlparser)));
+    return static_cast<stlparser *>(malloc(get_max(sizeof(stlparser), 2084ul)));
 }
 
 void
@@ -405,7 +413,7 @@ stlparser_run(stlparser * p, stlparse_hooks * hooks,
                 }
                 else
                 {
-                    if ((ch < 'A' || ch > 'Z') && ch != '_')
+                    if (ch < 'A' || ch > 'Z')
                     {
                         p->error = stlparse_error_inval_method;
                         return i + 1;
@@ -570,7 +578,7 @@ hdrline_start:
                     switch (p->heval)
                     {
                     case eval_hdr_val_content_length:
-                        p->content_len      = str_to_uint64(p->buf, p->buf_idx, &err);
+                        p->content_len = str_to_uint64(p->buf, p->buf_idx, &err);
                         p->orig_content_len = p->content_len;
 
                         if (err == 1)
