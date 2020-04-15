@@ -68,14 +68,12 @@ void parser_hook::on_hdrs_begin() noexcept
 
 void parser_hook::on_hdr_key(const char* text, std::size_t size) noexcept
 {
-    std::cout << "\ton_hdr_key[" << size << "]: "
-              << std::string(text, size) << std::endl;
+    std::cout << "\ton_hdr_key[" << size << "]: " << std::string(text, size) << std::endl;
 }
 
 void parser_hook::on_hdr_val(const char* text, std::size_t size) noexcept
 {
-    std::cout << "\ton_hdr_val[" << size << "]: "
-              << std::string(text, size) << std::endl;
+    std::cout << "\ton_hdr_val[" << size << "]: " << std::string(text, size) << std::endl;
 }
 
 void parser_hook::on_hdrs_end() noexcept
@@ -85,8 +83,7 @@ void parser_hook::on_hdrs_end() noexcept
 
 void parser_hook::on_body(const void *ptr, std::size_t size) noexcept
 {
-    std::cout << "\ton_body[" << size << "]: "
-              << std::string(static_cast<const char*>(ptr), size) << std::endl;
+    std::cout << "\ton_body[" << size << "]: " << std::string(static_cast<const char*>(ptr), size) << std::endl;
 }
 
 void parser_hook::on_end() noexcept

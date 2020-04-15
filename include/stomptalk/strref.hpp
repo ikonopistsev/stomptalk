@@ -62,6 +62,11 @@ public:
         , size_(text.size())
     {   }
 
+    strref(const char *data, std::size_t size) noexcept
+        : ptr_(data)
+        , size_(size)
+    {   }
+
     constexpr const char* data() const noexcept
     {
         return ptr_;

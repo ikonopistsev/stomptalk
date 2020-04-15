@@ -1,31 +1,29 @@
 #pragma once
 
 #include <cstdint>
+#include "stomptalk/strref.hpp"
 
 namespace stomptalk {
 
-template<std::size_t sz>
+template<std::size_t Size>
 class stackbuf
 {
-    char buf_[sz];
+    char buf_[Size];
     char* curr_{ buf_ };
 
 public:
     stackbuf() = default;
 
+    strref pop() noexcept
+    {
+        auto size = static_cast<std::size_t>(curr_ - buf_);
+        curr_ = buf_;
+        return strref(buf_, size);
+    }
+
     void reset() noexcept
     {
         curr_ = buf_;
-    }
-
-    const char* begin() const noexcept
-    {
-        return buf_;
-    }
-
-    const char* end() const noexcept
-    {
-        return curr_;
     }
 
     bool push(char ch) noexcept
@@ -40,16 +38,6 @@ public:
             curr_ = b;
 
         return c < curr_;
-    }
-
-    const char *data() const noexcept
-    {
-        return buf_;
-    }
-
-    std::size_t size() const noexcept
-    {
-        return static_cast<std::size_t>(end() - begin());
     }
 };
 
