@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+namespace stomptalk {
+
 template <int L>
 struct memeq;
 
@@ -110,3 +112,5 @@ bool eqstr(const char (&str)[L], const char *target)
 {
     return memeq<L-1>::cmp(str, target);
 }
+
+} // namepsace stomptalk

@@ -1,16 +1,32 @@
 TEMPLATE = lib
 TARGET = stomptalk
 
-CONFIG += object_parallel_to_source static
+CONFIG += object_parallel_to_source static c++17
 CONFIG -= qt
 
 SOURCES += \
-    src/parser.cpp
+    src/parser.cpp \
+#    src/content.cpp \
+#    src/frame_base.cpp \
+#    src/header_base.cpp \
+#    src/header.cpp \
+#    src/strref.cpp \
+#    src/v12.cpp \
+    src/parser_hook.cpp
 
-HEADERS += include/stomptalk/parser.h \
-    include/stomptalk/config.h \
-    include/stomptalk/stomptalk.hpp \
-    src/memeq.hpp
+HEADERS += \
+    include/stomptalk/header.hpp \
+    include/stomptalk/strref.hpp \
+    include/stomptalk/crefwrap.hpp \
+    include/stomptalk/cmd_tag.hpp \
+    include/stomptalk/memeq.hpp \
+    include/stomptalk/tag.hpp \
+    include/stomptalk/parser.hpp \
+    include/stomptalk/parser_hook.hpp \
+    include/stomptalk/method.hpp \
+    include/stomptalk/stackbuf.hpp
 
 INCLUDEPATH += include
 #DEFINES += STOMPTALK_DEBUG
+
+SOURCES +=
