@@ -1,4 +1,2 @@
 # stomptalk
-stomp protocol parser
-
-build on https://github.com/criticalstack/libevhtp.git http parser code
+stomp protocol parser http://stomp.github.io
