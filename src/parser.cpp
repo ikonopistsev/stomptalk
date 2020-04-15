@@ -189,6 +189,8 @@ parser::result parser::hdrline_hdr_key(parser_hook& hook,
             auto data = sbuf_.data();
             auto size = sbuf_.size();
 
+            sbuf_.reset();
+
             // определяем значимый ли хидер
             eval_header(data, size);
 
@@ -203,12 +205,16 @@ parser::result parser::hdrline_hdr_key(parser_hook& hook,
         {
             if (ch == '\r')
             {
+                sbuf_.reset();
+
                 state_fn_ = &parser::hdrline_almost_done;
                 break;
             }
 
             if (ch == '\n')
             {
+                sbuf_.reset();
+
                 state_fn_ = &parser::hdrline_done;
                 break;
             }
@@ -217,8 +223,6 @@ parser::result parser::hdrline_hdr_key(parser_hook& hook,
                 return result(parser_hook::error::too_big, curr);
         }
     } while (curr < end);
-
-    sbuf_.reset();
 
     return result(curr);
 }
@@ -357,9 +361,7 @@ parser::result parser::body_read(parser_hook& hook,
     curr += to_read;
 
     if (content_len_ == 0)
-    {
         state_fn_ = &parser::frame_end;
-    }
 
     return result(curr);
 }
@@ -370,20 +372,29 @@ parser::result parser::body_read_no_length(parser_hook& hook,
     const char *beg = curr;
     do {
         if (*curr++ == '\0')
-            break;
+        {
+            // если достигли конца переходим к новому фрейму
+            state_fn_ = &parser::frame_end;
+            // вернемся назад чтобы обработать каллбек
+            return result(--curr);
+        }
     } while (curr < end);
 
+    // считаем количество данных боди
     auto to_read = static_cast<std::size_t>(std::distance(beg, curr));
 
-    state_fn_ = &parser::start_state;
+    // сообщаем о боди
     hook.on_body(beg, to_read);
 
     return result(curr);
 }
 
-parser::result parser::frame_end(parser_hook&,
+parser::result parser::frame_end(parser_hook& hook,
     const char* curr, const char *) noexcept
 {
+    // закончили
+    hook.on_end();
+
     state_fn_ = &parser::start_state;
     return (*curr++ != 0) ?
         result(parser_hook::error::inval_frame, curr) : result(curr);

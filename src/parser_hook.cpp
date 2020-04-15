@@ -50,7 +50,7 @@ bool parser_hook::eval_method(const char* text, std::size_t size) noexcept
 
 void parser_hook::on_begin() noexcept
 {
-    //std::cout << "on_begin" << std::endl;
+    std::cout << "on_begin" << std::endl;
 }
 
 void parser_hook::on_method(const char* text, std::size_t size) noexcept
@@ -58,37 +58,40 @@ void parser_hook::on_method(const char* text, std::size_t size) noexcept
     if (!eval_method(text, size))
         method_ = method::unknown;
 
-    //std::cout << "on_method: " << std::string(text, size) << std::endl;
+    std::cout << "on_method: " << std::string(text, size) << std::endl;
 }
 
 void parser_hook::on_hdrs_begin() noexcept
 {
-    //std::cout << "on_hdrs_begin" << std::endl;
+    std::cout << "on_hdrs_begin" << std::endl;
 }
 
 void parser_hook::on_hdr_key(const char* text, std::size_t size) noexcept
 {
-    //std::cout << "\t" << std::string(text, size) << std::endl;
+    std::cout << "\ton_hdr_key[" << size << "]: "
+              << std::string(text, size) << std::endl;
 }
 
 void parser_hook::on_hdr_val(const char* text, std::size_t size) noexcept
 {
-    //std::cout << "\t" << std::string(text, size) << std::endl;
+    std::cout << "\ton_hdr_val[" << size << "]: "
+              << std::string(text, size) << std::endl;
 }
 
 void parser_hook::on_hdrs_end() noexcept
 {
-    //std::cout << "on_hdrs_end" << std::endl;
+    std::cout << "on_hdrs_end" << std::endl;
 }
 
 void parser_hook::on_body(const void *ptr, std::size_t size) noexcept
 {
-    //std::cout << "on_body: " << size << ' ' << std::string(static_cast<const char*>(ptr), size) << std::endl;
+    std::cout << "\ton_body[" << size << "]: "
+              << std::string(static_cast<const char*>(ptr), size) << std::endl;
 }
 
 void parser_hook::on_end() noexcept
 {
-    //std::cout << "on_end" << std::endl;
+    std::cout << "on_end" << std::endl << std::endl;
 }
 
 } // stomptalk

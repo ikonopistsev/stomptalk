@@ -115,7 +115,8 @@ public:
 
     void clear() noexcept;
 
-    std::size_t run(parser_hook& hook, const char *ptr, std::size_t len) noexcept;
+    std::size_t run(parser_hook& hook,
+        const char *ptr, std::size_t len) noexcept;
 
 };
 
