@@ -5,11 +5,16 @@ option(STOMPTALK_DEBUG "show debug" OFF)
 
 set(source
     src/parser.cpp
+    src/parser_hook.cpp
 )
 
 set(pub_header
-    include/stomptalk/parser.h
-    include/stomptalk/config.h
+    include/stomptalk/memeq.hpp
+    include/stomptalk/strref.hpp
+    include/stomptalk/method.hpp
+    include/stomptalk/parser.hpp
+    include/stomptalk/stackbuf.hpp
+    include/stomptalk/parser_hook.hpp
 )
 
 add_library(stomptalk SHARED ${source})
