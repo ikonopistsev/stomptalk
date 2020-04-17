@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = stomptalk
 
-CONFIG += object_parallel_to_source static c++17
+CONFIG += object_parallel_to_source static c++14
 CONFIG -= qt
 
 SOURCES += \
@@ -12,19 +12,30 @@ SOURCES += \
 #    src/header.cpp \
 #    src/strref.cpp \
 #    src/v12.cpp \
-    src/parser_hook.cpp
+    src/parser_hook.cpp \
+    src/user_hook.cpp
 
 HEADERS += \
     include/stomptalk/header.hpp \
     include/stomptalk/strref.hpp \
-    include/stomptalk/crefwrap.hpp \
     include/stomptalk/cmd_tag.hpp \
     include/stomptalk/memeq.hpp \
     include/stomptalk/tag.hpp \
     include/stomptalk/parser.hpp \
     include/stomptalk/parser_hook.hpp \
     include/stomptalk/method.hpp \
-    include/stomptalk/stackbuf.hpp
+    include/stomptalk/stackbuf.hpp \
+    include/stomptalk/user_hook.hpp
 
 INCLUDEPATH += include
-#DEFINES += STOMPTALK_DEBUG
+
+CONFIG(release, debug|release) {
+    DEFINES += NDEBUG
+}
+
+#DEFINES += __AVX__ __AVX2__
+
+#QMAKE_CFLAGS_RELEASE += "-march=znver1 -mavx2 -O3 -fpie -fomit-frame-pointer -fno-common -fno-zero-initialized-in-bss"
+QMAKE_CXXFLAGS_RELEASE += "-march=znver1 -mavx2 -O3"
+#QMAKE_LFLAGS+="-march=znver1 -mavx2"
+

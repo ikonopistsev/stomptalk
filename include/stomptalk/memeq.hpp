@@ -95,6 +95,7 @@ struct memeq<8>
     }
 };
 
+
 template <int L>
 struct memeq
 {

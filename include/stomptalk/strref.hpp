@@ -62,7 +62,7 @@ public:
         , size_(text.size())
     {   }
 
-    strref(const char *data, std::size_t size) noexcept
+    constexpr strref(const char *data, std::size_t size) noexcept
         : ptr_(data)
         , size_(size)
     {   }

@@ -4,29 +4,29 @@
 #include <cstdint>
 
 namespace stomptalk {
+namespace method {
 
-struct method
+enum type
+    : std::size_t
 {
-    enum type
-        : std::size_t
-    {
-        none = 0,
-        ack,
-        nack,
-        send,
-        abort,
-        begin,
-        error,
-        commit,
-        connect,
-        message,
-        receipt,
-        subscribe,
-        connected,
-        disconnect,
-        unsubscribe,
-        unknown
-    };
+    none = 0,
+    ack,
+    nack,
+    send,
+    abort,
+    begin,
+    error,
+    commit,
+    connect,
+    message,
+    receipt,
+    subscribe,
+    connected,
+    disconnect,
+    unsubscribe,
+    unknown
+};
+
 };
 
 namespace tag {

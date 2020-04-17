@@ -90,10 +90,8 @@ const char* parser::method_state(parser_hook& hook,
         if (ch == '\r')
         {
             // определяем метод
-            auto text = sbuf_.pop();
-
             // вызываем каллбек
-            hook.on_method(text.data(), text.size());
+            hook.on_method(sbuf_.pop());
 
             // переходим к поиску конца метода
             state_fn_ = &parser::method_amost_done;
@@ -104,10 +102,8 @@ const char* parser::method_state(parser_hook& hook,
         else if (ch == '\n')
         {
             // определяем метод
-            auto text = sbuf_.pop();
-
             // вызываем каллбек
-            hook.on_method(text.data(), text.size());
+            hook.on_method(sbuf_.pop());
 
             // переходим к поиску конца метода
             state_fn_ = &parser::method_done;
@@ -174,17 +170,17 @@ const char* parser::method_done(parser_hook& hook,
         return curr;
     }
 
-    hook.on_hdrs_begin();
-
     state_fn_ = &parser::hdrline_hdr_key;
 
     return (curr < end) ?
         hdrline_hdr_key(hook, curr, end) : curr;
 }
 
-void parser::eval_header(const char* text, std::size_t size) noexcept
+void parser::eval_header(const strref& val) noexcept
 {
     header::mask::type rc;
+    auto text = val.data();
+    auto size = val.size();
     switch (size)
     {
         case (header::tag::size_of(header::tag::content_length())):
@@ -208,12 +204,12 @@ void parser::eval_header(const char* text, std::size_t size) noexcept
     }
 }
 
-void parser::eval_value(const char* text, std::size_t) noexcept
+void parser::eval_value(const strref& val) noexcept
 {
     if (heval_ == heval::content_length)
     {
         //content_len_ = str_to_uint64(text, size);
-        content_len_ = static_cast<std::uint64_t>(std::atoll(text));
+        content_len_ = static_cast<std::uint64_t>(std::atoll(val.data()));
     }
 }
 
@@ -230,10 +226,10 @@ const char* parser::hdrline_hdr_key(parser_hook& hook,
             auto text = sbuf_.pop();
 
             // определяем значимый ли хидер
-            eval_header(text.data(), text.size());
+            eval_header(text);
 
             // выполняем каллбек на хидер
-            hook.on_hdr_key(text.data(), text.size());
+            hook.on_hdr_key(text);
 
             state_fn_ = &parser::hdrline_val;
 
@@ -286,10 +282,9 @@ const char* parser::hdrline_val(parser_hook& hook,
             // сохраняем параметры стека
             auto text = sbuf_.pop();
 
-            eval_value(text.data(), text.size());
+            eval_value(text);
 
-            hook.on_hdr_val(text.data(), text.size());
-
+            hook.on_hdr_val(text);
 
             // переходим к поиску конца метода
             state_fn_ = &parser::hdrline_almost_done;
@@ -302,9 +297,9 @@ const char* parser::hdrline_val(parser_hook& hook,
             // сохраняем параметры стека
             auto text = sbuf_.pop();
 
-            eval_value(text.data(), text.size());
+            eval_value(text);
 
-            hook.on_hdr_val(text.data(), text.size());
+            hook.on_hdr_val(text);
 
             // переходим к поиску конца метода
             state_fn_ = &parser::hdrline_done;
@@ -332,9 +327,6 @@ const char* parser::hdrline_done(parser_hook& hook,
     // начала боди через
     if (ch == '\r')
     {
-        // выполняем каллбек на хидер
-        hook.on_hdrs_end();
-
         // переходим к поиску конца метода
         state_fn_ = &parser::almost_done;
 
@@ -343,9 +335,6 @@ const char* parser::hdrline_done(parser_hook& hook,
     }
     else if (ch == '\n')
     {
-        // выполняем каллбек на хидер
-        hook.on_hdrs_end();
-
         // переходим к поиску конца метода
         state_fn_ = &parser::done;
 
@@ -401,7 +390,7 @@ const char* parser::done(parser_hook& hook,
         ++curr;
 
         // закончили
-        hook.on_end();
+        hook.on_frame();
     }
     else
     {
@@ -455,7 +444,7 @@ const char* parser::body_read(parser_hook& hook,
     {
         content_len_ -= to_read;
 
-        hook.on_body(curr, to_read);
+        hook.on_body(strref(curr, to_read));
     }
 
     curr += to_read;
@@ -493,7 +482,7 @@ const char* parser::body_read_no_length(parser_hook& hook,
     if (to_read > 0)
     {
         // сообщаем о боди
-        hook.on_body(beg, to_read);
+        hook.on_body(strref(beg, to_read));
     }
 
     return curr;
@@ -503,7 +492,7 @@ const char* parser::frame_end(parser_hook& hook,
     const char* curr, const char *) noexcept
 {
     // закончили
-    hook.on_end();
+    hook.on_frame();
 
     state_fn_ = &parser::start_state;
 

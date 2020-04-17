@@ -74,8 +74,8 @@ public:
 
     bool push(char ch) noexcept;
 
-    void eval_header(const char* text, std::size_t size) noexcept;
-    void eval_value(const char* text, std::size_t size) noexcept;
+    void eval_header(const strref& val) noexcept;
+    void eval_value(const strref& val) noexcept;
 
 public:
     parser() = default;

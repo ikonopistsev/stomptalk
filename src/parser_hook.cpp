@@ -1,16 +1,11 @@
 #include "stomptalk/parser_hook.hpp"
-#include <iterator>
-#include <cassert>
-#include <iostream>
 
 namespace stomptalk {
 
-parser_hook::~parser_hook() noexcept
-{   }
-
-
-bool parser_hook::eval_method(const char* text, std::size_t size) noexcept
+bool parser_hook::eval_method(const strref& val) noexcept
 {
+    auto text = val.data();
+    auto size = val.size();
     switch (size)
     {
     case tag::size_of(tag::ack()):
@@ -48,47 +43,43 @@ bool parser_hook::eval_method(const char* text, std::size_t size) noexcept
     return false;
 }
 
+// вызываем каллбек
 void parser_hook::on_begin() noexcept
 {
-    std::cout << "on_begin" << std::endl;
+    hook_.on_hook_begin(*this);
 }
 
-void parser_hook::on_method(const char* text, std::size_t size) noexcept
+void parser_hook::on_method(const strref& text) noexcept
 {
-    if (!eval_method(text, size))
+    if (!eval_method(text))
         method_ = method::unknown;
 
-    std::cout << "on_method: " << std::string(text, size) << std::endl;
+    hook_.on_method(*this, text);
 }
 
-void parser_hook::on_hdrs_begin() noexcept
+void parser_hook::on_hdr_key(const strref& text) noexcept
 {
-    std::cout << "on_hdrs_begin" << std::endl;
+    hook_.on_hdr_key(*this, text);
 }
 
-void parser_hook::on_hdr_key(const char* text, std::size_t size) noexcept
+void parser_hook::on_hdr_val(const strref& text) noexcept
 {
-    std::cout << "\ton_hdr_key[" << size << "]: " << std::string(text, size) << std::endl;
+    hook_.on_hdr_val(*this, text);
 }
 
-void parser_hook::on_hdr_val(const char* text, std::size_t size) noexcept
+void parser_hook::on_body(const strref& text) noexcept
 {
-    std::cout << "\ton_hdr_val[" << size << "]: " << std::string(text, size) << std::endl;
+    hook_.on_body(*this, text);
 }
 
-void parser_hook::on_hdrs_end() noexcept
+void parser_hook::on_frame() noexcept
 {
-    std::cout << "on_hdrs_end" << std::endl;
+    hook_.on_hook_end(*this);
 }
 
-void parser_hook::on_body(const void *ptr, std::size_t size) noexcept
+void parser_hook::next_frame() noexcept
 {
-    std::cout << "\ton_body[" << size << "]: " << std::string(static_cast<const char*>(ptr), size) << std::endl;
-}
-
-void parser_hook::on_end() noexcept
-{
-    std::cout << "on_end" << std::endl << std::endl;
+    error_ = error::next_frame;
 }
 
 } // stomptalk

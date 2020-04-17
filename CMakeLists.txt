@@ -6,6 +6,7 @@ option(STOMPTALK_DEBUG "show debug" OFF)
 set(source
     src/parser.cpp
     src/parser_hook.cpp
+    src/user_hook.cpp
 )
 
 set(pub_header
