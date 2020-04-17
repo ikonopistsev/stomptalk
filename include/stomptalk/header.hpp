@@ -2,53 +2,59 @@
 
 #include "stomptalk/tag.hpp"
 #include "stomptalk/memeq.hpp"
-#include <functional>
+#include <string_view>
 
 namespace stomptalk {
 namespace header {
 
 class base
 {
-    strref key_{};
-    strref val_{};
+    std::string_view key_{};
+    std::string_view val_{};
 
 public:
     constexpr base() = default;
 
     template<std::size_t N>
-    explicit constexpr base(const cref<N>& key) noexcept
-        : key_(key)
+    explicit constexpr base(strref<N> key) noexcept
+        : key_(key.view())
     {   }
 
-    base(const strref& key, const strref& val) noexcept
+    template<std::size_t S1, std::size_t S2>
+    explicit constexpr base(strref<S1> key, strref<S2> val) noexcept
+        : key_(key.view())
+        , val_(val.view())
+    {   }
+
+    base(std::string_view key, std::string_view val) noexcept
         : key_(key)
         , val_(val)
     {   }
 
 
-    strref key() const noexcept
+    std::string_view key() const noexcept
     {
         return key_;
     }
 
-    strref value() const noexcept
+    std::string_view value() const noexcept
     {
         return val_;
     }
 
-    void set(strref val) noexcept
+    void set(const std::string_view& val) noexcept
     {
         val_ = val;
     }
 };
 
 template<std::size_t S1, std::size_t S2>
-static constexpr base make(cref<S1> key, cref<S2> val) noexcept
+static constexpr base make(strref<S1> key, strref<S2> val) noexcept
 {
     return base(key, val);
 }
 
-static inline base make(strref key, strref val) noexcept
+static inline base make(std::string_view key, std::string_view val) noexcept
 {
     return base(key, val);
 }
@@ -64,8 +70,8 @@ public:
     {   }
 
     template<std::size_t N>
-    explicit constexpr basic(const cref<N>& ref) noexcept
-        : base(strref(T::name()), strref(ref))
+    explicit constexpr basic(strref<N> ref) noexcept
+        : base(T::name(), ref)
     {   }
 };
 
@@ -80,14 +86,6 @@ constexpr std::size_t id_of(const basic<T>&) noexcept
 {
     return T::id;
 }
-
-template <std::size_t N>
-constexpr const char* value_from(const cref<N>& c) noexcept
-{
-    return c.data();
-}
-
-
 
 typedef basic<tag::content_type> content_type;
 typedef basic<tag::content_length> content_length;

@@ -40,20 +40,20 @@ namespace tag {
 struct content_length {
     static constexpr auto id = mask::content_length;
     static constexpr auto name() noexcept {
-        return mkref("content-length");
+        return make_ref("content-length");
     }
 };
 
 struct content_type {
     static constexpr auto id = mask::content_type;
     static constexpr auto name() noexcept {
-        return mkref("content-type");
+        return make_ref("content-type");
     }
     static constexpr auto text() noexcept {
-        return mkref("text/plain");
+        return make_ref("text/plain");
     }
     static constexpr auto json() noexcept {
-        return mkref("application/json");
+        return make_ref("application/json");
     }
 };
 

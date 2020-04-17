@@ -26,19 +26,14 @@ void parser::clear() noexcept
     sbuf_.reset();
 }
 
-static inline std::size_t distance(const char* begin, const char* end) noexcept
-{
-    return static_cast<std::size_t>(end - begin);
-}
-
 static inline bool ch_isupper(char ch) noexcept
 {
     return ('A' <= ch) && (ch <= 'Z');
     //return 0 == std::isupper(ch);
 }
 
-const char* parser::start_state(parser_hook& hook,
-    const char* curr, const char *end) noexcept
+parser::pointer parser::start_state(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     do {
 
@@ -59,7 +54,7 @@ const char* parser::start_state(parser_hook& hook,
         hook.set(parser_hook::content::none);
 
         // вызываем каллбек
-        hook.on_begin();
+        hook.on_frame();
 
         // сохраняем стек
         if (!sbuf_.push(ch))
@@ -81,8 +76,8 @@ const char* parser::start_state(parser_hook& hook,
     return curr;
 }
 
-const char* parser::method_state(parser_hook& hook,
-    const char* curr, const char *end) noexcept
+parser::pointer parser::method_state(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     do {
         auto ch = *curr++;
@@ -127,8 +122,8 @@ const char* parser::method_state(parser_hook& hook,
     return curr;
 }
 
-const char* parser::method_amost_done(parser_hook& hook,
-    const char* curr, const char* end) noexcept
+parser::pointer parser::method_amost_done(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     if (*curr++ != '\n')
     {
@@ -153,8 +148,8 @@ static inline bool ch_isprint_nospace(char ch) noexcept
     return (ch > 32) && (ch <= 126);
 }
 
-const char* parser::method_done(parser_hook& hook,
-    const char* curr, const char* end) noexcept
+parser::pointer parser::method_done(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     auto ch = *curr++;
 
@@ -176,7 +171,7 @@ const char* parser::method_done(parser_hook& hook,
         hdrline_hdr_key(hook, curr, end) : curr;
 }
 
-void parser::eval_header(const strref& val) noexcept
+void parser::eval_header(std::string_view val) noexcept
 {
     header::mask::type rc;
     auto text = val.data();
@@ -204,7 +199,7 @@ void parser::eval_header(const strref& val) noexcept
     }
 }
 
-void parser::eval_value(const strref& val) noexcept
+void parser::eval_value(std::string_view val) noexcept
 {
     if (heval_ == heval::content_length)
     {
@@ -213,8 +208,8 @@ void parser::eval_value(const strref& val) noexcept
     }
 }
 
-const char* parser::hdrline_hdr_key(parser_hook& hook,
-    const char* curr, const char* end) noexcept
+parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     do
     {
@@ -271,8 +266,8 @@ const char* parser::hdrline_hdr_key(parser_hook& hook,
     return curr;
 }
 
-const char* parser::hdrline_val(parser_hook& hook,
-    const char* curr, const char *end) noexcept
+parser::pointer parser::hdrline_val(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     do {
         auto ch = *curr++;
@@ -319,8 +314,8 @@ const char* parser::hdrline_val(parser_hook& hook,
     return curr;
 }
 
-const char* parser::hdrline_done(parser_hook& hook,
-    const char* curr, const char* end) noexcept
+parser::pointer parser::hdrline_done(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     auto ch = *curr++;
 
@@ -360,8 +355,8 @@ const char* parser::hdrline_done(parser_hook& hook,
     return curr;
 }
 
-const char* parser::hdrline_almost_done(parser_hook& hook,
-    const char* curr, const char* end) noexcept
+parser::pointer parser::hdrline_almost_done(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     if (*curr++ != '\n')
     {
@@ -376,8 +371,8 @@ const char* parser::hdrline_almost_done(parser_hook& hook,
         hdrline_done(hook, curr, end) : curr;
 }
 
-const char* parser::done(parser_hook& hook,
-    const char* curr, const char* end) noexcept
+parser::pointer parser::done(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     auto ch = *curr;
 
@@ -390,7 +385,7 @@ const char* parser::done(parser_hook& hook,
         ++curr;
 
         // закончили
-        hook.on_frame();
+        hook.on_frame_end();
     }
     else
     {
@@ -416,8 +411,8 @@ const char* parser::done(parser_hook& hook,
 }
 
 
-const char* parser::almost_done(parser_hook& hook,
-    const char* curr, const char* end) noexcept
+parser::pointer parser::almost_done(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     if (*curr++ != '\n')
     {
@@ -432,10 +427,10 @@ const char* parser::almost_done(parser_hook& hook,
         done(hook, curr, end) : curr;
 }
 
-const char* parser::body_read(parser_hook& hook,
-    const char* curr, const char *end) noexcept
+parser::pointer parser::body_read(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
-    auto to_read = distance(curr, end);
+    auto to_read = std::distance(curr, end);
 
     to_read = static_cast<std::size_t>(
         (std::min)(static_cast<std::uint64_t>(to_read), content_len_));
@@ -444,7 +439,7 @@ const char* parser::body_read(parser_hook& hook,
     {
         content_len_ -= to_read;
 
-        hook.on_body(strref(curr, to_read));
+        hook.on_body(curr, to_read);
     }
 
     curr += to_read;
@@ -460,8 +455,8 @@ const char* parser::body_read(parser_hook& hook,
     return curr;
 }
 
-const char* parser::body_read_no_length(parser_hook& hook,
-    const char* curr, const char *end) noexcept
+parser::pointer parser::body_read_no_length(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
 {
     const char *beg = curr;
 
@@ -477,22 +472,22 @@ const char* parser::body_read_no_length(parser_hook& hook,
     } while (curr < end);
 
     // считаем количество данных боди
-    auto to_read = distance(beg, curr);
+    auto to_read = std::distance(beg, curr);
 
     if (to_read > 0)
     {
         // сообщаем о боди
-        hook.on_body(strref(beg, to_read));
+        hook.on_body(beg, to_read);
     }
 
     return curr;
 }
 
-const char* parser::frame_end(parser_hook& hook,
-    const char* curr, const char *) noexcept
+parser::pointer parser::frame_end(parser_hook& hook,
+    parser::pointer curr, parser::pointer) noexcept
 {
     // закончили
-    hook.on_frame();
+    hook.on_frame_end();
 
     state_fn_ = &parser::start_state;
 
@@ -518,7 +513,7 @@ std::size_t parser::run(parser_hook& hook,
             break;
     }
 
-    return distance(begin, curr);
+    return static_cast<std::size_t>(std::distance(begin, curr));
 }
 
 } // namespace stomptalk

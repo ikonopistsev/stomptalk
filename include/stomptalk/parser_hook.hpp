@@ -5,10 +5,6 @@
 namespace stomptalk {
 
 class parser;
-
-template<class T>
-class hookfn;
-
 class parser_hook
 {
 public:
@@ -43,16 +39,18 @@ public:
     };
 
 protected:
-    user_hook hook_{};
+    hook_base& hook_;
     method::type method_{method::unknown};
     error::type error_{error::none};
     content::type content_type_{content::none};
     std::int64_t content_len_{};
 
-    bool eval_method(const strref& val) noexcept;
+    bool eval_method(std::string_view val) noexcept;
 
 public:
-    parser_hook() = default;
+    parser_hook(hook_base& hook)
+        : hook_(hook)
+    {   }
 
     void set(error::type value) noexcept
     {
@@ -62,17 +60,6 @@ public:
     void set(content::type value) noexcept
     {
         content_type_ = value;
-    }
-
-    void set(const user_hook& hook) noexcept
-    {
-        hook_ = hook;
-    }
-
-    template<class T>
-    void set(const T& hook)
-    {
-        hook.apply(*this);
     }
 
     bool ok() const noexcept
@@ -100,17 +87,35 @@ public:
         content_len_ = content_length;
     }
 
-    void on_begin() noexcept;
+    void on_frame() noexcept
+    {
+        hook_.on_frame(*this);
+    }
 
-    void on_method(const strref& val) noexcept;
+    void on_method(std::string_view text) noexcept
+    {
+        hook_.on_method(*this, std::move(text));
+    }
 
-    void on_hdr_key(const strref& val) noexcept;
+    void on_hdr_key(std::string_view text) noexcept
+    {
+        hook_.on_hdr_key(*this, std::move(text));
+    }
 
-    void on_hdr_val(const strref& val) noexcept;
+    void on_hdr_val(std::string_view text) noexcept
+    {
+        hook_.on_hdr_val(*this, std::move(text));
+    }
 
-    void on_body(const strref& val) noexcept;
+    void on_body(const void* ptr, std::size_t size) noexcept
+    {
+        hook_.on_body(*this, ptr, size);
+    }
 
-    void on_frame() noexcept;
+    void on_frame_end() noexcept
+    {
+        hook_.on_frame_end(*this);
+    }
 
     void next_frame() noexcept;
 };

@@ -2,7 +2,7 @@
 
 namespace stomptalk {
 
-bool parser_hook::eval_method(const strref& val) noexcept
+bool parser_hook::eval_method(std::string_view val) noexcept
 {
     auto text = val.data();
     auto size = val.size();
@@ -41,40 +41,6 @@ bool parser_hook::eval_method(const strref& val) noexcept
     }
 
     return false;
-}
-
-// вызываем каллбек
-void parser_hook::on_begin() noexcept
-{
-    hook_.on_hook_begin(*this);
-}
-
-void parser_hook::on_method(const strref& text) noexcept
-{
-    if (!eval_method(text))
-        method_ = method::unknown;
-
-    hook_.on_method(*this, text);
-}
-
-void parser_hook::on_hdr_key(const strref& text) noexcept
-{
-    hook_.on_hdr_key(*this, text);
-}
-
-void parser_hook::on_hdr_val(const strref& text) noexcept
-{
-    hook_.on_hdr_val(*this, text);
-}
-
-void parser_hook::on_body(const strref& text) noexcept
-{
-    hook_.on_body(*this, text);
-}
-
-void parser_hook::on_frame() noexcept
-{
-    hook_.on_hook_end(*this);
 }
 
 void parser_hook::next_frame() noexcept

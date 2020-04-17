@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include "stomptalk/strref.hpp"
+#include <string_view>
 
 namespace stomptalk {
 
@@ -14,11 +14,14 @@ class stackbuf
 public:
     stackbuf() = default;
 
-    strref pop() noexcept
+    std::string_view pop() noexcept
     {
-        auto size = static_cast<std::size_t>(curr_ - buf_);
+        std::string_view rc(buf_,
+            std::distance(buf_, curr_));
+
         curr_ = buf_;
-        return strref(buf_, size);
+
+        return rc;
     }
 
     void reset() noexcept

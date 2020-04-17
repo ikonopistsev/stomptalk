@@ -1,7 +1,6 @@
 #pragma once
 
 #include "stomptalk/strref.hpp"
-#include <cstdint>
 
 namespace stomptalk {
 namespace method {
@@ -34,91 +33,91 @@ namespace tag {
 struct ack {
     static constexpr auto id = method::ack;
     static constexpr auto name() noexcept {
-        return mkref("ACK");
+        return make_ref("ACK");
     }
 };
 
 struct nack {
     static constexpr auto id = method::nack;
     static constexpr auto name() noexcept {
-        return mkref("NACK");
+        return make_ref("NACK");
     }
 };
 
 struct send {
     static constexpr auto id = method::send;
     static constexpr auto name() noexcept {
-        return mkref("SEND");
+        return make_ref("SEND");
     }
 };
 
 struct abort {
     static constexpr auto id = method::abort;
     static constexpr auto name() noexcept {
-        return mkref("ABORT");
+        return make_ref("ABORT");
     }
 };
 
 struct begin {
     static constexpr auto id = method::begin;
     static constexpr auto name() noexcept {
-        return mkref("BEGIN");
+        return make_ref("BEGIN");
     }
 };
 
 struct commit {
     static constexpr auto id = method::commit;
     static constexpr auto name() noexcept {
-        return mkref("COMMIT");
+        return make_ref("COMMIT");
     }
 };
 
 struct connect {
     static constexpr auto id = method::connect;
     static constexpr auto name() noexcept {
-        return mkref("CONNECT");
+        return make_ref("CONNECT");
     }
 };
 
 struct message {
     static constexpr auto id = method::message;
     static constexpr auto name() noexcept {
-        return mkref("MESSAGE");
+        return make_ref("MESSAGE");
     }
 };
 
 struct receipt {
     static constexpr auto id = method::receipt;
     static constexpr auto name() noexcept {
-        return mkref("RECEIPT");
+        return make_ref("RECEIPT");
     }
 };
 
 struct connected {
     static constexpr auto id = method::connected;
     static constexpr auto name() noexcept {
-        return mkref("CONNECTED");
+        return make_ref("CONNECTED");
     }
 };
 
 struct subscribe {
     static constexpr auto id = method::subscribe;
     static constexpr auto name() noexcept {
-        return mkref("SUBSCRIBE");
+        return make_ref("SUBSCRIBE");
     }
 };
 
 struct disconnect {
     static constexpr auto id = method::disconnect;
     static constexpr auto name() noexcept {
-        return mkref("DISCONNECT");
+        return make_ref("DISCONNECT");
     }
 };
 
 struct unsubscribe {
     static constexpr auto id = method::unsubscribe;
     static constexpr auto name() noexcept {
-        return mkref("UNSUBSCRIBE");
+        return make_ref("UNSUBSCRIBE");
     }
 };
 

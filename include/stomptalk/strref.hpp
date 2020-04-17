@@ -1,20 +1,20 @@
 #pragma once
 
 #include "stomptalk/memeq.hpp"
-#include <string>
+#include <ostream>
 
 namespace stomptalk {
 
 template <std::size_t N>
-class cref
+class strref
 {
-    const char* ptr_;
+    const char* ptr_{""};
 
 public:
-    constexpr cref(const cref&) = default;
-    constexpr cref& operator=(const cref&) = default;
+    constexpr strref(const strref&) = default;
+    constexpr strref& operator=(const strref&) = default;
 
-    constexpr explicit cref(const char (&text)[N]) noexcept
+    constexpr explicit strref(const char (&text)[N]) noexcept
         : ptr_{text}
     {   }
 
@@ -27,78 +27,44 @@ public:
     {
         return N - 1;
     }
+
+    constexpr std::string_view view() noexcept
+    {
+        return std::string_view(data(), size());
+    }
 };
 
 template <std::size_t N>
-constexpr auto mkref(const char (&text)[N]) noexcept
+constexpr auto make_ref(const char (&text)[N]) noexcept
 {
-    return cref<N>(text);
+    return strref<N>(text);
 }
 
 template <std::size_t N>
-static constexpr std::size_t size_of(const cref<N>&) noexcept
+constexpr auto make_view(const char (&text)[N]) noexcept
+{
+    return std::string_view(text, N - 1);
+}
+
+template <std::size_t N>
+static constexpr std::size_t size_of(strref<N>) noexcept
 {
     return N - 1;
 }
 
 template <std::size_t N>
-static constexpr bool equals(const cref<N>& ref, const char *text) noexcept
+static constexpr bool equals(strref<N> ref, const char *text) noexcept
 {
     return memeq<size_of(ref)>::cmp(ref.data(), text);
 }
-
-class strref
-{
-    const char* ptr_{ "" };
-    std::size_t size_{ 0 };
-
-public:
-    constexpr strref() = default;
-    constexpr strref(const strref&) = default;
-
-    template<std::size_t N>
-    explicit constexpr strref(const cref<N>& text) noexcept
-        : ptr_(text.data())
-        , size_(text.size())
-    {   }
-
-    constexpr strref(const char *data, std::size_t size) noexcept
-        : ptr_(data)
-        , size_(size)
-    {   }
-
-    constexpr const char* data() const noexcept
-    {
-        return ptr_;
-    }
-
-    constexpr std::size_t size() const noexcept
-    {
-        return size_;
-    }
-
-    constexpr bool empty() const noexcept
-    {
-        return 0 == size();
-    }
-
-    void print(std::string& out) const;
-};
 
 } // namespace stomptalk
 
 #include <ostream>
 
-template<class C, class T>
-std::basic_ostream<C, T>& operator<<(std::basic_ostream<C, T>& os,
-    const stomptalk::strref& ref)
-{
-    return os.write(ref.data(), ref.size());
-}
-
 template<class C, class T, std::size_t N>
 constexpr std::basic_ostream<C, T>& operator<<(std::basic_ostream<C, T>& os,
-    const stomptalk::cref<N>& ref)
+    stomptalk::strref<N>ref)
 {
     return os.write(ref.data(), N - 1);
 }
