@@ -28,7 +28,7 @@ public:
         return N - 1;
     }
 
-    constexpr std::string_view view() noexcept
+    constexpr operator std::string_view() const noexcept
     {
         return std::string_view(data(), size());
     }
