@@ -34,12 +34,6 @@ public:
     pointer method_state(parser_hook& hook,
         pointer curr, pointer end) noexcept;
 
-    pointer method_amost_done(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer method_done(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
     pointer hdrline_hdr_key(parser_hook& hook,
         pointer curr, pointer end) noexcept;
 

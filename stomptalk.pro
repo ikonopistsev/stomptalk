@@ -33,7 +33,10 @@ CONFIG(release, debug|release) {
 
 #DEFINES += __AVX__ __AVX2__
 
+QMAKE_CXXFLAGS_RELEASE += "-O3 -march=native"
+QMAKE_LFLAGS_RELEASE += "-O3 -march=native"
+
 #QMAKE_CFLAGS_RELEASE += "-march=znver1 -mavx2 -O3 -fpie -fomit-frame-pointer -fno-common -fno-zero-initialized-in-bss"
-QMAKE_CXXFLAGS_RELEASE += "-march=znver1 -mavx2 -O3"
+#QMAKE_CXXFLAGS_RELEASE += "-march=znver1 -mavx2 -O3"
 #QMAKE_LFLAGS+="-march=znver1 -mavx2"
 

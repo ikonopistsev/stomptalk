@@ -89,10 +89,10 @@ parser::pointer parser::method_state(parser_hook& hook,
             hook.on_method(sbuf_.pop());
 
             // переходим к поиску конца метода
-            state_fn_ = &parser::method_amost_done;
+            state_fn_ = &parser::hdrline_almost_done;
 
             return (curr < end) ?
-                method_amost_done(hook, curr, end) : curr;
+                hdrline_almost_done(hook, curr, end) : curr;
         }
         else if (ch == '\n')
         {
@@ -101,10 +101,10 @@ parser::pointer parser::method_state(parser_hook& hook,
             hook.on_method(sbuf_.pop());
 
             // переходим к поиску конца метода
-            state_fn_ = &parser::method_done;
+            state_fn_ = &parser::hdrline_done;
 
             return (curr < end) ?
-                method_done(hook, curr, end) : curr;
+                hdrline_done(hook, curr, end) : curr;
         }
         else if (!ch_isupper(ch))
         {
@@ -122,53 +122,14 @@ parser::pointer parser::method_state(parser_hook& hook,
     return curr;
 }
 
-parser::pointer parser::method_amost_done(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    if (*curr++ != '\n')
-    {
-        hook.set(parser_hook::error::inval_reqline);
-        return  curr;
-    }
-
-    // переходим к поиску конца метода
-    state_fn_ = &parser::method_done;
-
-    return (curr < end) ?
-        method_done(hook, curr, end) : curr;
-}
-
-static inline bool ch_isprint(char ch) noexcept
-{
-    return (ch > 32) && (ch <= 126);
-}
+//static inline bool ch_isprint(char ch) noexcept
+//{
+//    return (ch >= 32) && (ch <= 126);
+//}
 
 static inline bool ch_isprint_nospace(char ch) noexcept
 {
     return (ch > 32) && (ch <= 126);
-}
-
-parser::pointer parser::method_done(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    auto ch = *curr++;
-
-    if (!ch_isprint_nospace(ch))
-    {
-        hook.set(parser_hook::error::inval_reqline);
-        return curr;
-    }
-
-    if (!sbuf_.push(ch))
-    {
-        hook.set(parser_hook::error::too_big);
-        return curr;
-    }
-
-    state_fn_ = &parser::hdrline_hdr_key;
-
-    return (curr < end) ?
-        hdrline_hdr_key(hook, curr, end) : curr;
 }
 
 void parser::eval_header(std::string_view val) noexcept
