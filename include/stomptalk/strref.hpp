@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stomptalk/memeq.hpp"
-#include <ostream>
+#include <string_view>
 
 namespace stomptalk {
 

@@ -94,6 +94,9 @@ public:
 
     void on_method(std::string_view text) noexcept
     {
+        if (!eval_method(text))
+            method_ = method::unknown;
+
         hook_.on_method(*this, std::move(text));
     }
 

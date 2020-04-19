@@ -313,7 +313,10 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
 
     state_fn_ = &parser::hdrline_hdr_key;
 
-    return curr;
+    return (curr < end) ?
+        hdrline_hdr_key(hook, curr, end) : curr;
+
+//    return curr;
 }
 
 parser::pointer parser::hdrline_almost_done(parser_hook& hook,

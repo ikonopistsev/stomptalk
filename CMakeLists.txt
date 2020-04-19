@@ -3,10 +3,12 @@ project(stomptalk VERSION 0.0.2 DESCRIPTION "stomp protocol parser")
 
 option(STOMPTALK_DEBUG "show debug" OFF)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(source
     src/parser.cpp
     src/parser_hook.cpp
-    src/user_hook.cpp
 )
 
 set(pub_header

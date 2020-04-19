@@ -34,9 +34,9 @@ class hook_fn final
     : public  hook_base
 {
 public:
-    typedef void (T::*frame_fn)(parser_hook&);
-    typedef void (T::*header_fn)(parser_hook&, std::string_view);
-    typedef void (T::*body_fn)(parser_hook&, const void*, std::size_t);
+    typedef void (T::*frame_fn)(parser_hook&) noexcept;
+    typedef void (T::*header_fn)(parser_hook&, std::string_view) noexcept;
+    typedef void (T::*body_fn)(parser_hook&, const void*, std::size_t) noexcept;
 
 private:
     T& that_;
@@ -82,10 +82,13 @@ private:
     }
 
 public:
-    hook_fn(T& that, frame_fn frame,
-           header_fn method, header_fn hdr_key,
-           header_fn hdr_val, body_fn body,
-           frame_fn frame_end) noexcept
+    hook_fn(T& that,
+            frame_fn frame,
+            header_fn method,
+            header_fn hdr_key,
+            header_fn hdr_val,
+            body_fn body,
+            frame_fn frame_end) noexcept
         : that_(that)
         , frame_(frame)
         , method_(method)
