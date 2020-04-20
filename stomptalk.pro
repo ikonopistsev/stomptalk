@@ -2,7 +2,7 @@ TEMPLATE = lib
 TARGET = stomptalk
 
 CONFIG -= qt
-CONFIG += object_parallel_to_source c++17 console warn_on
+CONFIG += object_parallel_to_source c++17 console warn_on static
 CONFIG -= app_bundle
 
 SOURCES += \
