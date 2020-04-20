@@ -1,17 +1,12 @@
 TEMPLATE = lib
 TARGET = stomptalk
 
-CONFIG += object_parallel_to_source static c++17
 CONFIG -= qt
+CONFIG += object_parallel_to_source c++17 console warn_on
+CONFIG -= app_bundle
 
 SOURCES += \
     src/parser.cpp \
-#    src/content.cpp \
-#    src/frame_base.cpp \
-#    src/header_base.cpp \
-#    src/header.cpp \
-#    src/strref.cpp \
-#    src/v12.cpp \
     src/parser_hook.cpp
 
 HEADERS += \
@@ -30,8 +25,6 @@ INCLUDEPATH += include
 CONFIG(release, debug|release) {
     DEFINES += NDEBUG
 }
-
-#DEFINES += __AVX__ __AVX2__
 
 QMAKE_CXXFLAGS_RELEASE += "-O3 -march=native"
 QMAKE_LFLAGS_RELEASE += "-O3 -march=native"
