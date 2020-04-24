@@ -47,7 +47,7 @@ struct antoull
             return val[9] + antoull<N - 1>::conv(ptr);
         }
 
-        return -std::numeric_limits<std::int64_t>::max();
+        return std::numeric_limits<std::int64_t>::min();
     }
 };
 
@@ -83,7 +83,7 @@ struct antoull<1>
                 return 9;
         }
 
-        return -std::numeric_limits<std::int64_t>::max();
+        return std::numeric_limits<std::int64_t>::min();
     }
 };
 
