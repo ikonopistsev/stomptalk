@@ -95,6 +95,8 @@ static inline std::int64_t antoull(const char *ptr, std::size_t n) noexcept
 {
     switch (n)
     {
+    case 0x10:
+        return detail::antoull<0x10>::conv(ptr);
     case 0x0f:
         return detail::antoull<0x0f>::conv(ptr);
     case 0x0e:
