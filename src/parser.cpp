@@ -1,6 +1,7 @@
 #include "stomptalk/parser.hpp"
 #include "stomptalk/header.hpp"
 #include "stomptalk/parser_hook.hpp"
+#include "stomptalk/antoull.hpp"
 #include <cstring>
 #include <cassert>
 
@@ -164,8 +165,9 @@ void parser::eval_value(std::string_view val) noexcept
 {
     if (heval_ == heval::content_length)
     {
-        //content_len_ = str_to_uint64(text, size);
-        content_len_ = static_cast<std::uint64_t>(std::atoll(val.data()));
+        auto content_len = antoull(val.data(), val.size());
+        if (content_len > 0ll)
+            content_len_ = static_cast<std::uint64_t>(content_len);
     }
 }
 

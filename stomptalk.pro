@@ -7,7 +7,9 @@ CONFIG -= app_bundle
 
 SOURCES += \
     src/parser.cpp \
-    src/parser_hook.cpp
+    src/parser_hook.cpp \
+    src/v12.cpp \
+    src/frame_base.cpp
 
 HEADERS += \
     include/stomptalk/header.hpp \
@@ -18,9 +20,14 @@ HEADERS += \
     include/stomptalk/parser_hook.hpp \
     include/stomptalk/method.hpp \
     include/stomptalk/stackbuf.hpp \
-    include/stomptalk/user_hook.hpp
+    include/stomptalk/user_hook.hpp \
+    include/stomptalk/validator.hpp \
+    include/stomptalk/v12.hpp \
+    include/stomptalk/rabbitmq.hpp \
+    include/stomptalk/antoull.hpp
 
-INCLUDEPATH += include
+INCLUDEPATH += include \
+    ..
 
 CONFIG(release, debug|release) {
     DEFINES += NDEBUG

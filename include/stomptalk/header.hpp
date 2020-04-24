@@ -7,7 +7,44 @@
 namespace stomptalk {
 namespace header {
 
+template<class K, class V>
 class base
+{
+    K key_{};
+    K val_{};
+
+public:
+    base() = default;
+
+    explicit base(K key) noexcept
+        : key_(std::move(key))
+    {   }
+
+    base(K key, V val) noexcept
+        : key_(std::move(key))
+        , val_(std::move(val))
+    {   }
+
+    const K& key() const noexcept
+    {
+        return key_;
+    }
+
+    const V& value() const noexcept
+    {
+        return val_;
+    }
+
+    void set(V val) noexcept
+    {
+        val_ = std::move(val);
+    }
+};
+
+typedef base<std::string, std::string> custom;
+
+template<>
+class base<std::string_view, std::string_view>
 {
     std::string_view key_{};
     std::string_view val_{};
@@ -38,26 +75,32 @@ public:
     {
         val_ = val;
     }
+
+    constexpr operator bool() const noexcept
+    {
+        return !val_.empty();
+    }
 };
 
-constexpr static inline base make(std::string_view key,
-                                  std::string_view val) noexcept
-{
-    return base(key, val);
-}
+typedef base<std::string_view, std::string_view> fixed;
 
+constexpr static inline base<std::string_view, std::string_view>
+    make(std::string_view key, std::string_view val) noexcept
+{
+    return base<std::string_view, std::string_view>(key, val);
+}
 
 template<class T>
 class basic
-    : public base
+    : public fixed
 {
 public:
     constexpr explicit basic() noexcept
-        : base(T::name())
+        : fixed(T::name())
     {   }
 
     explicit constexpr basic(std::string_view val) noexcept
-        : base(T::name(), val)
+        : fixed(T::name(), val)
     {   }
 };
 
@@ -75,13 +118,43 @@ constexpr std::size_t id_of(const basic<T>&) noexcept
 
 typedef basic<tag::content_type> content_type;
 typedef basic<tag::content_length> content_length;
+typedef basic<tag::heart_beat> heart_beat;
+typedef basic<tag::accept_version> accept_version;
+typedef basic<tag::host> host;
+typedef basic<tag::login> login;
+typedef basic<tag::passcode> passcode;
+typedef basic<tag::destination> destination;
+typedef basic<tag::message_id> message_id;
+typedef basic<tag::subscription> subscription;
+typedef basic<tag::ack> ack;
+typedef basic<tag::id> id;
+typedef basic<tag::receipt> receipt;
+
+constexpr static accept_version ver12() noexcept {
+    return accept_version(tag::accept_version::v12());
+}
+
+constexpr static ack client_individual() noexcept {
+    return ack(tag::ack::client_individual());
+}
+
+constexpr static ack client() noexcept {
+    return ack(tag::ack::client());
+}
 
 } // namespace header
 } // namespace stomptalk
 
-template<class C, class T>
+template<class C, class T, class V>
 std::basic_ostream<C, T>& operator<<(std::basic_ostream<C, T>& os,
-    const stomptalk::header::base& h)
+    stomptalk::header::custom hdr)
 {
-    return os << h.key() << '=' << h.value();
+    return os << hdr.key() << '=' << hdr.value();
+}
+
+template<class C, class T, class V>
+constexpr std::basic_ostream<C, T>& operator<<(std::basic_ostream<C, T>& os,
+    stomptalk::header::fixed hdr)
+{
+    return os << hdr.key() << '=' << hdr.value();
 }

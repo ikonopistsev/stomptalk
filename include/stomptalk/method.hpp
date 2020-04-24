@@ -138,5 +138,12 @@ static constexpr bool detect_method_id(method::type& rc,
     return res;
 }
 
+template <class T>
+static constexpr bool equal(const T&, const char *text)
+{
+    constexpr auto name = T::name();
+    return memeq<size_of(name)>::cmp(name.data(), text);
+}
+
 } // namespace tag
 } // namespace stomptalk

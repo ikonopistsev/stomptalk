@@ -1,44 +1,31 @@
 #include "stomptalk/v12.hpp"
-#include "mkstr.hpp"
+#include "stomptalk/header.hpp"
 
 namespace stomptalk {
 
 namespace cmd {
 namespace name {
 
-static const auto stomp(mkstr(std::cref("STOMP")));
-static const auto connect(mkstr(std::cref("CONNECT")));
-static const auto send(mkstr(std::cref("SEND")));
-static const auto subscribe(mkstr(std::cref("SUBSCRIBE")));
-static const auto unsubscribe(mkstr(std::cref("UNSUBSCRIBE")));
-static const auto ack(mkstr(std::cref("ACK")));
-static const auto nack(mkstr(std::cref("NACK")));
-static const auto begin(mkstr(std::cref("BEGIN")));
-static const auto commit(mkstr(std::cref("COMMIT")));
-static const auto abort(mkstr(std::cref("ABORT")));
+static const auto stomp = make_ref("STOMP");
+static const auto connect = make_ref("CONNECT");
+static const auto send = make_ref("SEND");
+static const auto subscribe = make_ref("SUBSCRIBE");
+static const auto unsubscribe = make_ref("UNSUBSCRIBE");
+static const auto ack = make_ref("ACK");
+static const auto nack = make_ref("NACK");
+static const auto begin = make_ref("BEGIN");
+static const auto commit = make_ref("COMMIT");
+static const auto abort = make_ref("ABORT");
 } // namespace name
 } // namespace cmd
 
 namespace v12 {
 
-heart_beat::heart_beat(std::size_t cx, std::size_t cy)
-    : cx_(cx)
-    , cy_(cy)
-{   }
-
-void heart_beat::apply(frame_base& frame) const
-{
-    auto t = std::to_string(cx_);
-    t += ',';
-    t += std::to_string(cy_);
-    frame.push(header::heart_beat(t));
-}
-
 connect::connect(const std::string& host, std::size_t size_reserve)
 {
     reserve(size_reserve);
-    print(cmd::name::connect);
-    push(header::accept_version("1.2"));
+    push_ref(cmd::name::connect);
+    push(header::ver12());
     push(header::host(host));
 }
 
@@ -46,8 +33,8 @@ connect::connect(const std::string& host,
     const std::string& login, std::size_t size_reserve)
 {
     reserve(size_reserve);
-    print(cmd::name::connect);
-    push(header::accept_version("1.2"));
+    push_ref(cmd::name::connect);
+    push(header::ver12());
     push(header::host(host));
     push(header::login(login));
 }
@@ -56,11 +43,24 @@ connect::connect(const std::string& host, const std::string& login,
     const std::string& passcode, std::size_t size_reserve)
 {
     reserve(size_reserve);
-    print(cmd::name::connect);
-    push(header::accept_version("1.2"));
+    push_ref(cmd::name::connect);
+    push(header::ver12());
     push(header::host(host));
     push(header::login(login));
     push(header::passcode(passcode));
+}
+
+//SUBSCRIBE
+//    REQUIRED: destination, id
+//    OPTIONAL: ack
+
+subscribe::subscribe(const std::string& destination,
+    const std::string& id, std::size_t size_reserve)
+{
+    reserve(size_reserve);
+    push_ref(cmd::name::subscribe);
+    push(header::destination(destination));
+    push(header::id(id));
 }
 
 //SEND
@@ -70,7 +70,7 @@ connect::connect(const std::string& host, const std::string& login,
 send::send(const std::string& dest, std::size_t size_reserve)
 {
     reserve(size_reserve);
-    print(cmd::name::send);
+    push_ref(cmd::name::send);
     push(header::destination(dest));
 }
 

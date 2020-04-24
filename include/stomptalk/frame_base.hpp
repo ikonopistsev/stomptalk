@@ -1,48 +1,40 @@
 #pragma once
 
 #include "stomptalk/header.hpp"
-#include "stomptalk/content.hpp"
-#include "stomptalk/frame_base_fwd.hpp"
-#include <iostream>
+
+#include "btpro/buffer.hpp"
 
 namespace stomptalk {
 
 class frame_base
 {
-    std::string buffer_{};
+    btpro::buffer buffer_{};
 
 protected:
+    void push_ref(std::string_view text);
+
     void reserve(std::size_t size);
 
-    void print(const std::string& text);
-
-    void br();
+    void push(std::string_view text);
 
 public:
 
     frame_base() = default;
 
     // выставить хидер
-    void push(const header::base& header);
+    void push(header::fixed header);
 
-    // дописать контент
-    void append(const std::string& conent);
-
-    template<class T>
-    void write(T& out)
+    std::string str() const
     {
-        br();
-        out << buffer_;
+        return buffer_.str();
     }
 
-    template<class T>
-    void write(T& out, const content& val)
+    template<class B>
+    void write(B& output)
     {
-        val.apply(*this);
-        out << buffer_;
+        buffer_.append(std::cref("\n\0"));
+        output.write(std::move(buffer_));
     }
-
-    std::size_t size() const noexcept;
 };
 
 } // namespace stomptalk

@@ -1,40 +1,31 @@
 #include "stomptalk/frame_base.hpp"
-#include "mkstr.hpp"
+#include "stomptalk/strref.hpp"
 
 namespace stomptalk {
 
+void frame_base::push_ref(std::string_view text)
+{
+    buffer_.append_ref(text.data(), text.size())
+        .append_ref(std::cref("\n"));
+}
+
 void frame_base::reserve(std::size_t size)
 {
-    buffer_.reserve(size);
+    buffer_.expand(size);
 }
 
-void frame_base::print(const std::string& text)
+void frame_base::push(std::string_view text)
 {
-    buffer_.append(text);
-    br();
+    buffer_.append(text)
+        .append_ref(std::cref("\n"));
 }
 
-void frame_base::push(const header::base& header)
+void frame_base::push(header::fixed header)
 {
-    header.print(buffer_);
-    br();
-}
-
-void frame_base::br()
-{
-    static const auto br = mkstr(std::cref("\r\n"));
-    buffer_.append(br);
-}
-
-void frame_base::append(const std::string& conent)
-{
-    br();
-    buffer_.append(conent);
-}
-
-std::size_t frame_base::size() const noexcept
-{
-    return buffer_.size();
+    buffer_.append(header.key())
+        .append_ref(std::cref(":"))
+        .append(header.value())
+        .append_ref(std::cref("\n"));
 }
 
 } // namespace sti

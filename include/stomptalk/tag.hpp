@@ -38,14 +38,14 @@ namespace mask
 namespace tag {
 
 struct content_length {
-    static constexpr auto id = mask::content_length;
+    static constexpr auto mask = mask::content_length;
     static constexpr auto name() noexcept {
         return make_ref("content-length");
     }
 };
 
 struct content_type {
-    static constexpr auto id = mask::content_type;
+    static constexpr auto mask = mask::content_type;
     static constexpr auto name() noexcept {
         return make_ref("content-type");
     }
@@ -54,6 +54,92 @@ struct content_type {
     }
     static constexpr auto json() noexcept {
         return make_ref("application/json");
+    }
+};
+
+struct heart_beat {
+    static constexpr auto mask = mask::heart_beat;
+    static constexpr auto name() noexcept {
+        return make_ref("heart-beat");
+    }
+};
+
+struct accept_version {
+    static constexpr auto mask = mask::accept_version;
+    static constexpr auto name() noexcept {
+        return make_ref("accept-version");
+    }
+    static constexpr auto v12() noexcept {
+        return make_ref("1.2");
+    }
+};
+
+struct host {
+    static constexpr auto mask = mask::host;
+    static constexpr auto name() noexcept {
+        return make_ref("host");
+    }
+};
+
+struct login {
+    static constexpr auto mask = mask::login;
+    static constexpr auto name() noexcept {
+        return make_ref("login");
+    }
+};
+
+struct passcode {
+    static constexpr auto mask = mask::passcode;
+    static constexpr auto name() noexcept {
+        return make_ref("passcode");
+    }
+};
+
+struct destination {
+    static constexpr auto mask = mask::passcode;
+    static constexpr auto name() noexcept {
+        return make_ref("destination");
+    }
+};
+
+struct message_id {
+    static constexpr auto mask = mask::message_id;
+    static constexpr auto name() noexcept {
+        return make_ref("message-id");
+    }
+};
+
+struct subscription {
+    static constexpr auto mask = mask::subscription;
+    static constexpr auto name() noexcept {
+        return make_ref("subscription");
+    }
+};
+
+struct ack {
+    static constexpr auto mask = mask::ack;
+    static constexpr auto name() noexcept {
+        return make_ref("ack");
+    }
+    static constexpr auto client() noexcept {
+        return make_ref("client");
+    }
+    static constexpr auto client_individual() noexcept {
+        return make_ref("client-individual");
+    }
+};
+
+struct id {
+    static constexpr auto mask = mask::id;
+    static constexpr auto name() noexcept {
+        return make_ref("id");
+    }
+};
+
+struct receipt {
+    static constexpr auto mask = mask::receipt;
+    static constexpr auto name() noexcept {
+        return make_ref("receipt");
     }
 };
 
@@ -70,7 +156,7 @@ static constexpr bool detect_header_id(header::mask::type& rc,
     constexpr auto name = T::name();
     auto res =  memeq<size_of(name)>::cmp(name.data(), text);
     if (res)
-        rc = T::id;
+        rc = T::mask;
     return res;
 }
 
