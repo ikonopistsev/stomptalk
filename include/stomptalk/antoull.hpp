@@ -2,6 +2,7 @@
 
 #include <limits>
 #include <cstdint>
+#include <type_traits>
 
 namespace stomptalk {
 namespace detail {
@@ -9,22 +10,24 @@ namespace detail {
 template<class T, std::size_t N>
 struct antoull
 {
-    static constexpr auto pow = 10 * antoull<T, N - 1>::pow;
+    static constexpr auto pw = 10 * antoull<T, N - 1>::pw;
     static T conv(const char *ptr) noexcept
     {
+        static_assert (std::is_signed<T>::value, "type not signed");
         auto i = static_cast<std::intptr_t>(*ptr - '0');
         if ((i < 0) || (i > 9))
             return std::numeric_limits<T>::min();
-        return static_cast<T>(i * pow) + antoull<T, N - 1>::conv(++ptr);
+        return static_cast<T>(i * pw) + antoull<T, N - 1>::conv(++ptr);
     }
 };
 
 template<class T>
 struct antoull<T, 1>
 {
-    static constexpr auto pow = std::int64_t{1};
+    static constexpr auto pw = std::int64_t{1};
     static T conv(const char *ptr) noexcept
     {
+        static_assert (std::is_signed<T>::value, "type not signed");
         auto i = static_cast<std::intptr_t>(*ptr - '0');
         return ((i < 0) || (i > 9)) ?
             std::numeric_limits<T>::min() : static_cast<T>(i);
