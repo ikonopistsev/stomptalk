@@ -11,6 +11,7 @@ class parser
     typedef const char* pointer;
     typedef pointer (parser::*state_fn_type)(parser_hook&, pointer, pointer);
 
+public:
     struct heval
     {
         enum type
@@ -22,7 +23,7 @@ class parser
         };
     };
 
-public:
+private:
     std::uint64_t content_len_{};
     std::uint64_t orig_content_len_{};
     std::uint64_t bytes_read_{};
@@ -65,10 +66,10 @@ public:
 
     heval::type heval_{};
 
-    stackbuf<2048> sbuf_{};
+    stackbuf<char, 2048> sbuf_{};
 
-    void eval_header(std::string_view val) noexcept;
-    void eval_value(std::string_view val) noexcept;
+    void eval_header(parser_hook& hook, std::string_view val) noexcept;
+    void eval_value(parser_hook& hook, std::string_view val) noexcept;
 
 public:
     parser() = default;

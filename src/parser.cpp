@@ -52,7 +52,7 @@ parser::pointer parser::start_state(parser_hook& hook,
         content_len_ = 0;
         orig_content_len_ = 0;
         hook.set(parser_hook::error::none);
-        hook.set(parser_hook::content::none);
+        hook.set(parser_hook::content_type_id::none);
 
         // вызываем каллбек
         hook.on_frame();
@@ -133,26 +133,27 @@ static inline bool ch_isprint_nospace(char ch) noexcept
     return (ch > 32) && (ch <= 126);
 }
 
-void parser::eval_header(std::string_view val) noexcept
+void parser::eval_header(parser_hook&, std::string_view val) noexcept
 {
-    header::mask::type rc;
+    using header::size_of;
+    using namespace header::tag;
+
+    header::mask_id::type rc;
     auto text = val.data();
     auto size = val.size();
     switch (size)
     {
-        case (header::tag::size_of(header::tag::content_length())):
-            if (header::tag::detect_header_id(rc,
-                header::tag::content_length(), text))
+        case (size_of(content_length())):
+            if (detect(rc, content_length(), text))
             {
-                if (rc == header::mask::content_length)
+                if (rc == header::mask_id::content_length)
                     heval_ = heval::content_length;
             }
         break;
-        case (header::tag::size_of(header::tag::content_type())):
-            if (header::tag::detect_header_id(rc,
-                header::tag::content_type(), text))
+        case (size_of(content_type())):
+            if (detect(rc, content_type(), text))
             {
-                if (rc == header::mask::content_type)
+                if (rc == header::mask_id::content_type)
                     heval_ = heval::content_type;
             }
         break;
@@ -161,13 +162,21 @@ void parser::eval_header(std::string_view val) noexcept
     }
 }
 
-void parser::eval_value(std::string_view val) noexcept
+void parser::eval_value(parser_hook& hook, std::string_view val) noexcept
 {
     if (heval_ == heval::content_length)
     {
-        auto content_len = antoull(val.data(), val.size());
+        auto content_len = antoull(val);
         if (content_len > 0ll)
-            content_len_ = static_cast<std::uint64_t>(content_len);
+        {
+            auto value = static_cast<std::uint64_t>(content_len);
+            content_len_ = value;
+            hook.set_content_length(value);
+        }
+    }
+    else if (heval_ == heval::content_type)
+    {
+        hook.eval_content_type(val);
     }
 }
 
@@ -184,7 +193,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
             auto text = sbuf_.pop();
 
             // определяем значимый ли хидер
-            eval_header(text);
+            eval_header(hook, text);
 
             // выполняем каллбек на хидер
             hook.on_hdr_key(text);
@@ -240,7 +249,7 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
             // сохраняем параметры стека
             auto text = sbuf_.pop();
 
-            eval_value(text);
+            eval_value(hook, text);
 
             hook.on_hdr_val(text);
 
@@ -255,7 +264,7 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
             // сохраняем параметры стека
             auto text = sbuf_.pop();
 
-            eval_value(text);
+            eval_value(hook, text);
 
             hook.on_hdr_val(text);
 

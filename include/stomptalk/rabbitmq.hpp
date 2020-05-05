@@ -113,5 +113,11 @@ constexpr static persistent persistent_on() noexcept {
     return persistent(tag::enable());
 }
 
+class subscription_base
+{
+public:
+    virtual void message(v12::incoming::message message);
+};
+
 } // namespace rabbitmq
 } // namespace stomptalk

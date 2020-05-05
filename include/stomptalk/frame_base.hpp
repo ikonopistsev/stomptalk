@@ -2,38 +2,34 @@
 
 #include "stomptalk/header.hpp"
 
-#include "btpro/buffer.hpp"
-
 namespace stomptalk {
 
 class frame_base
 {
-    btpro::buffer buffer_{};
-
 protected:
-    void push_ref(std::string_view text);
-
-    void reserve(std::size_t size);
-
-    void push(std::string_view text);
+    virtual void append(std::string_view text) = 0;
+    virtual void append_ref(std::string_view text) = 0;
 
 public:
-
     frame_base() = default;
+    virtual ~frame_base() = default;
 
-    // выставить хидер
-    void push(header::fixed header);
+    virtual void reserve(std::size_t len) = 0;
 
-    std::string str() const
+    template<std::size_t N>
+    void push(strref<N> val)
     {
-        return buffer_.str();
+        append_ref(val);
+        append_ref(make_ref("\n"));
     }
 
-    template<class B>
-    void write(B& output)
+    // выставить хидер
+    void push(header::fixed hdr)
     {
-        buffer_.append(std::cref("\n\0"));
-        output.write(std::move(buffer_));
+        append(hdr.key());
+        append_ref(make_ref(":"));
+        append(hdr.value());
+        append_ref(make_ref("\n"));
     }
 };
 

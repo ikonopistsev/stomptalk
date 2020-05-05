@@ -42,6 +42,7 @@ public:
 };
 
 typedef base<std::string, std::string> custom;
+typedef base<std::string_view, std::string_view> incoming;
 
 template<>
 class base<std::string_view, std::string_view>
@@ -84,10 +85,9 @@ public:
 
 typedef base<std::string_view, std::string_view> fixed;
 
-constexpr static inline base<std::string_view, std::string_view>
-    make(std::string_view key, std::string_view val) noexcept
+static constexpr auto make(std::string_view key, std::string_view val) noexcept
 {
-    return base<std::string_view, std::string_view>(key, val);
+    return fixed(key, val);
 }
 
 template<class T>
@@ -116,29 +116,29 @@ constexpr std::size_t id_of(const basic<T>&) noexcept
     return T::id;
 }
 
-typedef basic<tag::content_type> content_type;
-typedef basic<tag::content_length> content_length;
-typedef basic<tag::heart_beat> heart_beat;
-typedef basic<tag::accept_version> accept_version;
-typedef basic<tag::host> host;
-typedef basic<tag::login> login;
-typedef basic<tag::passcode> passcode;
-typedef basic<tag::destination> destination;
-typedef basic<tag::message_id> message_id;
-typedef basic<tag::subscription> subscription;
-typedef basic<tag::ack> ack;
-typedef basic<tag::id> id;
-typedef basic<tag::receipt> receipt;
+typedef basic<header::tag::content_type> content_type;
+typedef basic<header::tag::content_length> content_length;
+typedef basic<header::tag::heart_beat> heart_beat;
+typedef basic<header::tag::accept_version> accept_version;
+typedef basic<header::tag::host> host;
+typedef basic<header::tag::login> login;
+typedef basic<header::tag::passcode> passcode;
+typedef basic<header::tag::destination> destination;
+typedef basic<header::tag::message_id> message_id;
+typedef basic<header::tag::subscription> subscription;
+typedef basic<header::tag::ack> ack;
+typedef basic<header::tag::id> id;
+typedef basic<header::tag::receipt> receipt;
 
-constexpr static accept_version ver12() noexcept {
+static constexpr auto ver12() noexcept {
     return accept_version(tag::accept_version::v12());
 }
 
-constexpr static ack client_individual() noexcept {
+static constexpr auto client_individual() noexcept {
     return ack(tag::ack::client_individual());
 }
 
-constexpr static ack client() noexcept {
+static constexpr auto client() noexcept {
     return ack(tag::ack::client());
 }
 

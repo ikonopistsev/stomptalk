@@ -8,8 +8,7 @@ CONFIG -= app_bundle
 SOURCES += \
     src/parser.cpp \
     src/parser_hook.cpp \
-    src/v12.cpp \
-    src/frame_base.cpp
+    src/btpro/connection.cpp
 
 HEADERS += \
     include/stomptalk/header.hpp \
@@ -18,13 +17,18 @@ HEADERS += \
     include/stomptalk/tag.hpp \
     include/stomptalk/parser.hpp \
     include/stomptalk/parser_hook.hpp \
-    include/stomptalk/method.hpp \
     include/stomptalk/stackbuf.hpp \
     include/stomptalk/user_hook.hpp \
     include/stomptalk/validator.hpp \
     include/stomptalk/v12.hpp \
     include/stomptalk/rabbitmq.hpp \
-    include/stomptalk/antoull.hpp
+    include/stomptalk/antoull.hpp \
+    include/stomptalk/validator.hpp \
+    include/stomptalk/frame_base.hpp \
+    include/stomptalk/btpro/frame.hpp \
+    include/stomptalk/btpro/v12.hpp \
+    include/stomptalk/btpro/connection.hpp \
+    include/stomptalk/btpro/subscription.hpp
 
 INCLUDEPATH += include \
     ..

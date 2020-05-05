@@ -5,18 +5,18 @@
 
 namespace stomptalk {
 
-template<std::size_t Size>
+template<class T, std::size_t Size>
 class stackbuf
 {
-    char buf_[Size];
-    char* curr_{ buf_ };
+    T buf_[Size];
+    T* curr_{ buf_ };
 
 public:
     stackbuf() = default;
 
-    std::string_view pop() noexcept
+    std::basic_string_view<T> pop() noexcept
     {
-        std::string_view rc(buf_,
+        std::basic_string_view<T> rc(buf_,
             std::distance(buf_, curr_));
 
         curr_ = buf_;
@@ -29,7 +29,7 @@ public:
         curr_ = buf_;
     }
 
-    bool push(char ch) noexcept
+    bool push(T ch) noexcept
     {
         auto b = buf_;
         auto e = b + sizeof (buf_);

@@ -8,6 +8,9 @@ class parser;
 class parser_hook
 {
 public:
+    typedef method::type_id method_type_id;
+    typedef header::tag::content_type::content_type_id content_type_id;
+
     struct error
     {
         enum type
@@ -23,27 +26,13 @@ public:
         };
     };
 
-    struct content
-    {
-        enum type
-            : std::size_t
-        {
-            none,
-            stream,
-            text,
-            html,
-            json,
-            xml,
-            other
-        };
-    };
-
 protected:
     hook_base& hook_;
-    method::type method_{method::unknown};
+
     error::type error_{error::none};
-    content::type content_type_{content::none};
-    std::int64_t content_len_{};
+    method_type_id::type method_{method_type_id::unknown};
+    std::uint64_t content_len_{};
+    content_type_id::type content_type_{content_type_id::none};
 
     bool eval_method(std::string_view val) noexcept;
 
@@ -57,17 +46,19 @@ public:
         error_ = value;
     }
 
-    void set(content::type value) noexcept
+    void set(content_type_id::type value) noexcept
     {
         content_type_ = value;
     }
+
+    void eval_content_type(std::string_view val) noexcept;
 
     bool ok() const noexcept
     {
         return get_error() == error::none;
     }
 
-    stomptalk::method::type get_method() const noexcept
+    method_type_id::type get_method() const noexcept
     {
         return method_;
     }
@@ -77,12 +68,12 @@ public:
         return error_;
     }
 
-    content::type get_content_type() const noexcept
+    content_type_id::type get_content_type() const noexcept
     {
         return content_type_;
     }
 
-    void set_content_length(std::int64_t content_length) noexcept
+    void set_content_length(std::uint64_t content_length) noexcept
     {
         content_len_ = content_length;
     }
@@ -95,7 +86,7 @@ public:
     void on_method(std::string_view text) noexcept
     {
         if (!eval_method(text))
-            method_ = method::unknown;
+            method_ = method::type_id::unknown;
 
         hook_.on_method(*this, std::move(text));
     }

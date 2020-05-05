@@ -4,43 +4,51 @@ namespace stomptalk {
 
 bool parser_hook::eval_method(std::string_view val) noexcept
 {
+    using method::size_of;
+    using namespace method::tag;
+
     auto text = val.data();
     auto size = val.size();
     switch (size)
     {
-    case tag::size_of(tag::ack()):
-        return tag::detect_method_id(method_, tag::ack(), text);
+    case size_of(ack()):
+        return detect(method_, ack(), text);
 
-    case tag::size_of(tag::nack()):
-        return tag::detect_method_id(method_, tag::nack(), text) ||
-            tag::detect_method_id(method_, tag::send(), text);
+    case size_of(nack()):
+        return detect(method_, nack(), text) ||
+            detect(method_, send(), text);
 
-    case tag::size_of(tag::abort()):
-        return tag::detect_method_id(method_, tag::abort(), text) ||
-            tag::detect_method_id(method_, tag::begin(), text);
+    case size_of(abort()):
+        return detect(method_, abort(), text) ||
+            detect(method_, begin(), text);
 
-    case tag::size_of(tag::commit()):
-        return tag::detect_method_id(method_, tag::commit(), text);
+    case size_of(commit()):
+        return detect(method_, commit(), text);
 
-    case tag::size_of(tag::connect()):
-        return tag::detect_method_id(method_, tag::connect(), text) ||
-            tag::detect_method_id(method_, tag::message(), text) ||
-            tag::detect_method_id(method_, tag::receipt(), text);
+    case size_of(connect()):
+        return detect(method_, connect(), text) ||
+            detect(method_, message(), text) ||
+            detect(method_, receipt(), text);
 
-    case tag::size_of(tag::connected()):
-        return tag::detect_method_id(method_, tag::connected(), text) ||
-            tag::detect_method_id(method_, tag::subscribe(), text);
+    case size_of(connected()):
+        return detect(method_, connected(), text) ||
+            detect(method_, subscribe(), text);
 
-    case tag::size_of(tag::disconnect()):
-        return tag::detect_method_id(method_, tag::disconnect(), text);
+    case size_of(disconnect()):
+        return detect(method_, disconnect(), text);
 
-    case tag::size_of(tag::unsubscribe()):
-        return tag::detect_method_id(method_, tag::unsubscribe(), text);
+    case size_of(unsubscribe()):
+        return detect(method_, unsubscribe(), text);
 
     default:;
     }
 
     return false;
+}
+
+void parser_hook::eval_content_type(std::string_view val) noexcept
+{
+    content_type_ = header::tag::content_type::eval_content_type(val);
 }
 
 void parser_hook::next_frame() noexcept
