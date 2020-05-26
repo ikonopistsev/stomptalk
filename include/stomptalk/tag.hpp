@@ -217,13 +217,18 @@ struct content_type {
         };
     };
 
-    static constexpr auto xml_text() noexcept {
+    // вообще должно быть
+    // тип/подтип;параметр=значение
+    // https://developer.mozilla.org/ru/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+    // но мы упростим
+
+    static constexpr auto text_xml() noexcept {
         return make_ref("text/xml");
     }
-    static constexpr auto html() noexcept {
+    static constexpr auto text_html() noexcept {
         return make_ref("text/html");
     }
-    static constexpr auto text() noexcept {
+    static constexpr auto text_plain() noexcept {
         return make_ref("text/plain");
     }
     static constexpr auto xml() noexcept {
@@ -236,17 +241,6 @@ struct content_type {
         return make_ref("application/octet-stream");
     }
 
-    template <class T>
-    static constexpr bool detect(content_type_id::type& ident,
-        const T&, const char *text) noexcept
-    {
-        constexpr auto name = T::name();
-        auto rc =  memeq<size_of(name)>::cmp(name.data(), text);
-        if (rc)
-            ident = T::id;
-        return rc;
-    }
-
     static inline
     content_type_id::type eval_content_type(std::string_view val) noexcept
     {
@@ -256,16 +250,16 @@ struct content_type {
         auto size = val.size();
         switch (size)
         {
-        case size_of(xml_text()):
-                if (memeq<size_of(xml_text())>::cmp(xml_text().data(), str))
+        case size_of(text_xml()):
+                if (memeq<size_of(text_xml())>::cmp(text_xml().data(), str))
                     rc = content_type_id::xml;
             break;
-        case size_of(html()):
-            if (memeq<size_of(html())>::cmp(html().data(), str))
+        case size_of(text_html()):
+            if (memeq<size_of(text_html())>::cmp(text_html().data(), str))
                 rc = content_type_id::html;
             break;
-        case size_of(text()):
-            if (memeq<size_of(text())>::cmp(text().data(), str))
+        case size_of(text_plain()):
+            if (memeq<size_of(text_plain())>::cmp(text_plain().data(), str))
                 rc = content_type_id::html;
             break;
         case size_of(xml()):
