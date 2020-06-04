@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stomptalk/frame_base.hpp"
+#include "stomptalk/frame.hpp"
 
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@ public:
         , cy_(cy)
     {   }
 
-    void apply(frame_base& frame) const
+    void apply(frame::base& frame) const
     {
         auto t = std::to_string(cx_);
         t += ',';
@@ -97,10 +97,12 @@ template<class T>
 class subscribe_basic
 {
     T that_{};
+    std::string id_{};
 
 public:
     subscribe_basic(const std::string& destination, const std::string& id,
               std::size_t size_reserve = 320)
+        : id_(id)
     {
         that_.reserve(size_reserve);
         that_.push(method::tag::subscribe::name());
@@ -117,6 +119,11 @@ public:
     void write(B& output)
     {
         that_.write(output);
+    }
+
+    const std::string id() const noexcept
+    {
+        return id_;
     }
 
     std::string str() const
@@ -161,13 +168,13 @@ namespace incoming {
 
 class frame
 {
-    method::type_id::type method_{method::type_id::none};
+    method::base method_{};
     std::string_view content_type_{};
     std::vector<header::incoming> header_{};
 public:
     frame() = default;
 
-    void set(method::type_id::type method) noexcept
+    void set(method::num_id::type method) noexcept
     {
         method_ = method;
     }
@@ -182,7 +189,7 @@ public:
         header_.push_back(std::move(value));
     }
 
-    method::type_id::type method() noexcept
+    method::base method() noexcept
     {
         return method_;
     }

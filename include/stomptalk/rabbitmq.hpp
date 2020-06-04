@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stomptalk/frame_base.hpp"
+#include "stomptalk/frame.hpp"
 
 namespace stomptalk {
 namespace rabbitmq {
@@ -29,7 +29,9 @@ namespace mask
         max_priority                = 1 << 0x09,
         persistent                  = 1 << 0x0a,
         reply_to                    = 1 << 0x0b,
-        last_mask_id                = reply_to
+        session                     = 1 << 0x0c,
+        redelivered                 = 1 << 0x0d,
+        last_mask_id                = redelivered
     };
 };
 
@@ -84,6 +86,13 @@ struct reply_to {
     }
 };
 
+struct session {
+    static constexpr auto mask = mask::session;
+    static constexpr auto name() noexcept {
+        return make_ref("reply-to");
+    }
+};
+
 } // namespace tag
 
 typedef header::basic<tag::prefetch_count> prefetch_count;
@@ -113,11 +122,11 @@ constexpr static persistent persistent_on() noexcept {
     return persistent(tag::enable());
 }
 
-class subscription_base
-{
-public:
-    virtual void message(v12::incoming::message message);
-};
+//class subscription_base
+//{
+//public:
+//    virtual void message(v12::incoming::message message);
+//};
 
 } // namespace rabbitmq
 } // namespace stomptalk

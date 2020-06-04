@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string_view>
 
 namespace stomptalk {
 
@@ -104,14 +105,26 @@ struct memeq
         return (L > 8) ? memeq<8>::cmp(ptr1, ptr2) &&
             memeq<L-8>::cmp(reinterpret_cast<const std::uint8_t*>(ptr1) + 8,
                             reinterpret_cast<const std::uint8_t*>(ptr2) + 8)
-        : memeq<8>::cmp(ptr1, ptr2);
+            : memeq<8>::cmp(ptr1, ptr2);
     }
 };
 
 template<int L>
-bool eqstr(const char (&str)[L], const char *target)
+bool eqstr(const char (&str)[L], const char *target) noexcept
 {
     return memeq<L-1>::cmp(str, target);
+}
+
+template<std::size_t N, template<std::size_t> class S, class T>
+bool eqstr(S<N> str_ref, T val) noexcept
+{
+    return memeq<N>::cmp(str_ref.data(), val.data());
+}
+
+template<std::size_t N, template<std::size_t> class S>
+bool eqstr(S<N> str_ref, const char* val) noexcept
+{
+    return memeq<N>::cmp(str_ref.data(), val);
 }
 
 } // namepsace stomptalk

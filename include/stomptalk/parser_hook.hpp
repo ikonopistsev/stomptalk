@@ -8,7 +8,7 @@ class parser;
 class parser_hook
 {
 public:
-    typedef method::type_id method_type_id;
+    typedef method::base method_type;
     typedef header::tag::content_type::content_type_id content_type_id;
 
     struct error
@@ -30,7 +30,7 @@ protected:
     hook_base& hook_;
 
     error::type error_{error::none};
-    method_type_id::type method_{method_type_id::unknown};
+    method_type method_{};
     std::uint64_t content_len_{};
     content_type_id::type content_type_{content_type_id::none};
 
@@ -58,7 +58,12 @@ public:
         return get_error() == error::none;
     }
 
-    method_type_id::type get_method() const noexcept
+    operator method_type::value_type() const noexcept
+    {
+        return method_;
+    }
+
+    method_type get_method() const noexcept
     {
         return method_;
     }
@@ -85,9 +90,7 @@ public:
 
     void on_method(std::string_view text) noexcept
     {
-        if (!eval_method(text))
-            method_ = method::type_id::unknown;
-
+        method_ = hook_.eval_method(text);
         hook_.on_method(*this, std::move(text));
     }
 

@@ -3,16 +3,17 @@
 #include "stomptalk/header.hpp"
 
 namespace stomptalk {
+namespace frame {
 
-class frame_base
+class base
 {
 protected:
     virtual void append(std::string_view text) = 0;
     virtual void append_ref(std::string_view text) = 0;
 
 public:
-    frame_base() = default;
-    virtual ~frame_base() = default;
+    base() = default;
+    virtual ~base() = default;
 
     virtual void reserve(std::size_t len) = 0;
 
@@ -33,4 +34,5 @@ public:
     }
 };
 
+} // namespace frame
 } // namespace stomptalk

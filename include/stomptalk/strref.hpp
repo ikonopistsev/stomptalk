@@ -14,7 +14,8 @@ public:
     constexpr strref(const strref&) = default;
     constexpr strref& operator=(const strref&) = default;
 
-    constexpr explicit strref(const char (&text)[N]) noexcept
+    template<std::size_t L>
+    constexpr explicit strref(const char (&text)[L]) noexcept
         : ptr_{text}
     {   }
 
@@ -25,7 +26,7 @@ public:
 
     static constexpr std::size_t size() noexcept
     {
-        return N - 1;
+        return N;
     }
 
     constexpr operator std::string_view() const noexcept
@@ -37,7 +38,7 @@ public:
 template <std::size_t N>
 constexpr auto make_ref(const char (&text)[N]) noexcept
 {
-    return strref<N>(text);
+    return strref<N - 1>(text);
 }
 
 template <std::size_t N>
@@ -49,7 +50,7 @@ constexpr auto make_view(const char (&text)[N]) noexcept
 template <std::size_t N>
 static constexpr std::size_t size_of(strref<N>) noexcept
 {
-    return N - 1;
+    return N;
 }
 
 template <std::size_t N>

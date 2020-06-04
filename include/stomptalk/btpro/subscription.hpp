@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stomptalk/frame_base.hpp"
+#include "stomptalk/frame.hpp"
 #include "btpro/tcp/bev.hpp"
 
 #include <string>

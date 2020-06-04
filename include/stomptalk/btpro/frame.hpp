@@ -1,13 +1,13 @@
 #pragma once
 
-#include "stomptalk/frame_base.hpp"
+#include "stomptalk/frame.hpp"
 #include "btpro/tcp/bev.hpp"
 
 namespace stomptalk {
 namespace tcp {
 
 class frame final
-    : public stomptalk::frame_base
+    : public stomptalk::frame::base
 {
     be::buffer buf_;
 

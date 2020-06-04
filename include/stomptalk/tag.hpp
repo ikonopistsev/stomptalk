@@ -7,7 +7,7 @@
 namespace stomptalk {
 namespace method {
 
-struct type_id {
+struct num_id {
 
 enum type
     : std::size_t
@@ -35,91 +35,98 @@ enum type
 namespace tag {
 
 struct ack {
-    static constexpr auto id = type_id::ack;
+    static constexpr auto num = num_id::ack;
     static constexpr auto name() noexcept {
         return make_ref("ACK");
     }
 };
 
 struct nack {
-    static constexpr auto id = type_id::nack;
+    static constexpr auto num = num_id::nack;
     static constexpr auto name() noexcept {
         return make_ref("NACK");
     }
 };
 
 struct send {
-    static constexpr auto id = type_id::send;
+    static constexpr auto num = num_id::send;
     static constexpr auto name() noexcept {
         return make_ref("SEND");
     }
 };
 
 struct abort {
-    static constexpr auto id = type_id::abort;
+    static constexpr auto num = num_id::abort;
     static constexpr auto name() noexcept {
         return make_ref("ABORT");
     }
 };
 
 struct begin {
-    static constexpr auto id = type_id::begin;
+    static constexpr auto num = num_id::begin;
     static constexpr auto name() noexcept {
         return make_ref("BEGIN");
     }
 };
 
+struct error {
+    static constexpr auto num = num_id::error;
+    static constexpr auto name() noexcept {
+        return make_ref("ERROR");
+    }
+};
+
 struct commit {
-    static constexpr auto id = type_id::commit;
+    static constexpr auto num = num_id::commit;
     static constexpr auto name() noexcept {
         return make_ref("COMMIT");
     }
 };
 
 struct connect {
-    static constexpr auto id = type_id::connect;
+    static constexpr auto num = num_id::connect;
     static constexpr auto name() noexcept {
         return make_ref("CONNECT");
     }
 };
 
 struct message {
-    static constexpr auto id = type_id::message;
+    static constexpr auto num = num_id::message;
     static constexpr auto name() noexcept {
         return make_ref("MESSAGE");
     }
 };
 
 struct receipt {
-    static constexpr auto id = type_id::receipt;
+    static constexpr auto num = num_id::receipt;
     static constexpr auto name() noexcept {
         return make_ref("RECEIPT");
     }
 };
 
 struct connected {
-    static constexpr auto id = type_id::connected;
+    static constexpr auto num = num_id::connected;
     static constexpr auto name() noexcept {
         return make_ref("CONNECTED");
     }
 };
 
 struct subscribe {
-    static constexpr auto id = type_id::subscribe;
+    static constexpr auto num = num_id::subscribe;
     static constexpr auto name() noexcept {
         return make_ref("SUBSCRIBE");
     }
 };
 
 struct disconnect {
-    static constexpr auto id = type_id::disconnect;
+    static constexpr auto num = num_id::disconnect;
     static constexpr auto name() noexcept {
         return make_ref("DISCONNECT");
     }
 };
 
 struct unsubscribe {
-    static constexpr auto id = type_id::unsubscribe;
+    static constexpr auto num = num_id::unsubscribe;
     static constexpr auto name() noexcept {
         return make_ref("UNSUBSCRIBE");
     }
@@ -127,33 +134,153 @@ struct unsubscribe {
 
 } // namespace tag
 
+class base
+{
+public:
+    typedef std::size_t value_type;
+
+private:
+    value_type num_id_ = { num_id::none };
+
+public:
+    base() = default;
+    base(base&&) = default;
+    base& operator=(base&&) = default;
+    base(const base&) = default;
+    base& operator=(const base&) = default;
+
+
+    explicit base(value_type num_id) noexcept
+        : num_id_(num_id)
+    {   }
+
+    std::string_view str() const noexcept
+    {
+        using namespace tag;
+
+        switch (num_id_)
+        {
+        case num_id::none:
+            return make_ref("none");
+        case ack::num:
+            return ack::name();
+        case nack::num:
+            return nack::name();
+        case send::num:
+            return send::name();
+        case abort::num:
+            return abort::name();
+        case begin::num:
+            return begin::name();
+        case error::num:
+            return error::name();
+        case commit::num:
+            return commit::name();
+        case connect::num:
+            return connect::name();
+        case message::num:
+            return message::name();
+        case receipt::num:
+            return receipt::name();
+        case subscribe::num:
+            return subscribe::name();
+        case connected::num:
+            return connected::name();
+        case disconnect::num:
+            return disconnect::name();
+        case unsubscribe::num:
+            return unsubscribe::name();
+        default: ;
+        }
+
+        return make_ref("unknown");
+    }
+
+    void set(value_type num_id) noexcept
+    {
+        num_id_ = num_id;
+    }
+
+    base& operator=(value_type num_id) noexcept
+    {
+        set(num_id);
+        return *this;
+    }
+
+    value_type num_id() const noexcept
+    {
+        return num_id_;
+    }
+
+    operator value_type() const noexcept
+    {
+        return num_id();
+    }
+};
+
+
 template <class T>
-static constexpr std::size_t size_of(const T&) noexcept
+static constexpr std::size_t size_of(T) noexcept
 {
     return stomptalk::size_of(T::name());
 }
 
 template <class T>
-static constexpr bool detect(method::type_id::type& method_id,
-    const T&, const char *text) noexcept
+static constexpr bool detect(method::base& method, const char *text, T) noexcept
 {
-    constexpr auto name = T::name();
-    auto rc =  memeq<size_of(name)>::cmp(name.data(), text);
+    auto rc = eqstr(T::name(), text);
     if (rc)
-        method_id = T::id;
+        method = T::num;
     return rc;
 }
 
-template <class T>
-static constexpr bool equal(const T&, const char *text)
+template <class T, class V>
+static constexpr bool detect(method::base& method, V text, T) noexcept
 {
-    constexpr auto name = T::name();
-    return memeq<size_of(name)>::cmp(name.data(), text);
+    return detect(method, text.data(), T());
 }
+
+//template <class T>
+//static constexpr bool equal(const T&, const char *text)
+//{
+//    constexpr auto name = T::name();
+//    return memeq<size_of(name)>::cmp(name.data(), text);
+//}
 
 } // namespace method
 
 namespace header {
+
+struct num_id
+{
+
+enum type
+    : std::size_t
+{
+    content_length = 0,
+    content_type,
+    accept_version,
+    host,
+    version,
+    destination,
+    id,
+    transaction,
+    message_id,
+    subscription,
+    receipt_id,
+    login,
+    passcode,
+    heart_beat,
+    session,
+    server,
+    ack,
+    receipt,
+    message,
+    last_type_id = message
+    // type_next    = last_type_id + 1
+};
+
+};
 
 struct mask_id
 {
@@ -161,25 +288,25 @@ struct mask_id
 enum type
     : std::uint64_t
 {
-    content_length  = 1,
-    content_type    = 1 << 0x01,
-    accept_version  = 1 << 0x02,
-    host            = 1 << 0x03,
-    version         = 1 << 0x04,
-    destination     = 1 << 0x05,
-    id              = 1 << 0x06,
-    transaction     = 1 << 0x07,
-    message_id      = 1 << 0x08,
-    subscription    = 1 << 0x09,
-    receipt_id      = 1 << 0x0a,
-    login           = 1 << 0x0b,
-    passcode        = 1 << 0x0c,
-    heart_beat      = 1 << 0x0d,
-    session         = 1 << 0x0e,
-    server          = 1 << 0x0f,
-    ack             = 1 << 0x10,
-    receipt         = 1 << 0x11,
-    message         = 1 << 0x12,
+    content_length  = 1 << num_id::content_length,
+    content_type    = 1 << num_id::content_type,
+    accept_version  = 1 << num_id::accept_version,
+    host            = 1 << num_id::host,
+    version         = 1 << num_id::version,
+    destination     = 1 << num_id::destination,
+    id              = 1 << num_id::id,
+    transaction     = 1 << num_id::transaction,
+    message_id      = 1 << num_id::message_id,
+    subscription    = 1 << num_id::subscription,
+    receipt_id      = 1 << num_id::receipt_id,
+    login           = 1 << num_id::login,
+    passcode        = 1 << num_id::passcode,
+    heart_beat      = 1 << num_id::heart_beat,
+    session         = 1 << num_id::session,
+    server          = 1 << num_id::server,
+    ack             = 1 << num_id::ack,
+    receipt         = 1 << num_id::receipt,
+    message         = 1 << num_id::message,
     last_mask_id    = message
     // mask_next    = last_mask_id << 1
 };
@@ -189,6 +316,7 @@ enum type
 namespace tag {
 
 struct content_length {
+    static constexpr auto num = num_id::content_length;
     static constexpr auto mask = mask_id::content_length;
     static constexpr auto name() noexcept {
         return make_ref("content-length");
@@ -196,6 +324,7 @@ struct content_length {
 };
 
 struct content_type {
+    static constexpr auto num = num_id::content_type;
     static constexpr auto mask = mask_id::content_type;
     static constexpr auto name() noexcept {
         return make_ref("content-type");
@@ -246,28 +375,26 @@ struct content_type {
     {
         content_type_id::type rc = content_type_id::octet;
 
-        auto str = val.data();
-        auto size = val.size();
-        switch (size)
+        switch (val.size())
         {
         case size_of(text_xml()):
-                if (memeq<size_of(text_xml())>::cmp(text_xml().data(), str))
-                    rc = content_type_id::xml;
+            if (eqstr(text_xml(), val))
+                rc = content_type_id::xml;
             break;
         case size_of(text_html()):
-            if (memeq<size_of(text_html())>::cmp(text_html().data(), str))
+            if (eqstr(text_html(), val))
                 rc = content_type_id::html;
             break;
         case size_of(text_plain()):
-            if (memeq<size_of(text_plain())>::cmp(text_plain().data(), str))
+            if (eqstr(text_plain(), val))
                 rc = content_type_id::html;
             break;
         case size_of(xml()):
-            if (memeq<size_of(xml())>::cmp(xml().data(), str))
+            if (eqstr(xml(), val))
                 rc = content_type_id::xml;
             break;
         case size_of(json()):
-            if (memeq<size_of(json())>::cmp(json().data(), str))
+            if (eqstr(json(), val))
                 rc = content_type_id::json;
             break;
         case size_of(octet()):
@@ -279,6 +406,7 @@ struct content_type {
 };
 
 struct heart_beat {
+    static constexpr auto num = num_id::heart_beat;
     static constexpr auto mask = mask_id::heart_beat;
     static constexpr auto name() noexcept {
         return make_ref("heart-beat");
@@ -286,6 +414,7 @@ struct heart_beat {
 };
 
 struct accept_version {
+    static constexpr auto num = num_id::accept_version;
     static constexpr auto mask = mask_id::accept_version;
     static constexpr auto name() noexcept {
         return make_ref("accept-version");
@@ -296,6 +425,7 @@ struct accept_version {
 };
 
 struct host {
+    static constexpr auto num = num_id::host;
     static constexpr auto mask = mask_id::host;
     static constexpr auto name() noexcept {
         return make_ref("host");
@@ -303,6 +433,7 @@ struct host {
 };
 
 struct login {
+    static constexpr auto num = num_id::login;
     static constexpr auto mask = mask_id::login;
     static constexpr auto name() noexcept {
         return make_ref("login");
@@ -310,6 +441,7 @@ struct login {
 };
 
 struct passcode {
+    static constexpr auto num = num_id::passcode;
     static constexpr auto mask = mask_id::passcode;
     static constexpr auto name() noexcept {
         return make_ref("passcode");
@@ -317,13 +449,15 @@ struct passcode {
 };
 
 struct destination {
-    static constexpr auto mask = mask_id::passcode;
+    static constexpr auto num = num_id::destination;
+    static constexpr auto mask = mask_id::destination;
     static constexpr auto name() noexcept {
         return make_ref("destination");
     }
 };
 
 struct message_id {
+    static constexpr auto num = num_id::message_id;
     static constexpr auto mask = mask_id::message_id;
     static constexpr auto name() noexcept {
         return make_ref("message-id");
@@ -331,6 +465,7 @@ struct message_id {
 };
 
 struct subscription {
+    static constexpr auto num = num_id::subscription;
     static constexpr auto mask = mask_id::subscription;
     static constexpr auto name() noexcept {
         return make_ref("subscription");
@@ -338,6 +473,7 @@ struct subscription {
 };
 
 struct ack {
+    static constexpr auto num = num_id::ack;
     static constexpr auto mask = mask_id::ack;
     static constexpr auto name() noexcept {
         return make_ref("ack");
@@ -351,6 +487,7 @@ struct ack {
 };
 
 struct id {
+    static constexpr auto num = num_id::id;
     static constexpr auto mask = mask_id::id;
     static constexpr auto name() noexcept {
         return make_ref("id");
@@ -358,30 +495,51 @@ struct id {
 };
 
 struct receipt {
+    static constexpr auto num = num_id::receipt;
     static constexpr auto mask = mask_id::receipt;
     static constexpr auto name() noexcept {
         return make_ref("receipt");
     }
 };
 
+struct receipt_id {
+    static constexpr auto num = num_id::receipt_id;
+    static constexpr auto mask = mask_id::receipt_id;
+    static constexpr auto name() noexcept {
+        return make_ref("receipt-id");
+    }
+};
+
 } // namespace tag
 
 template <class T>
-static constexpr std::size_t size_of(const T&) noexcept
+static constexpr std::size_t size_of(T) noexcept
 {
     return stomptalk::size_of(T::name());
 }
 
 template <class T>
 static constexpr bool detect(header::mask_id::type& rc,
-    const T&, const char *text) noexcept
+    const char *text, T) noexcept
 {
-    constexpr auto name = T::name();
-    auto res =  memeq<size_of(name)>::cmp(name.data(), text);
+    auto res = eqstr(T::name(), text);
     if (res)
         rc = T::mask;
     return res;
 }
 
+template <class T, class V>
+static constexpr bool detect(header::mask_id::type& rc, V text, T) noexcept
+{
+    return detect(rc, text.data(), T());
+}
+
 } // namespace header
 } // namespace stomptalk
+
+template<class C, class T>
+constexpr std::basic_ostream<C, T>& operator<<(std::basic_ostream<C, T>& os,
+    stomptalk::method::base method)
+{
+    return os << method.str();
+}

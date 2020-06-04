@@ -5,6 +5,7 @@
 #include "stomptalk/btpro/v12.hpp"
 #include "btpro/tcp/bev.hpp"
 #include "stomptalk/btpro/subscription.hpp"
+#include <map>
 
 namespace stomptalk {
 namespace tcp {
@@ -28,12 +29,17 @@ private:
     on_event_fn evfn_{};
     on_connect_fn connfn_{};
     on_stomp_fn logonfn_{};
+    on_stomp_fn messagefn_{};
 
     stomptalk::parser stomp_{};
     stomptalk::parser_hook hook_{*this};
 
     std::string key_{};
     std::vector<header::custom> header_{};
+
+    typedef std::map<std::string, on_stomp_fn> recept_store_type;
+    typedef typename recept_store_type::iterator recept_iterator;
+    recept_store_type id_store_{};
 
     template<class A>
     struct proxy
@@ -130,23 +136,89 @@ private:
 
     }
 
+    template<class F>
+    void foreach_header(F fn)
+    {
+        for (auto& h: header_)
+            fn(std::string_view(h.key()), std::string_view(h.value()));
+    }
+
+    template<class S>
+    recept_iterator touch_header(v12::incoming::frame& rc, S tag)
+    {
+        recept_iterator i = id_store_.end();
+        foreach_header([&](std::string_view key, std::string_view value) {
+            std::cout << key << " = " << value << std::endl;
+
+            rc.push(header::incoming(key, value));
+
+            if (memeq<header::size_of(tag)>::cmp(
+                tag.name().data(), key.data()))
+            {
+                i = id_store_.find(std::string(value));
+            }
+        });
+        return i;
+    }
+
     virtual void on_frame_end(parser_hook& hook) noexcept override
     {
         switch (hook.get_method())
         {
-        case method::type_id::connected: {
+        case method::num_id::message: {
+
             v12::incoming::frame rc;
-            rc.set(method::type_id::connected);
-            for (auto& h: header_)
-                rc.push(header::incoming(std::string_view(h.key()),
-                                         std::string_view(h.value())));
-            exec_on_logon(std::move(rc));
+            rc.set(method::num_id::message);
+
+            std::cout << std::endl << rc.method() << std::endl;
+            header::tag::subscription header;
+            auto i = touch_header(rc, header);
+            if (i != id_store_.end())
+                exec_on_message(std::move(rc), i->second);
+
             break;
         }
-        case method::type_id::receipt:
+
+        case method::num_id::connected: {
+            v12::incoming::frame rc;
+            rc.set(method::num_id::connected);
+
+            std::cout << std::endl << rc.method() << std::endl;
+            foreach_header([&](std::string_view key, std::string_view value) {
+                std::cout << key << " = " << value << std::endl;
+                rc.push(header::incoming(key, value));
+            });
+
+            exec_on_logon(rc);
+
             break;
-        case method::type_id::error:
+        }
+
+        case method::num_id::receipt: {
+            v12::incoming::frame rc;
+            rc.set(method::num_id::receipt);
+
+            std::cout << std::endl << "receipt" << std::endl;
+            header::tag::receipt_id header;
+            auto i = touch_header(rc, header);
+            if (i != id_store_.end())
+                exec_on_message(std::move(rc), i->second);
+
             break;
+        }
+
+        case method::num_id::error: {
+            v12::incoming::frame rc;
+            rc.set(method::num_id::receipt);
+
+            std::cout << std::endl << "error" << std::endl;
+            foreach_header([&](std::string_view key, std::string_view value) {
+                std::cout << key << " = " << value << std::endl;
+                rc.push(header::incoming(key, value));
+            });
+            break;
+        }
+
         default: ;
         }
     }
@@ -164,6 +236,22 @@ private:
         catch (...)
         {
             std::cerr << "exec_on_logon" << std::endl;
+        }
+    }
+
+    void exec_on_message(v12::incoming::frame frame, on_stomp_fn fn) noexcept
+    {
+        try
+        {
+            (self_.*fn)(std::move(frame));
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+        catch (...)
+        {
+            std::cerr << "exec_on_message" << std::endl;
         }
     }
 
@@ -206,6 +294,7 @@ public:
 
     void logon(stomptalk::v12::connect frame)
     {
+        std::cout << std::endl << frame.str() << std::endl;
         frame.write(bev_);
     }
 
@@ -213,9 +302,39 @@ public:
     {
         assert(logonfn);
 
+        std::cout << std::endl <<  frame.str() << std::endl;
         frame.write(bev_);
 
         logonfn_ = logonfn;
+    }
+
+    void subscribe(stomptalk::v12::subscribe frame)
+    {
+        std::cout << std::endl << frame.str() << std::endl;
+        frame.write(bev_);
+    }
+
+    void subscribe(stomptalk::v12::subscribe frame, on_stomp_fn subsfn)
+    {
+        assert(subsfn);
+
+        const auto& frame_id = frame.id();
+
+        if (!frame_id.empty())
+        {
+            if (id_store_.find(frame_id) != id_store_.end())
+                throw std::runtime_error("dub id");
+
+            std::cout << std::endl <<  frame.str() << std::endl;
+            frame.write(bev_);
+
+            id_store_[frame_id] = subsfn;
+        }
+        else
+        {
+            std::cout << std::endl <<  frame.str() << std::endl;
+            frame.write(bev_);
+        }
     }
 
     //void subscribe()

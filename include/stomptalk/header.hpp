@@ -134,11 +134,11 @@ static constexpr auto ver12() noexcept {
     return accept_version(tag::accept_version::v12());
 }
 
-static constexpr auto client_individual() noexcept {
+static constexpr auto ask_client_individual() noexcept {
     return ack(tag::ack::client_individual());
 }
 
-static constexpr auto client() noexcept {
+static constexpr auto ask_client() noexcept {
     return ack(tag::ack::client());
 }
 

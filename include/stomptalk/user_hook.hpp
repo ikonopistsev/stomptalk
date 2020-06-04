@@ -27,6 +27,8 @@ public:
     virtual void on_body(parser_hook&, const void*, std::size_t) noexcept = 0;
 
     virtual void on_frame_end(parser_hook&) noexcept = 0;
+
+    virtual method::base eval_method(std::string_view val) noexcept;
 };
 
 template<class T>

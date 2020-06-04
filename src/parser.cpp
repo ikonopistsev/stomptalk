@@ -139,19 +139,17 @@ void parser::eval_header(parser_hook&, std::string_view val) noexcept
     using namespace header::tag;
 
     header::mask_id::type rc;
-    auto text = val.data();
-    auto size = val.size();
-    switch (size)
+    switch (val.size())
     {
         case (size_of(content_length())):
-            if (detect(rc, content_length(), text))
+            if (detect(rc, val, content_length()))
             {
                 if (rc == header::mask_id::content_length)
                     heval_ = heval::content_length;
             }
         break;
         case (size_of(content_type())):
-            if (detect(rc, content_type(), text))
+            if (detect(rc, val, content_type()))
             {
                 if (rc == header::mask_id::content_type)
                     heval_ = heval::content_type;
