@@ -12,6 +12,8 @@ SOURCES += \
     src/user_hook.cpp
 
 HEADERS += \
+    include/stomptalk/btpro/receipt_pool.hpp \
+    include/stomptalk/btpro/subs_pool.hpp \
     include/stomptalk/header.hpp \
     include/stomptalk/strref.hpp \
     include/stomptalk/memeq.hpp \
@@ -28,7 +30,6 @@ HEADERS += \
     include/stomptalk/btpro/frame.hpp \
     include/stomptalk/btpro/v12.hpp \
     include/stomptalk/btpro/connection.hpp \
-    include/stomptalk/btpro/subscription.hpp \
     include/stomptalk/frame.hpp
 
 INCLUDEPATH += include \

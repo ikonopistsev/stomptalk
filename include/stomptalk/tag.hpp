@@ -254,8 +254,7 @@ namespace header {
 struct num_id
 {
 
-enum type
-    : std::size_t
+enum type : std::size_t
 {
     content_length = 0,
     content_type,
@@ -282,36 +281,34 @@ enum type
 
 };
 
-struct mask_id
-{
+struct mask_id {
 
-enum type
-    : std::uint64_t
+enum type : std::uint64_t
 {
-    content_length  = 1 << num_id::content_length,
-    content_type    = 1 << num_id::content_type,
-    accept_version  = 1 << num_id::accept_version,
-    host            = 1 << num_id::host,
-    version         = 1 << num_id::version,
-    destination     = 1 << num_id::destination,
-    id              = 1 << num_id::id,
-    transaction     = 1 << num_id::transaction,
-    message_id      = 1 << num_id::message_id,
-    subscription    = 1 << num_id::subscription,
-    receipt_id      = 1 << num_id::receipt_id,
-    login           = 1 << num_id::login,
-    passcode        = 1 << num_id::passcode,
-    heart_beat      = 1 << num_id::heart_beat,
-    session         = 1 << num_id::session,
-    server          = 1 << num_id::server,
-    ack             = 1 << num_id::ack,
-    receipt         = 1 << num_id::receipt,
-    message         = 1 << num_id::message,
+    content_length  = 1ull << num_id::content_length,
+    content_type    = 1ull << num_id::content_type,
+    accept_version  = 1ull << num_id::accept_version,
+    host            = 1ull << num_id::host,
+    version         = 1ull << num_id::version,
+    destination     = 1ull << num_id::destination,
+    id              = 1ull << num_id::id,
+    transaction     = 1ull << num_id::transaction,
+    message_id      = 1ull << num_id::message_id,
+    subscription    = 1ull << num_id::subscription,
+    receipt_id      = 1ull << num_id::receipt_id,
+    login           = 1ull << num_id::login,
+    passcode        = 1ull << num_id::passcode,
+    heart_beat      = 1ull << num_id::heart_beat,
+    session         = 1ull << num_id::session,
+    server          = 1ull << num_id::server,
+    ack             = 1ull << num_id::ack,
+    receipt         = 1ull << num_id::receipt,
+    message         = 1ull << num_id::message,
     last_mask_id    = message
     // mask_next    = last_mask_id << 1
 };
 
-};
+}; // struct mask_id
 
 namespace tag {
 

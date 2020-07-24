@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stomptalk/frame.hpp"
+#include "stomptalk/rabbitmq.hpp"
 
 #include <string>
 #include <vector>
@@ -96,18 +96,19 @@ public:
 template<class T>
 class subscribe_basic
 {
+public:
+    typedef std::function<void()> fn_type;
+
+private:
     T that_{};
-    std::string id_{};
 
 public:
-    subscribe_basic(const std::string& destination, const std::string& id,
-              std::size_t size_reserve = 320)
-        : id_(id)
+    subscribe_basic(const std::string& destination,
+                    std::size_t size_reserve = 320)
     {
         that_.reserve(size_reserve);
         that_.push(method::tag::subscribe::name());
         push(header::destination(destination));
-        push(header::id(id));
     }
 
     void push(header::fixed hdr)
@@ -119,11 +120,6 @@ public:
     void write(B& output)
     {
         that_.write(output);
-    }
-
-    const std::string id() const noexcept
-    {
-        return id_;
     }
 
     std::string str() const
@@ -170,7 +166,7 @@ class frame
 {
     method::base method_{};
     std::string_view content_type_{};
-    std::vector<header::incoming> header_{};
+
 public:
     frame() = default;
 
@@ -182,11 +178,6 @@ public:
     void set(header::content_type conent_type)
     {
         content_type_ = conent_type.value();
-    }
-
-    void push(header::incoming value)
-    {
-        header_.push_back(std::move(value));
     }
 
     method::base method() noexcept

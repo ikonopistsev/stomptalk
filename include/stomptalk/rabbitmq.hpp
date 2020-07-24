@@ -13,24 +13,48 @@ namespace rabbitmq {
 //x-dead-letter-routing-key
 //x-max-priority
 
+struct num_id
+{
+
+enum type : std::size_t
+{
+    prefetch_count              = header::num_id::last_type_id + 1,
+    durable                     = prefetch_count + 1,
+    auto_delete                 = prefetch_count + 2,
+    message_ttl                 = prefetch_count + 3,
+    expires                     = prefetch_count + 4,
+    max_length                  = prefetch_count + 5,
+    max_length_bytes            = prefetch_count + 6,
+    dead_letter_exchange        = prefetch_count + 7,
+    dead_letter_routing_key     = prefetch_count + 8,
+    max_priority                = prefetch_count + 9,
+    persistent                  = prefetch_count + 10,
+    reply_to                    = prefetch_count + 11,
+    session                     = prefetch_count + 12,
+    redelivered                 = prefetch_count + 13,
+    last_mask_id                = redelivered
+};
+
+};
+
 namespace mask
 {
     enum type : std::uint64_t
     {
-        prefetch_count              = 1,
-        durable                     = 1 << 0x01,
-        auto_delete                 = 1 << 0x02,
-        message_ttl                 = 1 << 0x03,
-        expires                     = 1 << 0x04,
-        max_length                  = 1 << 0x05,
-        max_length_bytes            = 1 << 0x06,
-        dead_letter_exchange        = 1 << 0x07,
-        dead_letter_routing_key     = 1 << 0x08,
-        max_priority                = 1 << 0x09,
-        persistent                  = 1 << 0x0a,
-        reply_to                    = 1 << 0x0b,
-        session                     = 1 << 0x0c,
-        redelivered                 = 1 << 0x0d,
+        prefetch_count              = 1ull << num_id::prefetch_count,
+        durable                     = 1ull << num_id::durable,
+        auto_delete                 = 1ull << num_id::auto_delete,
+        message_ttl                 = 1ull << num_id::message_ttl,
+        expires                     = 1ull << num_id::expires,
+        max_length                  = 1ull << num_id::max_length,
+        max_length_bytes            = 1ull << num_id::max_length_bytes,
+        dead_letter_exchange        = 1ull << num_id::dead_letter_exchange,
+        dead_letter_routing_key     = 1ull << num_id::dead_letter_routing_key,
+        max_priority                = 1ull << num_id::max_priority,
+        persistent                  = 1ull << num_id::persistent,
+        reply_to                    = 1ull << num_id::reply_to,
+        session                     = 1ull << num_id::session,
+        redelivered                 = 1ull << num_id::redelivered,
         last_mask_id                = redelivered
     };
 };
@@ -45,6 +69,7 @@ static constexpr auto disable() noexcept {
 }
 
 struct prefetch_count {
+    static constexpr auto num = num_id::prefetch_count;
     static constexpr auto mask = mask::prefetch_count;
     static constexpr auto name() noexcept {
         return make_ref("prefetch-count");
@@ -52,6 +77,7 @@ struct prefetch_count {
 };
 
 struct durable {
+    static constexpr auto num = num_id::durable;
     static constexpr auto mask = mask::durable;
     static constexpr auto name() noexcept {
         return make_ref("durable");
@@ -59,6 +85,7 @@ struct durable {
 };
 
 struct auto_delete {
+    static constexpr auto num = num_id::auto_delete;
     static constexpr auto mask = mask::auto_delete;
     static constexpr auto name() noexcept {
         return make_ref("auto-delete");
@@ -66,6 +93,7 @@ struct auto_delete {
 };
 
 struct persistent {
+    static constexpr auto num = num_id::persistent;
     static constexpr auto mask = mask::durable;
     static constexpr auto name() noexcept {
         return make_ref("persistent");
@@ -73,6 +101,7 @@ struct persistent {
 };
 
 struct message_ttl {
+    static constexpr auto num = num_id::message_ttl;
     static constexpr auto mask = mask::message_ttl;
     static constexpr auto name() noexcept {
         return make_ref("x-message-ttl");
@@ -80,6 +109,7 @@ struct message_ttl {
 };
 
 struct reply_to {
+    static constexpr auto num = num_id::reply_to;
     static constexpr auto mask = mask::reply_to;
     static constexpr auto name() noexcept {
         return make_ref("reply-to");
@@ -87,6 +117,7 @@ struct reply_to {
 };
 
 struct session {
+    static constexpr auto num = num_id::session;
     static constexpr auto mask = mask::session;
     static constexpr auto name() noexcept {
         return make_ref("reply-to");
