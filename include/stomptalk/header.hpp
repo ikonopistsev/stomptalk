@@ -142,6 +142,25 @@ static constexpr auto ask_client() noexcept {
     return ack(tag::ack::client());
 }
 
+static constexpr auto content_type_text_xml() noexcept {
+    return content_type(tag::content_type::text_xml());
+}
+static constexpr auto content_type_text_html() noexcept {
+    return content_type(tag::content_type::text_html());
+}
+static constexpr auto content_type_text_plain() noexcept {
+    return content_type(tag::content_type::text_plain());
+}
+static constexpr auto content_type_xml() noexcept {
+    return content_type(tag::content_type::xml());
+}
+static constexpr auto content_type_json() noexcept {
+    return content_type(tag::content_type::json());
+}
+static constexpr auto content_type_octet() noexcept {
+    return content_type(tag::content_type::octet());
+}
+
 } // namespace header
 } // namespace stomptalk
 

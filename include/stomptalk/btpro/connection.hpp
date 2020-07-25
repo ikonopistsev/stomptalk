@@ -113,7 +113,8 @@ private:
 
     virtual void on_frame(parser_hook&) noexcept override
     {
-        recv_.clear(btpro::buffer());
+        btpro::buffer buf;
+        recv_ = std::move(buf);
     }
 
     virtual
@@ -187,6 +188,7 @@ private:
         }
 
         case method::num_id::error: {
+            std::cout << "ERROR!" << std::endl;
             break;
         }
 
@@ -318,12 +320,6 @@ public:
         assert(logonfn);
     }
 
-    void connect(const std::string& host, int port)
-    {
-        create();
-        bev_.connect(btpro::ipv6::addr(host, port));
-    }
-
     void connect(btpro::dns_ref dns, const std::string& host, int port)
     {
         create();
@@ -347,20 +343,49 @@ public:
         logonfn_ = logonfn;
     }
 
-    void subscribe(stomptalk::v12::subscribe frame, subs_pool::fn_type fn)
+    void subscribe(tcp::subscribe frame, receipt_pool::fn_type fn)
     {
         assert(fn);
 
+        // id квитанции
         auto receipt_id = create_receipt_id();
         frame.push(header::receipt(receipt_id));
 
+        // id подписки
         auto subs_id = create_subs_id();
         frame.push(header::id(subs_id));
 
+        auto frame_fn = frame.fn();
         receipt_.create(receipt_id, [=]{
-            subs_.create(subs_id, std::move(fn));
+            try
+            {
+                // сохраняем подписку
+                subs_.create(subs_id, std::move(frame_fn));
+                // выполняем обработчик
+                fn();
+            }  catch (...) {
+
+            }
         });
 
+        std::cout << std::endl << frame.str() << std::endl;
+        frame.write(bev_);
+    }
+
+    void send(tcp::send frame, receipt_pool::fn_type fn)
+    {
+        if (fn)
+        {
+            auto receipt_id = create_receipt_id();
+            frame.push(header::receipt(receipt_id));
+            receipt_.create(receipt_id, std::move(fn));
+        }
+
+        send(std::move(frame));
+    }
+
+    void send(tcp::send frame)
+    {
         std::cout << std::endl << frame.str() << std::endl;
         frame.write(bev_);
     }

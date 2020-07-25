@@ -8,8 +8,7 @@ namespace stomptalk {
 namespace v12 {
 
 typedef conntect_basic<tcp::frame> connect;
-typedef send_basic<tcp::frame> send;
-typedef subscribe_basic<tcp::frame> subscribe;
+typedef send_basic<tcp::send_frame> send;
 
 //class layout final
 //    : public hook_base

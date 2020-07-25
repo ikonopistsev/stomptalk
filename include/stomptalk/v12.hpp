@@ -100,63 +100,79 @@ public:
     typedef std::function<void()> fn_type;
 
 private:
-    T that_{};
+    T frame_{};
+    fn_type fn_{};
 
 public:
     subscribe_basic(const std::string& destination,
                     std::size_t size_reserve = 320)
     {
-        that_.reserve(size_reserve);
-        that_.push(method::tag::subscribe::name());
+        frame_.reserve(size_reserve);
+        frame_.push(method::tag::subscribe::name());
         push(header::destination(destination));
     }
 
     void push(header::fixed hdr)
     {
-        that_.push(hdr);
+        frame_.push(hdr);
+    }
+
+    void set(fn_type fn)
+    {
+        fn_ = std::move(fn);
+    }
+
+    const fn_type& fn() const noexcept
+    {
+        return fn_;
     }
 
     template<class B>
     void write(B& output)
     {
-        that_.write(output);
+        frame_.write(output);
     }
 
     std::string str() const
     {
-        return that_.str();
+        return frame_.str();
     }
 };
 
 template<class T>
 class send_basic
 {
-    T that_{};
+    T frame_{};
 
 public:
     explicit send_basic(const std::string& dest, std::size_t size_reserve = 320)
     {
-        that_.reserve(size_reserve);
-        that_.push(method::tag::send::name());
+        frame_.reserve(size_reserve);
+        frame_.push(method::tag::send::name());
         push(header::destination(dest));
     }
 
     void push(header::fixed hdr)
     {
-        that_.push(hdr);
+        frame_.push(hdr);
+    }
+
+    template<class B>
+    void append_data(B buf)
+    {
+        frame_.append_data(std::move(buf));
     }
 
     template<class B>
     void write(B& output)
     {
-        that_.write(output);
+        frame_.write(output);
     }
 
     std::string str() const
     {
-        return that_.str();
+        return frame_.str();
     }
-
 };
 
 
