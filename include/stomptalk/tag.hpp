@@ -286,6 +286,7 @@ struct mask_id {
 
 enum type : std::uint64_t
 {
+    none            = 0,
     content_length  = 1ull << num_id::content_length,
     content_type    = 1ull << num_id::content_type,
     accept_version  = 1ull << num_id::accept_version,
@@ -331,14 +332,14 @@ struct content_type {
     struct content_type_id
     {
         enum type
-            : std::uint64_t
+            : std::size_t
         {
             none    = 0,
             octet   = 1,    // default type
-            html    = 1 << 0x01,
-            json    = 1 << 0x02,
-            xml     = 1 << 0x03,
-            text    = 1 << 0x04,
+            html    = 2,
+            json    = 3,
+            xml     = 4,
+            text    = 5,
             last_content_type_id = text
             // mask_next    = last_mask_id << 1
         };
@@ -403,14 +404,6 @@ struct content_type {
     }
 };
 
-struct heart_beat {
-    static constexpr auto num = num_id::heart_beat;
-    static constexpr auto mask = mask_id::heart_beat;
-    static constexpr auto name() noexcept {
-        return make_ref("heart-beat");
-    }
-};
-
 struct accept_version {
     static constexpr auto num = num_id::accept_version;
     static constexpr auto mask = mask_id::accept_version;
@@ -430,11 +423,27 @@ struct host {
     }
 };
 
+struct version {
+    static constexpr auto num = num_id::version;
+    static constexpr auto mask = mask_id::version;
+    static constexpr auto name() noexcept {
+        return make_ref("version");
+    }
+};
+
 struct login {
     static constexpr auto num = num_id::login;
     static constexpr auto mask = mask_id::login;
     static constexpr auto name() noexcept {
         return make_ref("login");
+    }
+};
+
+struct server {
+    static constexpr auto num = num_id::server;
+    static constexpr auto mask = mask_id::server;
+    static constexpr auto name() noexcept {
+        return make_ref("server");
     }
 };
 
@@ -446,11 +455,35 @@ struct passcode {
     }
 };
 
+struct heart_beat {
+    static constexpr auto num = num_id::heart_beat;
+    static constexpr auto mask = mask_id::heart_beat;
+    static constexpr auto name() noexcept {
+        return make_ref("heart-beat");
+    }
+};
+
+struct session {
+    static constexpr auto num = num_id::session;
+    static constexpr auto mask = mask_id::session;
+    static constexpr auto name() noexcept {
+        return make_ref("session");
+    }
+};
+
 struct destination {
     static constexpr auto num = num_id::destination;
     static constexpr auto mask = mask_id::destination;
     static constexpr auto name() noexcept {
         return make_ref("destination");
+    }
+};
+
+struct transaction {
+    static constexpr auto num = num_id::transaction;
+    static constexpr auto mask = mask_id::transaction;
+    static constexpr auto name() noexcept {
+        return make_ref("transaction");
     }
 };
 
@@ -500,6 +533,14 @@ struct receipt {
     }
 };
 
+struct message {
+    static constexpr auto num = num_id::message;
+    static constexpr auto mask = mask_id::message;
+    static constexpr auto name() noexcept {
+        return make_ref("message");
+    }
+};
+
 struct receipt_id {
     static constexpr auto num = num_id::receipt_id;
     static constexpr auto mask = mask_id::receipt_id;
@@ -510,6 +551,7 @@ struct receipt_id {
 
 } // namespace tag
 
+
 template <class T>
 static constexpr std::size_t size_of(T) noexcept
 {
@@ -517,19 +559,18 @@ static constexpr std::size_t size_of(T) noexcept
 }
 
 template <class T>
-static constexpr num_id::type detect(const char *text, T) noexcept
+static constexpr std::size_t detect(const char *text, T) noexcept
 {
     return eqstr(T::name(), text) ? T::num : num_id::none;
 }
 
 template <class T, class V>
-static constexpr num_id::type detect(V text, T) noexcept
+static constexpr std::size_t detect(V text, T) noexcept
 {
     return detect(text.data(), T());
 }
 
-static inline
-num_id::type eval_stomp_header_type(std::string_view hdr) noexcept
+static inline std::size_t eval_stomp_header(std::string_view hdr) noexcept
 {
     switch (hdr.size())
     {
@@ -537,11 +578,166 @@ num_id::type eval_stomp_header_type(std::string_view hdr) noexcept
         return detect(hdr, tag::id());
     case size_of(tag::ack()):
         return detect(hdr, tag::ack());
+    case size_of(tag::host()):
+        return detect(hdr, tag::host());
+    case size_of(tag::login()):
+        return detect(hdr, tag::login());
+    case size_of(tag::server()):
+        return detect(hdr, tag::server());
+    case size_of(tag::receipt()): {
+        auto rc = detect(hdr, tag::receipt());
+        if (!rc) {
+            rc = detect(hdr, tag::session());
+            if (!rc) {
+                rc = detect(hdr, tag::version());
+                if (!rc) {
+                    return detect(hdr, tag::message());
+                }
+            }
+        }
+        return rc;
+    }
+    case size_of(tag::passcode()):
+        return detect(hdr, tag::passcode());
+    case size_of(tag::message_id()): {
+        auto rc = detect(hdr, tag::receipt_id());
+        if (!rc) {
+            rc = detect(hdr, tag::message_id());
+            if (!rc) {
+                return detect(hdr, tag::heart_beat());
+            }
+        }
+        return rc;
+    }
+    case size_of(tag::destination()): {
+        auto rc = detect(hdr, tag::destination());
+        if (!rc) {
+            return detect(hdr, tag::transaction());
+        }
+        return rc;
+    }
+    case size_of(tag::content_type()): {
+        auto rc = detect(hdr, tag::content_type());
+        if (!rc) {
+            return detect(hdr, tag::subscription());
+        }
+        return rc;
+    }
+    case size_of(tag::content_length()): {
+        auto rc = detect(hdr, tag::content_length());
+        if (!rc) {
+            return detect(hdr, tag::accept_version());
+        }
+        return rc;
+    }
     default: ;
     }
 
     return num_id::none;
 }
+
+class generic
+{
+public:
+    typedef std::size_t value_type;
+
+protected:
+    value_type num_id_ = { num_id::none };
+
+public:
+    generic() = default;
+    generic(generic&&) = default;
+    generic& operator=(generic&&) = default;
+    generic(const generic&) = default;
+    generic& operator=(const generic&) = default;
+    virtual ~generic() = default;
+
+    explicit generic(std::string_view hdr) noexcept
+        : num_id_(eval_stomp_header(hdr))
+    {   }
+
+    explicit generic(value_type num_id) noexcept
+        : num_id_(num_id)
+    {   }
+
+    virtual void detect(std::string_view hdr) noexcept
+    {
+        num_id_ = eval_stomp_header(hdr);
+    }
+
+    virtual std::string_view str() const noexcept
+    {
+        using namespace tag;
+
+        switch (num_id_)
+        {
+        case num_id::none:
+            return make_ref("none");
+        case content_length::num:
+            return content_length::name();
+        case content_type::num:
+            return content_length::name();
+        case accept_version::num:
+            return accept_version::name();
+        case host::num:
+            return host::name();
+        case version::num:
+            return version::name();
+        case destination::num:
+            return destination::name();
+        case id::num:
+            return id::name();
+        case message_id::num:
+            return message_id::name();
+        case subscription::num:
+            return subscription::name();
+        case receipt_id::num:
+            return receipt_id::name();
+        case login::num:
+            return login::name();
+        case passcode::num:
+            return passcode::name();
+        case heart_beat::num:
+            return heart_beat::name();
+        case session::num:
+            return session::name();
+        case ack::num:
+            return ack::name();
+        case receipt::num:
+            return receipt::name();
+        default: ;
+        }
+
+        return make_ref("unknown");
+    }
+
+    void set(value_type num_id) noexcept
+    {
+        num_id_ = num_id;
+    }
+
+    generic& operator=(value_type num_id) noexcept
+    {
+        set(num_id);
+        return *this;
+    }
+
+    value_type num_id() const noexcept
+    {
+        return num_id_;
+    }
+
+    operator value_type() const noexcept
+    {
+        return num_id();
+    }
+
+    virtual operator bool() const noexcept
+    {
+        auto id = num_id();
+        return (num_id::none < id) && (id <= num_id::last_type_id);
+    }
+};
 
 } // namespace header
 } // namespace stomptalk

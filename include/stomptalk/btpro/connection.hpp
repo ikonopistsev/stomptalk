@@ -38,7 +38,7 @@ private:
     subs_pool subs_{};
     receipt_pool receipt_{};
 
-    header::num_id::type heval_{};
+    std::size_t heval_{};
 
     std::string receipt_id_{};
     std::string subscription_id_{};
@@ -198,21 +198,7 @@ private:
 
     void eval_header(parser_hook&, std::string_view val) noexcept
     {
-        using header::size_of;
-        using namespace header::tag;
-
-        header::mask_id::type rc;
-        switch (val.size())
-        {
-            case (size_of(receipt_id())):
-                if (detect(rc, val, receipt_id()))
-                        heval_ = header::num_id::receipt_id;
-            break;
-            case (size_of(subscription())):
-                if (detect(rc, val, subscription()))
-                        heval_ = header::num_id::subscription;
-            default:;
-        }
+        heval_ = header::eval_stomp_header(val);
     }
 
     void exec_on_logon() noexcept

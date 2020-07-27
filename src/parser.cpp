@@ -135,30 +135,13 @@ static inline bool ch_isprint_nospace(char ch) noexcept
 
 void parser::eval_header(parser_hook&, std::string_view val) noexcept
 {
-    using header::size_of;
-    using namespace header::tag;
-
-    header::num_id::type rc = header::eval_stomp_header_type(val);
-    switch (val.size())
-    {
-        case (size_of(content_length())):
-            return detect(val, content_length())
-            if (detect(rc, val, content_length()))
-            {
-                if (rc == header::mask_id::content_length)
-                    heval_ = heval::content_length;
-            }
-        break;
-        case (size_of(content_type())):
-            if (detect(rc, val, content_type()))
-            {
-                if (rc == header::mask_id::content_type)
-                    heval_ = heval::content_type;
-            }
-        break;
-        default:
-            heval_ = heval::none;
-    }
+    auto rc = header::eval_stomp_header(val);
+    if (rc == header::num_id::content_length)
+        heval_ = heval::content_length;
+    else if (rc == header::num_id::content_type)
+        heval_ = heval::content_type;
+    else
+        heval_ = heval::none;
 }
 
 void parser::eval_value(parser_hook& hook, std::string_view val) noexcept

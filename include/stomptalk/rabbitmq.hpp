@@ -30,7 +30,6 @@ enum type : std::size_t
     max_priority                = prefetch_count + 9,
     persistent                  = prefetch_count + 10,
     reply_to                    = prefetch_count + 11,
-    session                     = prefetch_count + 12,
     redelivered                 = prefetch_count + 13,
     last_mask_id                = redelivered
 };
@@ -53,7 +52,6 @@ namespace mask
         max_priority                = 1ull << num_id::max_priority,
         persistent                  = 1ull << num_id::persistent,
         reply_to                    = 1ull << num_id::reply_to,
-        session                     = 1ull << num_id::session,
         redelivered                 = 1ull << num_id::redelivered,
         last_mask_id                = redelivered
     };
@@ -116,11 +114,11 @@ struct reply_to {
     }
 };
 
-struct session {
-    static constexpr auto num = num_id::session;
-    static constexpr auto mask = mask::session;
+struct expires {
+    static constexpr auto num = num_id::expires;
+    static constexpr auto mask = mask::expires;
     static constexpr auto name() noexcept {
-        return make_ref("reply-to");
+        return make_ref("expires");
     }
 };
 
@@ -153,11 +151,95 @@ constexpr static persistent persistent_on() noexcept {
     return persistent(tag::enable());
 }
 
-//class subscription_base
+//static inline std::size_t eval_rabbitmq_header(std::string_view hdr) noexcept
 //{
-//public:
-//    virtual void message(v12::incoming::message message);
-//};
+///*
+//    durable                     = prefetch_count + 1,
+//    expires                     = prefetch_count + 4,
+//    session                     = prefetch_count + 12,
+//    reply_to                    = prefetch_count + 11,
+//    max_length                  = prefetch_count + 5,
+//    persistent                  = prefetch_count + 10,
+//    auto_delete                 = prefetch_count + 2,
+//    message_ttl                 = prefetch_count + 3,
+//    redelivered                 = prefetch_count + 13,
+//    max_priority                = prefetch_count + 9,
+//    prefetch_count              = header::num_id::last_type_id + 1,
+//    max_length_bytes            = prefetch_count + 6,
+//    dead_letter_exchange        = prefetch_count + 7,
+//    dead_letter_routing_key     = prefetch_count + 8,
+//*/
+//    switch (hdr.size())
+//    {
+//    case header::size_of(tag::durable()):
+//        return header::detect(hdr, tag::durable());
+//    case size_of(tag::durable()): {
+//        num_id::type rc = detect(hdr, tag::durable());
+//        if (!rc) {
+//            rc = detect(hdr, tag::expires());
+//            if (!rc) {
+//                return detect(hdr, tag::session());
+//            }
+//        }
+//        return rc;
+//    }
+
+//    case size_of(tag::ack()):
+//        return detect(hdr, tag::ack());
+//    case size_of(tag::host()):
+//        return detect(hdr, tag::host());
+//    case size_of(tag::login()):
+//        return detect(hdr, tag::login());
+//    case size_of(tag::server()):
+//        return detect(hdr, tag::server());
+//    case size_of(tag::version()): {
+//        num_id::type rc = detect(hdr, tag::version());
+//        if (!rc) {
+//            rc = detect(hdr, tag::session());
+//            if (!rc) {
+//                return detect(hdr, tag::receipt());
+//            }
+//        }
+//        return rc;
+//    }
+//    case size_of(tag::passcode()):
+//        return detect(hdr, tag::passcode());
+//    case size_of(tag::message_id()): {
+//        num_id::type rc = detect(hdr, tag::receipt_id());
+//        if (!rc) {
+//            rc = detect(hdr, tag::message_id());
+//            if (!rc) {
+//                return detect(hdr, tag::heart_beat());
+//            }
+//        }
+//        return rc;
+//    }
+//    case size_of(tag::destination()): {
+//        num_id::type rc = detect(hdr, tag::destination());
+//        if (!rc) {
+//            return detect(hdr, tag::transaction());
+//        }
+//        return rc;
+//    }
+//    case size_of(tag::content_type()): {
+//        num_id::type rc = detect(hdr, tag::content_type());
+//        if (!rc) {
+//            return detect(hdr, tag::subscription());
+//        }
+//        return rc;
+//    }
+//    case size_of(tag::content_length()): {
+//        num_id::type rc = detect(hdr, tag::content_length());
+//        if (!rc) {
+//            return detect(hdr, tag::accept_version());
+//        }
+//        return rc;
+//    }
+//    default: ;
+//    }
+
+//    return num_id::none;
+//}
 
 } // namespace rabbitmq
 } // namespace stomptalk
