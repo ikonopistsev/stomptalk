@@ -12,7 +12,9 @@ SOURCES += \
     src/user_hook.cpp
 
 HEADERS += \
+    include/stomptalk/btpro/hdrstok.hpp \
     include/stomptalk/btpro/receipt_pool.hpp \
+    include/stomptalk/btpro/stomplay.hpp \
     include/stomptalk/btpro/subs_pool.hpp \
     include/stomptalk/header.hpp \
     include/stomptalk/strref.hpp \

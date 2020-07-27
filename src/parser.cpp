@@ -138,10 +138,11 @@ void parser::eval_header(parser_hook&, std::string_view val) noexcept
     using header::size_of;
     using namespace header::tag;
 
-    header::mask_id::type rc;
+    header::num_id::type rc = header::eval_stomp_header_type(val);
     switch (val.size())
     {
         case (size_of(content_length())):
+            return detect(val, content_length())
             if (detect(rc, val, content_length()))
             {
                 if (rc == header::mask_id::content_length)

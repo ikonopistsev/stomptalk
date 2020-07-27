@@ -256,7 +256,8 @@ struct num_id
 
 enum type : std::size_t
 {
-    content_length = 0,
+    none = 0,
+    content_length,
     content_type,
     accept_version,
     host,
@@ -516,19 +517,30 @@ static constexpr std::size_t size_of(T) noexcept
 }
 
 template <class T>
-static constexpr bool detect(header::mask_id::type& rc,
-    const char *text, T) noexcept
+static constexpr num_id::type detect(const char *text, T) noexcept
 {
-    auto res = eqstr(T::name(), text);
-    if (res)
-        rc = T::mask;
-    return res;
+    return eqstr(T::name(), text) ? T::num : num_id::none;
 }
 
 template <class T, class V>
-static constexpr bool detect(header::mask_id::type& rc, V text, T) noexcept
+static constexpr num_id::type detect(V text, T) noexcept
 {
-    return detect(rc, text.data(), T());
+    return detect(text.data(), T());
+}
+
+static inline
+num_id::type eval_stomp_header_type(std::string_view hdr) noexcept
+{
+    switch (hdr.size())
+    {
+    case size_of(tag::id()):
+        return detect(hdr, tag::id());
+    case size_of(tag::ack()):
+        return detect(hdr, tag::ack());
+    default: ;
+    }
+
+    return num_id::none;
 }
 
 } // namespace header
