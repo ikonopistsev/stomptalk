@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stomptalk/v12.hpp"
-#include "stomptalk/user_hook.hpp"
+#include "stomptalk/hook_base.hpp"
 #include "stomptalk/btpro/frame.hpp"
 
 namespace stomptalk {

@@ -1,29 +1,14 @@
 #include "stomptalk/parser.hpp"
 #include "stomptalk/header.hpp"
 #include "stomptalk/parser_hook.hpp"
-#include "stomptalk/antoull.hpp"
 #include <cstring>
 #include <cassert>
 
 namespace stomptalk {
 
-enum eval_hdr_val
-{
-    eval_hdr_val_none = 0,
-    eval_hdr_val_content_length,
-    eval_hdr_val_content_type
-};
-
 void parser::clear() noexcept
 {
-    content_len_ = 0;
-    orig_content_len_ = 0;
-    bytes_read_ = 0;
-    total_bytes_read_ = 0;
-
     state_fn_  = &parser::start_state;
-    heval_  = heval::none;
-
     sbuf_.reset();
 }
 
@@ -49,10 +34,7 @@ parser::pointer parser::start_state(parser_hook& hook,
             return curr;
         }
 
-        content_len_ = 0;
-        orig_content_len_ = 0;
         hook.set(parser_hook::error::none);
-        hook.set(parser_hook::content_type_id::none);
 
         // вызываем каллбек
         hook.on_frame();
@@ -133,35 +115,6 @@ static inline bool ch_isprint_nospace(char ch) noexcept
     return (ch > 32) && (ch <= 126);
 }
 
-void parser::eval_header(parser_hook&, std::string_view val) noexcept
-{
-    auto rc = header::eval_stomp_header(val);
-    if (rc == header::num_id::content_length)
-        heval_ = heval::content_length;
-    else if (rc == header::num_id::content_type)
-        heval_ = heval::content_type;
-    else
-        heval_ = heval::none;
-}
-
-void parser::eval_value(parser_hook& hook, std::string_view val) noexcept
-{
-    if (heval_ == heval::content_length)
-    {
-        auto content_len = antoull(val);
-        if (content_len > 0ll)
-        {
-            auto value = static_cast<std::uint64_t>(content_len);
-            content_len_ = value;
-            hook.set_content_length(value);
-        }
-    }
-    else if (heval_ == heval::content_type)
-    {
-        hook.eval_content_type(val);
-    }
-}
-
 parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
@@ -173,9 +126,6 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
         {
             // сохраняем параметры стека
             auto text = sbuf_.pop();
-
-            // определяем значимый ли хидер
-            eval_header(hook, text);
 
             // выполняем каллбек на хидер
             hook.on_hdr_key(text);
@@ -231,8 +181,6 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
             // сохраняем параметры стека
             auto text = sbuf_.pop();
 
-            eval_value(hook, text);
-
             hook.on_hdr_val(text);
 
             // переходим к поиску конца метода
@@ -245,8 +193,6 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
         {
             // сохраняем параметры стека
             auto text = sbuf_.pop();
-
-            eval_value(hook, text);
 
             hook.on_hdr_val(text);
 
@@ -346,7 +292,7 @@ parser::pointer parser::done(parser_hook& hook,
     }
     else
     {
-        if (content_len_ > 0)
+        if (hook.content_length() > 0)
         {
             // выбираем как будем читать боди
             state_fn_ = &parser::body_read;
@@ -387,21 +333,23 @@ parser::pointer parser::almost_done(parser_hook& hook,
 parser::pointer parser::body_read(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
-    auto to_read = std::distance(curr, end);
+    auto to_read = static_cast<std::size_t>(std::distance(curr, end));
+    auto content_length = hook.content_length();
 
     to_read = static_cast<std::size_t>(
-        (std::min)(static_cast<std::uint64_t>(to_read), content_len_));
+        (std::min)(static_cast<std::uint64_t>(to_read), content_length));
 
     if (to_read > 0)
     {
-        content_len_ -= to_read;
+        content_length -= to_read;
+        hook.set(content_length);
 
         hook.on_body(curr, to_read);
     }
 
     curr += to_read;
 
-    if (content_len_ == 0)
+    if (content_length == 0)
     {
         state_fn_ = &parser::frame_end;
 
@@ -429,7 +377,7 @@ parser::pointer parser::body_read_no_length(parser_hook& hook,
     } while (curr < end);
 
     // считаем количество данных боди
-    auto to_read = std::distance(beg, curr);
+    auto to_read = static_cast<std::size_t>(std::distance(beg, curr));
 
     if (to_read > 0)
     {
@@ -462,13 +410,8 @@ std::size_t parser::run(parser_hook& hook,
     const char* curr = begin;
     const char* end = begin + len;
 
-    while (curr < end)
-    {
+    while ((curr < end) && hook.ok())
         curr = (this->*state_fn_)(hook, curr, end);
-
-        if (hook.get_error() != parser_hook::error::none)
-            break;
-    }
 
     return static_cast<std::size_t>(std::distance(begin, curr));
 }

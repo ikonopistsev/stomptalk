@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stomptalk/user_hook.hpp"
+#include "stomptalk/hook_base.hpp"
 
 namespace stomptalk {
 
@@ -8,9 +8,6 @@ class parser;
 class parser_hook
 {
 public:
-    typedef method::base method_type;
-    typedef header::tag::content_type::content_type_id content_type_id;
-
     struct error
     {
         enum type
@@ -30,89 +27,46 @@ protected:
     hook_base& hook_;
 
     error::type error_{error::none};
-    method_type method_{};
     std::uint64_t content_len_{};
-    content_type_id::type content_type_{content_type_id::none};
-
-    bool eval_method(std::string_view val) noexcept;
 
 public:
     parser_hook(hook_base& hook)
         : hook_(hook)
     {   }
 
-    void set(error::type value) noexcept
-    {
-        error_ = value;
-    }
-
-    void set(content_type_id::type value) noexcept
-    {
-        content_type_ = value;
-    }
-
-    void eval_content_type(std::string_view val) noexcept;
+    void reset() noexcept;
 
     bool ok() const noexcept
     {
-        return get_error() == error::none;
+        return error() == error::none;
     }
 
-    operator method_type::value_type() const noexcept
-    {
-        return method_;
-    }
-
-    method_type get_method() const noexcept
-    {
-        return method_;
-    }
-
-    error::type get_error() const noexcept
+    error::type error() const noexcept
     {
         return error_;
     }
 
-    content_type_id::type get_content_type() const noexcept
-    {
-        return content_type_;
-    }
-
-    void set_content_length(std::uint64_t content_length) noexcept
+    void set(std::uint64_t content_length) noexcept
     {
         content_len_ = content_length;
     }
 
-    void on_frame() noexcept
+    std::uint64_t content_length() const noexcept
     {
-        hook_.on_frame(*this);
+        return content_len_;
     }
 
-    void on_method(std::string_view text) noexcept
-    {
-        method_ = hook_.eval_method(text);
-        hook_.on_method(*this, std::move(text));
-    }
+    void on_frame() noexcept;
 
-    void on_hdr_key(std::string_view text) noexcept
-    {
-        hook_.on_hdr_key(*this, std::move(text));
-    }
+    void on_method(std::string_view text) noexcept;
 
-    void on_hdr_val(std::string_view text) noexcept
-    {
-        hook_.on_hdr_val(*this, std::move(text));
-    }
+    void on_hdr_key(std::string_view text) noexcept;
 
-    void on_body(const void* ptr, std::size_t size) noexcept
-    {
-        hook_.on_body(*this, ptr, size);
-    }
+    void on_hdr_val(std::string_view text) noexcept;
 
-    void on_frame_end() noexcept
-    {
-        hook_.on_frame_end(*this);
-    }
+    void on_body(const void* ptr, std::size_t size) noexcept;
+
+    void on_frame_end() noexcept;
 
     void next_frame() noexcept;
 };

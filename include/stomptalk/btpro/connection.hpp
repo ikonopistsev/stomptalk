@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stomptalk/parser.hpp"
-#include "stomptalk/user_hook.hpp"
+#include "stomptalk/hook_base.hpp"
 #include "stomptalk/btpro/v12.hpp"
 #include "btpro/tcp/bev.hpp"
 #include "stomptalk/btpro/subs_pool.hpp"
@@ -127,15 +127,15 @@ private:
                             std::string_view text) noexcept override
     {
         std::cout << text;
-        switch (hook.get_method())
-        {
-            case method::num_id::message:
-            case method::num_id::receipt:
-            case method::num_id::error:
-                eval_header(hook, text);
-            break;
-            default:;
-        }
+//        switch (hook.get_method())
+//        {
+//            case method::num_id::message:
+//            case method::num_id::receipt:
+//            case method::num_id::error:
+//                eval_header(hook, text);
+//            break;
+//            default:;
+//        }
     }
 
     virtual void on_hdr_val(parser_hook&,
@@ -170,30 +170,30 @@ private:
 
     virtual void on_frame_end(parser_hook& hook) noexcept override
     {
-        switch (hook.get_method())
-        {
-        case method::num_id::message: {
-            exec_on_message(subscription_id_, std::move(recv_));
-            break;
-        }
+//        switch (hook.get_method())
+//        {
+//        case method::num_id::message: {
+//            exec_on_message(subscription_id_, std::move(recv_));
+//            break;
+//        }
 
-        case method::num_id::connected: {
-            exec_on_logon();
-            break;
-        }
+//        case method::num_id::connected: {
+//            exec_on_logon();
+//            break;
+//        }
 
-        case method::num_id::receipt: {
-            exec_on_receipt();
-            break;
-        }
+//        case method::num_id::receipt: {
+//            exec_on_receipt();
+//            break;
+//        }
 
-        case method::num_id::error: {
-            std::cout << "ERROR!" << std::endl;
-            break;
-        }
+//        case method::num_id::error: {
+//            std::cout << "ERROR!" << std::endl;
+//            break;
+//        }
 
-        default: ;
-        }
+//        default: ;
+//        }
     }
 
     void eval_header(parser_hook&, std::string_view val) noexcept

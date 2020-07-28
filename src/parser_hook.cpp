@@ -2,52 +2,40 @@
 
 namespace stomptalk {
 
-bool parser_hook::eval_method(std::string_view val) noexcept
+void parser_hook::reset() noexcept
 {
-    using method::size_of;
-    using method::detect;
-    using namespace method::tag;
-
-    switch (val.size())
-    {
-    case size_of(ack()):
-        return detect(method_, val, ack());
-
-    case size_of(nack()):
-        return detect(method_, val, nack()) ||
-            detect(method_, val, send());
-
-    case size_of(abort()):
-        return detect(method_, val, abort()) ||
-            detect(method_, val, begin());
-
-    case size_of(commit()):
-        return detect(method_, val, commit());
-
-    case size_of(connect()):
-        return detect(method_, val, connect()) ||
-            detect(method_, val, message()) ||
-            detect(method_, val, receipt());
-
-    case size_of(connected()):
-        return detect(method_, val, connected()) ||
-            detect(method_, val, subscribe());
-
-    case size_of(disconnect()):
-        return detect(method_, val, disconnect());
-
-    case size_of(unsubscribe()):
-        return detect(method_, val, unsubscribe());
-
-    default:;
-    }
-
-    return false;
+    error_ = error::none;
+    content_len_ = 0;
 }
 
-void parser_hook::eval_content_type(std::string_view val) noexcept
+void parser_hook::on_frame() noexcept
 {
-    content_type_ = header::tag::content_type::eval_content_type(val);
+    hook_.on_frame(*this);
+}
+
+void parser_hook::on_method(std::string_view text) noexcept
+{
+    hook_.on_method(*this, text);
+}
+
+void parser_hook::on_hdr_key(std::string_view text) noexcept
+{
+    hook_.on_hdr_key(*this, text);
+}
+
+void parser_hook::on_hdr_val(std::string_view text) noexcept
+{
+    hook_.on_hdr_val(*this, text);
+}
+
+void parser_hook::on_body(const void* ptr, std::size_t size) noexcept
+{
+    hook_.on_body(*this, ptr, size);
+}
+
+void parser_hook::on_frame_end() noexcept
+{
+    hook_.on_frame_end(*this);
 }
 
 void parser_hook::next_frame() noexcept

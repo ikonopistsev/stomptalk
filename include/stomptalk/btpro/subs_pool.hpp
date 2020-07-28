@@ -14,6 +14,8 @@ class subs_pool
 {
 public:
     typedef std::function<void(btpro::buffer)> fn_type;
+    typedef std::unordered_map<std::string, fn_type> storage_type;
+    typedef storage_type::iterator iterator;
 
 private:
     std::unordered_map<std::string, fn_type> storage_{};
@@ -41,9 +43,9 @@ public:
             exec(std::get<1>(*f), std::move(buf));
     }
 
-    void remove(const std::string& id)
+    void erase(iterator f)
     {
-        storage_.erase(id);
+        storage_.erase(f);
     }
 };
 

@@ -2,6 +2,7 @@
 
 #include "stomptalk/memeq.hpp"
 #include "stomptalk/strref.hpp"
+
 #include <cstdint>
 
 namespace stomptalk {
@@ -134,90 +135,6 @@ struct unsubscribe {
 
 } // namespace tag
 
-class base
-{
-public:
-    typedef std::size_t value_type;
-
-private:
-    value_type num_id_ = { num_id::none };
-
-public:
-    base() = default;
-    base(base&&) = default;
-    base& operator=(base&&) = default;
-    base(const base&) = default;
-    base& operator=(const base&) = default;
-
-
-    explicit base(value_type num_id) noexcept
-        : num_id_(num_id)
-    {   }
-
-    std::string_view str() const noexcept
-    {
-        using namespace tag;
-
-        switch (num_id_)
-        {
-        case num_id::none:
-            return make_ref("none");
-        case ack::num:
-            return ack::name();
-        case nack::num:
-            return nack::name();
-        case send::num:
-            return send::name();
-        case abort::num:
-            return abort::name();
-        case begin::num:
-            return begin::name();
-        case error::num:
-            return error::name();
-        case commit::num:
-            return commit::name();
-        case connect::num:
-            return connect::name();
-        case message::num:
-            return message::name();
-        case receipt::num:
-            return receipt::name();
-        case subscribe::num:
-            return subscribe::name();
-        case connected::num:
-            return connected::name();
-        case disconnect::num:
-            return disconnect::name();
-        case unsubscribe::num:
-            return unsubscribe::name();
-        default: ;
-        }
-
-        return make_ref("unknown");
-    }
-
-    void set(value_type num_id) noexcept
-    {
-        num_id_ = num_id;
-    }
-
-    base& operator=(value_type num_id) noexcept
-    {
-        set(num_id);
-        return *this;
-    }
-
-    value_type num_id() const noexcept
-    {
-        return num_id_;
-    }
-
-    operator value_type() const noexcept
-    {
-        return num_id();
-    }
-};
-
 
 template <class T>
 static constexpr std::size_t size_of(T) noexcept
@@ -226,26 +143,69 @@ static constexpr std::size_t size_of(T) noexcept
 }
 
 template <class T>
-static constexpr bool detect(method::base& method, const char *text, T) noexcept
+static constexpr std::size_t detect(const char *text, T) noexcept
 {
-    auto rc = eqstr(T::name(), text);
-    if (rc)
-        method = T::num;
-    return rc;
+    return eqstr(T::name(), text) ? T::num : num_id::none;
 }
 
 template <class T, class V>
-static constexpr bool detect(method::base& method, V text, T) noexcept
+static constexpr std::size_t detect(V text, T) noexcept
 {
-    return detect(method, text.data(), T());
+    return detect(text.data(), T());
 }
 
-//template <class T>
-//static constexpr bool equal(const T&, const char *text)
-//{
-//    constexpr auto name = T::name();
-//    return memeq<size_of(name)>::cmp(name.data(), text);
-//}
+std::size_t eval_stom_method(std::string_view val) noexcept;
+
+class generic
+{
+public:
+    typedef std::size_t type;
+
+private:
+    type num_id_ = { num_id::none };
+
+public:
+    generic() = default;
+    generic(generic&&) = default;
+    generic& operator=(generic&&) = default;
+    generic(const generic&) = default;
+    generic& operator=(const generic&) = default;
+
+    virtual ~generic() = default;
+
+    explicit generic(type num_id) noexcept
+        : num_id_(num_id)
+    {   }
+
+    explicit generic(std::string_view val) noexcept
+        : num_id_(eval_stom_method(val))
+    {   }
+
+    virtual bool valid() const noexcept;
+
+    virtual std::string_view str() const noexcept;
+
+    void set(type num_id) noexcept
+    {
+        num_id_ = num_id;
+    }
+
+    generic& operator=(type num_id) noexcept
+    {
+        set(num_id);
+        return *this;
+    }
+
+    type num_id() const noexcept
+    {
+        return num_id_;
+    }
+
+    operator type() const noexcept
+    {
+        return num_id();
+    }
+};
 
 } // namespace method
 
@@ -307,7 +267,6 @@ enum type : std::uint64_t
     receipt         = 1ull << num_id::receipt,
     message         = 1ull << num_id::message,
     last_mask_id    = message
-    // mask_next    = last_mask_id << 1
 };
 
 }; // struct mask_id
@@ -369,39 +328,8 @@ struct content_type {
         return make_ref("application/octet-stream");
     }
 
-    static inline
-    content_type_id::type eval_content_type(std::string_view val) noexcept
-    {
-        content_type_id::type rc = content_type_id::octet;
-
-        switch (val.size())
-        {
-        case size_of(text_xml()):
-            if (eqstr(text_xml(), val))
-                rc = content_type_id::xml;
-            break;
-        case size_of(text_html()):
-            if (eqstr(text_html(), val))
-                rc = content_type_id::html;
-            break;
-        case size_of(text_plain()):
-            if (eqstr(text_plain(), val))
-                rc = content_type_id::html;
-            break;
-        case size_of(xml()):
-            if (eqstr(xml(), val))
-                rc = content_type_id::xml;
-            break;
-        case size_of(json()):
-            if (eqstr(json(), val))
-                rc = content_type_id::json;
-            break;
-        case size_of(octet()):
-        default: ;
-        }
-
-        return rc;
-    }
+    static content_type_id::type
+        eval_content_type(std::string_view val) noexcept;
 };
 
 struct accept_version {
@@ -570,79 +498,15 @@ static constexpr std::size_t detect(V text, T) noexcept
     return detect(text.data(), T());
 }
 
-static inline std::size_t eval_stomp_header(std::string_view hdr) noexcept
-{
-    switch (hdr.size())
-    {
-    case size_of(tag::id()):
-        return detect(hdr, tag::id());
-    case size_of(tag::ack()):
-        return detect(hdr, tag::ack());
-    case size_of(tag::host()):
-        return detect(hdr, tag::host());
-    case size_of(tag::login()):
-        return detect(hdr, tag::login());
-    case size_of(tag::server()):
-        return detect(hdr, tag::server());
-    case size_of(tag::receipt()): {
-        auto rc = detect(hdr, tag::receipt());
-        if (!rc) {
-            rc = detect(hdr, tag::session());
-            if (!rc) {
-                rc = detect(hdr, tag::version());
-                if (!rc) {
-                    return detect(hdr, tag::message());
-                }
-            }
-        }
-        return rc;
-    }
-    case size_of(tag::passcode()):
-        return detect(hdr, tag::passcode());
-    case size_of(tag::message_id()): {
-        auto rc = detect(hdr, tag::receipt_id());
-        if (!rc) {
-            rc = detect(hdr, tag::message_id());
-            if (!rc) {
-                return detect(hdr, tag::heart_beat());
-            }
-        }
-        return rc;
-    }
-    case size_of(tag::destination()): {
-        auto rc = detect(hdr, tag::destination());
-        if (!rc) {
-            return detect(hdr, tag::transaction());
-        }
-        return rc;
-    }
-    case size_of(tag::content_type()): {
-        auto rc = detect(hdr, tag::content_type());
-        if (!rc) {
-            return detect(hdr, tag::subscription());
-        }
-        return rc;
-    }
-    case size_of(tag::content_length()): {
-        auto rc = detect(hdr, tag::content_length());
-        if (!rc) {
-            return detect(hdr, tag::accept_version());
-        }
-        return rc;
-    }
-    default: ;
-    }
-
-    return num_id::none;
-}
+std::size_t eval_stomp_header(std::string_view hdr) noexcept;
 
 class generic
 {
 public:
-    typedef std::size_t value_type;
+    typedef std::size_t type;
 
 protected:
-    value_type num_id_ = { num_id::none };
+    type num_id_ = { num_id::none };
 
 public:
     generic() = default;
@@ -650,92 +514,50 @@ public:
     generic& operator=(generic&&) = default;
     generic(const generic&) = default;
     generic& operator=(const generic&) = default;
+
     virtual ~generic() = default;
 
     explicit generic(std::string_view hdr) noexcept
         : num_id_(eval_stomp_header(hdr))
     {   }
 
-    explicit generic(value_type num_id) noexcept
+    explicit generic(type num_id) noexcept
         : num_id_(num_id)
     {   }
 
-    virtual void detect(std::string_view hdr) noexcept
-    {
-        num_id_ = eval_stomp_header(hdr);
-    }
+    virtual bool valid() const noexcept;
 
-    virtual std::string_view str() const noexcept
-    {
-        using namespace tag;
+    virtual std::string_view str() const noexcept;
 
-        switch (num_id_)
-        {
-        case num_id::none:
-            return make_ref("none");
-        case content_length::num:
-            return content_length::name();
-        case content_type::num:
-            return content_length::name();
-        case accept_version::num:
-            return accept_version::name();
-        case host::num:
-            return host::name();
-        case version::num:
-            return version::name();
-        case destination::num:
-            return destination::name();
-        case id::num:
-            return id::name();
-        case message_id::num:
-            return message_id::name();
-        case subscription::num:
-            return subscription::name();
-        case receipt_id::num:
-            return receipt_id::name();
-        case login::num:
-            return login::name();
-        case passcode::num:
-            return passcode::name();
-        case heart_beat::num:
-            return heart_beat::name();
-        case session::num:
-            return session::name();
-        case ack::num:
-            return ack::name();
-        case receipt::num:
-            return receipt::name();
-        default: ;
-        }
-
-        return make_ref("unknown");
-    }
-
-    void set(value_type num_id) noexcept
+    void set(type num_id) noexcept
     {
         num_id_ = num_id;
     }
 
-    generic& operator=(value_type num_id) noexcept
+    bool is(type num_id) noexcept
+    {
+        return num_id_ == num_id;
+    }
+
+    generic& operator=(type num_id) noexcept
     {
         set(num_id);
         return *this;
     }
 
-    value_type num_id() const noexcept
+    type num_id() const noexcept
     {
         return num_id_;
     }
 
-    operator value_type() const noexcept
+    operator type() const noexcept
     {
         return num_id();
     }
 
-    virtual operator bool() const noexcept
+    operator bool() const noexcept
     {
-        auto id = num_id();
-        return (num_id::none < id) && (id <= num_id::last_type_id);
+        return valid();
     }
 };
 
@@ -743,8 +565,15 @@ public:
 } // namespace stomptalk
 
 template<class C, class T>
-constexpr std::basic_ostream<C, T>& operator<<(std::basic_ostream<C, T>& os,
-    stomptalk::method::base method)
+constexpr std::basic_ostream<C, T>& operator<<(
+    std::basic_ostream<C, T>& os, const stomptalk::method::generic& method)
 {
     return os << method.str();
+}
+
+template<class C, class T>
+constexpr std::basic_ostream<C, T>& operator<<(
+    std::basic_ostream<C, T>& os, const stomptalk::header::generic& hdr)
+{
+    return os << hdr.str();
 }

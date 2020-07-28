@@ -6,10 +6,12 @@ CONFIG += object_parallel_to_source c++17 console warn_on static
 CONFIG -= app_bundle
 
 SOURCES += \
+    src/btpro/receipt_pool.cpp \
+    src/hook_base.cpp \
     src/parser.cpp \
     src/parser_hook.cpp \
     src/btpro/connection.cpp \
-    src/user_hook.cpp
+    src/tag.cpp
 
 HEADERS += \
     include/stomptalk/btpro/hdrstok.hpp \
@@ -17,13 +19,14 @@ HEADERS += \
     include/stomptalk/btpro/stomplay.hpp \
     include/stomptalk/btpro/subs_pool.hpp \
     include/stomptalk/header.hpp \
+    include/stomptalk/header_arr.hpp \
+    include/stomptalk/hook_base.hpp \
     include/stomptalk/strref.hpp \
     include/stomptalk/memeq.hpp \
     include/stomptalk/tag.hpp \
     include/stomptalk/parser.hpp \
     include/stomptalk/parser_hook.hpp \
     include/stomptalk/stackbuf.hpp \
-    include/stomptalk/user_hook.hpp \
     include/stomptalk/validator.hpp \
     include/stomptalk/v12.hpp \
     include/stomptalk/rabbitmq.hpp \

@@ -164,6 +164,20 @@ static constexpr auto content_type_octet() noexcept {
 } // namespace header
 } // namespace stomptalk
 
+template <class K, class V>
+bool operator< (const stomptalk::header::base<K, V>& hdr1,
+    stomptalk::header::base<K, V>& hdr2) noexcept
+{
+    return hdr1.key() < hdr2.key();
+}
+
+template <class K, class V1, class V2>
+bool operator< (const stomptalk::header::base<K, V1>& hdr1,
+    stomptalk::header::base<K, V2>& hdr2) noexcept
+{
+    return hdr1.key() < hdr2.key();
+}
+
 template<class C, class T, class V>
 std::basic_ostream<C, T>& operator<<(std::basic_ostream<C, T>& os,
     stomptalk::header::custom hdr)

@@ -21,31 +21,12 @@ public:
 private:
     storage_type storage_{};
 
-    void exec(fn_type& fn) noexcept
-    {
-        try
-        {
-            fn();
-        }
-        catch (...)
-        {   }
-    }
+    void exec(fn_type& fn) noexcept;
 
 public:
-    void create(const std::string& receipt_id, fn_type fn)
-    {
-        storage_[receipt_id] = std::move(fn);
-    }
+    void create(const std::string& receipt_id, fn_type fn);
 
-    void on_recepit(const std::string& receipt_id)
-    {
-        auto f = storage_.find(receipt_id);
-        if (f != storage_.end())
-        {
-            exec(std::get<1>(*f));
-            storage_.erase(f);
-        }
-    }
+    void on_recepit(const std::string& receipt_id);
 };
 
 } // namespace tcp
