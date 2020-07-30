@@ -236,7 +236,7 @@ enum type : std::size_t
     ack,
     receipt,
     message,
-    last_type_id = message
+    last_num_id = message
     // type_next    = last_type_id + 1
 };
 
@@ -481,19 +481,20 @@ struct receipt_id {
 
 
 template <class T>
-static constexpr std::size_t size_of(T) noexcept
+constexpr std::size_t size_of(T) noexcept
 {
     return stomptalk::size_of(T::name());
 }
 
 template <class T>
-static constexpr std::size_t detect(const char *text, T) noexcept
+std::size_t detect(const char *text, T) noexcept
 {
-    return eqstr(T::name(), text) ? T::num : num_id::none;
+    return eqstr(T::name(), text) ?
+        std::size_t(T::num) : std::size_t(num_id::none);
 }
 
 template <class T, class V>
-static constexpr std::size_t detect(V text, T) noexcept
+std::size_t detect(V text, T) noexcept
 {
     return detect(text.data(), T());
 }

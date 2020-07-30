@@ -95,6 +95,8 @@ class basic
     : public fixed
 {
 public:
+    constexpr static auto num_id = T::num;
+
     constexpr explicit basic() noexcept
         : fixed(T::name())
     {   }
@@ -120,6 +122,8 @@ typedef basic<header::tag::content_type> content_type;
 typedef basic<header::tag::content_length> content_length;
 typedef basic<header::tag::heart_beat> heart_beat;
 typedef basic<header::tag::accept_version> accept_version;
+typedef basic<header::tag::version> version;
+typedef basic<header::tag::server> server;
 typedef basic<header::tag::host> host;
 typedef basic<header::tag::login> login;
 typedef basic<header::tag::passcode> passcode;
@@ -129,6 +133,7 @@ typedef basic<header::tag::subscription> subscription;
 typedef basic<header::tag::ack> ack;
 typedef basic<header::tag::id> id;
 typedef basic<header::tag::receipt> receipt;
+typedef basic<header::tag::receipt_id> receipt_id;
 
 static constexpr auto ver12() noexcept {
     return accept_version(tag::accept_version::v12());

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stomptalk/frame.hpp"
+#include "stomptalk/header_store.hpp"
 #include "btpro/tcp/bev.hpp"
 
 namespace stomptalk {
@@ -50,52 +51,96 @@ public:
     }
 };
 
-class send_frame final
-    : public frame
+class logon
 {
-    be::buffer data_;
+public:
+    typedef std::function<void(const rabbitmq::header_store&)> fn_type;
+
+private:
+    be::buffer data_{};
+
+    void append(std::string_view text)
+    {
+        data_.append(text.data(), text.size());
+    }
+
+    void append_ref(std::string_view text)
+    {
+        data_.append_ref(text.data(), text.size());
+    }
+
+    void push_fixed(header::fixed hdr)
+    {
+        append(hdr.key());
+        append_ref(make_ref(":"));
+        append(hdr.value());
+        append_ref(make_ref("\n"));
+    }
 
 public:
-    send_frame() = default;
-    send_frame(send_frame&&) = default;
-
-    virtual ~send_frame() override = default;
-
-    void append_data(be::buffer data)
+    explicit logon(const std::string& host, std::size_t size_reserve = 320)
     {
-        data_.append(std::move(data));
+        data_.expand(size_reserve);
+        push(method::tag::connect::name());
+        push(header::ver12());
+        push(header::host(host));
     }
 
-    virtual void write(bt::bev& output) override
+    logon(const std::string& host, const std::string& login,
+        std::size_t size_reserve = 320)
     {
-        auto sz = data_.size();
-        if (sz)
-        {
-            push(header::content_type_octet());
-            auto size_text = btdef::to_text(sz);
-            std::string_view size(size_text.data(), size_text.size());
-            push(header::content_length(size));
-            append_ref(make_ref("\n"));
-            buf_.append(std::move(data_));
-            append_ref(make_ref("\0"));
-
-            std::cout << std::endl << str() << std::endl;
-            output.write(std::move(buf_));
-        }
-        else
-            frame::write(output);
+        data_.expand(size_reserve);
+        push(method::tag::connect::name());
+        push(header::ver12());
+        push(header::host(host));
+        push(header::login(login));
     }
 
-    std::string str() const
+    logon(const std::string& host, const std::string& login,
+        const std::string& passcode, std::size_t size_reserve = 320)
     {
-        return buf_.str();
+        data_.expand(size_reserve);
+        push(method::tag::connect::name());
+        push(header::ver12());
+        push(header::host(host));
+        push(header::login(login));
+        push(header::passcode(passcode));
+    }
+
+    template<std::size_t N>
+    void push(strref<N> val)
+    {
+        append_ref(val);
+        append_ref(make_ref("\n"));
+    }
+
+    // выставить хидер
+    void push(header::fixed hdr)
+    {
+        push_fixed(hdr);
+    }
+
+    void push(header::id hdr)
+    {
+        push_fixed(hdr);
+    }
+
+    void write(bt::bev& output)
+    {
+        append_ref(make_ref("\n\0"));
+        output.write(std::move(data_));
+    }
+
+    std::string str() const noexcept
+    {
+        return data_.str();
     }
 };
 
 class subscribe
 {
 public:
-    typedef std::function<void(be::buffer)> fn_type;
+    typedef std::function<void(be::buffer, const rabbitmq::header_store&)> fn_type;
 
 private:
     be::buffer data_{};

@@ -6,12 +6,6 @@
 
 namespace stomptalk {
 
-void parser::clear() noexcept
-{
-    state_fn_  = &parser::start_state;
-    sbuf_.reset();
-}
-
 static inline bool ch_isupper(char ch) noexcept
 {
     return ('A' <= ch) && (ch <= 'Z');
@@ -34,17 +28,18 @@ parser::pointer parser::start_state(parser_hook& hook,
             return curr;
         }
 
-        hook.set(parser_hook::error::none);
-
+        sbuf_.reset();
+        hook.reset();
         // вызываем каллбек
         hook.on_frame();
 
         // сохраняем стек
-        if (!sbuf_.push(ch))
-        {
-            hook.set(parser_hook::error::too_big);
-            return curr;
-        }
+        sbuf_.push(ch);
+//        if (!sbuf_.push(ch))
+//        {
+//            hook.set(parser_hook::error::too_big);
+//            return curr;
+//        }
 
         // переходим к разбору метода
         state_fn_ = &parser::method_state;

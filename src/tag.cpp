@@ -155,14 +155,19 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
     {
     case size_of(tag::id()):
         return detect(hdr, tag::id());
+
     case size_of(tag::ack()):
         return detect(hdr, tag::ack());
+
     case size_of(tag::host()):
         return detect(hdr, tag::host());
+
     case size_of(tag::login()):
         return detect(hdr, tag::login());
+
     case size_of(tag::server()):
         return detect(hdr, tag::server());
+
     case size_of(tag::receipt()): {
         auto rc = detect(hdr, tag::receipt());
         if (!rc) {
@@ -176,8 +181,10 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         }
         return rc;
     }
+
     case size_of(tag::passcode()):
         return detect(hdr, tag::passcode());
+
     case size_of(tag::message_id()): {
         auto rc = detect(hdr, tag::receipt_id());
         if (!rc) {
@@ -188,6 +195,7 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         }
         return rc;
     }
+
     case size_of(tag::destination()): {
         auto rc = detect(hdr, tag::destination());
         if (!rc) {
@@ -195,6 +203,7 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         }
         return rc;
     }
+
     case size_of(tag::content_type()): {
         auto rc = detect(hdr, tag::content_type());
         if (!rc) {
@@ -202,6 +211,7 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         }
         return rc;
     }
+
     case size_of(tag::content_length()): {
         auto rc = detect(hdr, tag::content_length());
         if (!rc) {
@@ -209,6 +219,7 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         }
         return rc;
     }
+
     default: ;
     }
 
@@ -218,7 +229,7 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
 bool generic::valid() const noexcept
 {
     auto id = num_id();
-    return (num_id::none < id) && (id <= num_id::last_type_id);
+    return (num_id::none < id) && (id <= num_id::last_num_id);
 }
 
 std::string_view generic::str() const noexcept
@@ -257,6 +268,8 @@ std::string_view generic::str() const noexcept
         return heart_beat::name();
     case session::num:
         return session::name();
+    case server::num:
+        return server::name();
     case ack::num:
         return ack::name();
     case receipt::num:

@@ -1,47 +1,28 @@
 #pragma once
 
-#include "stomptalk/parser.hpp"
-#include "stomptalk/hook_base.hpp"
-#include "stomptalk/btpro/v12.hpp"
+#include "stomptalk/btpro/stomplay.hpp"
 #include "btpro/tcp/bev.hpp"
-#include "stomptalk/btpro/subs_pool.hpp"
-#include "stomptalk/btpro/receipt_pool.hpp"
 #include <map>
 
 namespace stomptalk {
 namespace tcp {
 
-template <class T>
-class connection final
-    : public stomptalk::hook_base
+class connection
 {
 public:
-    typedef void (T::*on_connect_fn)();
-    typedef void (T::*on_event_fn)(short);
-    typedef connection<T> this_type;
+    typedef rabbitmq::header_store header_type;
+    typedef std::function<void()> fun_type;
+    typedef std::function<void(short)> on_event_type;
+    typedef std::function<void(btpro::buffer, const header_type&)> on_data_type;
 
 private:
     btpro::queue_ref queue_{};
-
-    T& self_;
     btpro::tcp::bev bev_{};
 
-    on_event_fn evfn_{};
-    on_connect_fn connfn_{};
-    on_connect_fn logonfn_{};
-    subs_pool::fn_type messagefn_{};
+    on_event_type event_fun_{};
+    fun_type on_connect_fun_{};
 
-    stomptalk::parser stomp_{};
-    stomptalk::parser_hook hook_{*this};
-    btpro::buffer recv_{};
-
-    subs_pool subs_{};
-    receipt_pool receipt_{};
-
-    std::size_t heval_{};
-
-    std::string receipt_id_{};
-    std::string subscription_id_{};
+    stomplay stomplay_{};
 
     template<class A>
     struct proxy
@@ -65,14 +46,12 @@ private:
         if (what == BEV_EVENT_CONNECTED)
         {
             bev_.enable(EV_READ);
-
-            assert(connfn_);
-            (self_.*connfn_)();
+            on_connect_fun_();
         }
         else
         {
             bev_.destroy();
-            (self_.*evfn_)(what);
+            event_fun_(what);
         }
     }
 
@@ -96,7 +75,7 @@ private:
                 input.pullup(static_cast<ev_ssize_t>(needle)));
 
             // парсим данные
-            auto rc = stomp_.run(hook_, ptr, needle);
+            auto rc = stomplay_.parse(ptr, needle);
 
             // очищаем input
             input.drain(rc);
@@ -111,143 +90,39 @@ private:
         assert(input.empty());
     }
 
-    virtual void on_frame(parser_hook&) noexcept override
-    {
-        btpro::buffer buf;
-        recv_ = std::move(buf);
-    }
-
-    virtual
-    void on_method(parser_hook&, std::string_view method) noexcept override
-    {
-        std::cout << std::endl << std::endl << method << std::endl;
-    }
-
-    virtual void on_hdr_key(parser_hook& hook,
-                            std::string_view text) noexcept override
-    {
-        std::cout << text;
-//        switch (hook.get_method())
+//    void exec_on_logon() noexcept
+//    {
+//        try
 //        {
-//            case method::num_id::message:
-//            case method::num_id::receipt:
-//            case method::num_id::error:
-//                eval_header(hook, text);
-//            break;
-//            default:;
+//            (self_.*logonfn_)();
 //        }
-    }
-
-    virtual void on_hdr_val(parser_hook&,
-                            std::string_view val) noexcept override
-    {
-        std::cout << ": " << val << std::endl;
-        switch (heval_) {
-        case header::num_id::receipt_id:
-            receipt_id_ = val;
-            break;
-
-        case header::num_id::subscription:
-            subscription_id_ = val;
-            break;
-
-        default: ;
-        }
-
-        heval_ = header::num_id::content_length;
-    }
-
-    virtual void on_body(parser_hook&,
-                         const void* data, std::size_t sz) noexcept override
-    {
-        try
-        {
-            recv_.append(data, sz);
-        }
-        catch (...)
-        {   }
-    }
-
-    virtual void on_frame_end(parser_hook& hook) noexcept override
-    {
-//        switch (hook.get_method())
+//        catch (const std::exception& e)
 //        {
-//        case method::num_id::message: {
-//            exec_on_message(subscription_id_, std::move(recv_));
-//            break;
+//            std::cerr << e.what() << std::endl;
 //        }
-
-//        case method::num_id::connected: {
-//            exec_on_logon();
-//            break;
+//        catch (...)
+//        {
+//            std::cerr << "exec_on_logon" << std::endl;
 //        }
+//    }
 
-//        case method::num_id::receipt: {
-//            exec_on_receipt();
-//            break;
+
+
+//    void exec_on_message(const std::string& subscription_id, btpro::buffer buf) noexcept
+//    {
+//        try
+//        {
+//            subs_.on_message(subscription_id, std::move(buf));
 //        }
-
-//        case method::num_id::error: {
-//            std::cout << "ERROR!" << std::endl;
-//            break;
+//        catch (const std::exception& e)
+//        {
+//            std::cerr << e.what() << std::endl;
 //        }
-
-//        default: ;
+//        catch (...)
+//        {
+//            std::cerr << "exec_on_message" << std::endl;
 //        }
-    }
-
-    void eval_header(parser_hook&, std::string_view val) noexcept
-    {
-        heval_ = header::eval_stomp_header(val);
-    }
-
-    void exec_on_logon() noexcept
-    {
-        try
-        {
-            (self_.*logonfn_)();
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
-        catch (...)
-        {
-            std::cerr << "exec_on_logon" << std::endl;
-        }
-    }
-
-    void exec_on_receipt() noexcept
-    {
-        try
-        {
-            receipt_.on_recepit(receipt_id_);
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
-        catch (...)
-        {
-            std::cerr << "exec_on_logon" << std::endl;
-        }
-    }
-
-    void exec_on_message(const std::string& subscription_id, btpro::buffer buf) noexcept
-    {
-        try
-        {
-            subs_.on_message(subscription_id, std::move(buf));
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
-        catch (...)
-        {
-            std::cerr << "exec_on_message" << std::endl;
-        }
-    }
+//    }
 
     void create()
     {
@@ -255,8 +130,8 @@ private:
 
         bev_.create(queue_, btpro::socket());
 
-        bev_.set(&proxy<this_type>::recvcb,
-            nullptr, &proxy<this_type>::evcb, this);
+        bev_.set(&proxy<connection>::recvcb,
+            nullptr, &proxy<connection>::evcb, this);
     }
 
     static inline std::string startup_time() noexcept
@@ -293,17 +168,14 @@ private:
     }
 
 public:
-    connection(btpro::queue_ref queue, T& self, on_event_fn evfn,
-               on_connect_fn connfn, on_connect_fn logonfn) noexcept
+    connection(btpro::queue_ref queue,
+               on_event_type evfn, fun_type connfn) noexcept
         : queue_(std::move(queue))
-        , self_(self)
-        , evfn_(evfn)
-        , connfn_(connfn)
-        , logonfn_(logonfn)
+        , event_fun_(evfn)
+        , on_connect_fun_(connfn)
     {
         assert(evfn);
         assert(connfn);
-        assert(logonfn);
     }
 
     void connect(btpro::dns_ref dns, const std::string& host, int port)
@@ -313,20 +185,12 @@ public:
         bev_.connect(dns, host, port);
     }
 
-    void logon(stomptalk::v12::connect frame)
+    void logon(tcp::logon frame, tcp::logon::fn_type fn)
     {
-        std::cout << std::endl << frame.str() << std::endl;
+        stomplay_.on_logon(std::move(fn));
+
+        std::cout << std::endl << frame.str() << std::endl << std::endl;
         frame.write(bev_);
-    }
-
-    void logon(stomptalk::v12::connect frame, on_connect_fn logonfn)
-    {
-        assert(logonfn);
-
-        std::cout << std::endl <<  frame.str() << std::endl;
-        frame.write(bev_);
-
-        logonfn_ = logonfn;
     }
 
     void subscribe(tcp::subscribe frame, receipt_pool::fn_type fn)
@@ -342,19 +206,12 @@ public:
         frame.push(header::id(subs_id));
 
         auto frame_fn = frame.fn();
-        receipt_.create(receipt_id, [=]{
-            try
-            {
-                // сохраняем подписку
-                subs_.create(subs_id, std::move(frame_fn));
-                // выполняем обработчик
-                fn();
-            }  catch (...) {
-
-            }
+        stomplay_.add_receipt(receipt_id, [=](const stomptalk::rabbitmq::header_store& hdr){
+            stomplay_.add_subscribe(subs_id, std::move(frame_fn));
+            fn(hdr);
         });
 
-        std::cout << std::endl << frame.str() << std::endl;
+        std::cout << std::endl << frame.str() << std::endl << std::endl;
         frame.write(bev_);
     }
 
@@ -364,7 +221,7 @@ public:
         {
             auto receipt_id = create_receipt_id();
             frame.push(header::receipt(receipt_id));
-            receipt_.create(receipt_id, std::move(fn));
+            stomplay_.add_receipt(receipt_id, std::move(fn));
         }
 
         send(std::move(frame));
@@ -372,7 +229,7 @@ public:
 
     void send(tcp::send frame)
     {
-        std::cout << std::endl << frame.str() << std::endl;
+        //std::cout << std::endl << frame.str() << std::endl;
         frame.write(bev_);
     }
 };

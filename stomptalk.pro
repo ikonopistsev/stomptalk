@@ -11,6 +11,7 @@ SOURCES += \
     src/parser.cpp \
     src/parser_hook.cpp \
     src/btpro/connection.cpp \
+    src/rabbitmq.cpp \
     src/tag.cpp
 
 HEADERS += \
@@ -19,7 +20,7 @@ HEADERS += \
     include/stomptalk/btpro/stomplay.hpp \
     include/stomptalk/btpro/subs_pool.hpp \
     include/stomptalk/header.hpp \
-    include/stomptalk/header_arr.hpp \
+    include/stomptalk/header_store.hpp \
     include/stomptalk/hook_base.hpp \
     include/stomptalk/strref.hpp \
     include/stomptalk/memeq.hpp \
