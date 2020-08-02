@@ -211,8 +211,7 @@ public:
 
 namespace header {
 
-struct num_id
-{
+struct num_id {
 
 enum type : std::size_t
 {
@@ -236,8 +235,23 @@ enum type : std::size_t
     ack,
     receipt,
     message,
-    last_num_id = message
-    // type_next    = last_type_id + 1
+    prefetch_count,
+    durable,
+    auto_delete,
+    message_ttl,
+    expires,
+    max_length,
+    max_length_bytes,
+    dead_letter_exchange,
+    dead_letter_routing_key,
+    max_priority,
+    persistent,
+    reply_to,
+    redelivered,
+    original_exchange,
+    original_routing_key,
+    count,
+    last_num_id = original_routing_key
 };
 
 };
@@ -246,27 +260,42 @@ struct mask_id {
 
 enum type : std::uint64_t
 {
-    none            = 0,
-    content_length  = 1ull << num_id::content_length,
-    content_type    = 1ull << num_id::content_type,
-    accept_version  = 1ull << num_id::accept_version,
-    host            = 1ull << num_id::host,
-    version         = 1ull << num_id::version,
-    destination     = 1ull << num_id::destination,
-    id              = 1ull << num_id::id,
-    transaction     = 1ull << num_id::transaction,
-    message_id      = 1ull << num_id::message_id,
-    subscription    = 1ull << num_id::subscription,
-    receipt_id      = 1ull << num_id::receipt_id,
-    login           = 1ull << num_id::login,
-    passcode        = 1ull << num_id::passcode,
-    heart_beat      = 1ull << num_id::heart_beat,
-    session         = 1ull << num_id::session,
-    server          = 1ull << num_id::server,
-    ack             = 1ull << num_id::ack,
-    receipt         = 1ull << num_id::receipt,
-    message         = 1ull << num_id::message,
-    last_mask_id    = message
+    none                        = 0,
+    content_length              = 1ull << num_id::content_length,
+    content_type                = 1ull << num_id::content_type,
+    accept_version              = 1ull << num_id::accept_version,
+    host                        = 1ull << num_id::host,
+    version                     = 1ull << num_id::version,
+    destination                 = 1ull << num_id::destination,
+    id                          = 1ull << num_id::id,
+    transaction                 = 1ull << num_id::transaction,
+    message_id                  = 1ull << num_id::message_id,
+    subscription                = 1ull << num_id::subscription,
+    receipt_id                  = 1ull << num_id::receipt_id,
+    login                       = 1ull << num_id::login,
+    passcode                    = 1ull << num_id::passcode,
+    heart_beat                  = 1ull << num_id::heart_beat,
+    session                     = 1ull << num_id::session,
+    server                      = 1ull << num_id::server,
+    ack                         = 1ull << num_id::ack,
+    receipt                     = 1ull << num_id::receipt,
+    message                     = 1ull << num_id::message,
+    prefetch_count              = 1ull << num_id::prefetch_count,
+    durable                     = 1ull << num_id::durable,
+    auto_delete                 = 1ull << num_id::auto_delete,
+    message_ttl                 = 1ull << num_id::message_ttl,
+    expires                     = 1ull << num_id::expires,
+    max_length                  = 1ull << num_id::max_length,
+    max_length_bytes            = 1ull << num_id::max_length_bytes,
+    dead_letter_exchange        = 1ull << num_id::dead_letter_exchange,
+    dead_letter_routing_key     = 1ull << num_id::dead_letter_routing_key,
+    max_priority                = 1ull << num_id::max_priority,
+    persistent                  = 1ull << num_id::persistent,
+    reply_to                    = 1ull << num_id::reply_to,
+    redelivered                 = 1ull << num_id::redelivered,
+    original_exchange           = 1ull << num_id::original_exchange,
+    original_routing_key        = 1ull << num_id::original_routing_key,
+    last_mask_id                = original_routing_key
 };
 
 }; // struct mask_id
@@ -461,6 +490,13 @@ struct receipt {
     }
 };
 
+static constexpr auto enable() noexcept {
+    return make_ref("true");
+}
+static constexpr auto disable() noexcept {
+    return make_ref("false");
+}
+
 struct message {
     static constexpr auto num = num_id::message;
     static constexpr auto mask = mask_id::message;
@@ -474,6 +510,133 @@ struct receipt_id {
     static constexpr auto mask = mask_id::receipt_id;
     static constexpr auto name() noexcept {
         return make_ref("receipt-id");
+    }
+};
+
+struct prefetch_count {
+    static constexpr auto num = num_id::prefetch_count;
+    static constexpr auto mask = mask_id::prefetch_count;
+    static constexpr auto name() noexcept {
+        return make_ref("prefetch-count");
+    }
+};
+
+struct durable {
+    static constexpr auto num = num_id::durable;
+    static constexpr auto mask = mask_id::durable;
+    static constexpr auto name() noexcept {
+        return make_ref("durable");
+    }
+};
+
+struct auto_delete {
+    static constexpr auto num = num_id::auto_delete;
+    static constexpr auto mask = mask_id::auto_delete;
+    static constexpr auto name() noexcept {
+        return make_ref("auto-delete");
+    }
+
+    static constexpr auto enable() noexcept {
+        return make_ref("true");
+    }
+    static constexpr auto disable() noexcept {
+        return make_ref("false");
+    }
+};
+
+struct persistent {
+    static constexpr auto num = num_id::persistent;
+    static constexpr auto mask = mask_id::durable;
+    static constexpr auto name() noexcept {
+        return make_ref("persistent");
+    }
+};
+
+struct message_ttl {
+    static constexpr auto num = num_id::message_ttl;
+    static constexpr auto mask = mask_id::message_ttl;
+    static constexpr auto name() noexcept {
+        return make_ref("x-message-ttl");
+    }
+};
+
+struct reply_to {
+    static constexpr auto num = num_id::reply_to;
+    static constexpr auto mask = mask_id::reply_to;
+    static constexpr auto name() noexcept {
+        return make_ref("reply-to");
+    }
+};
+
+struct expires {
+    static constexpr auto num = num_id::expires;
+    static constexpr auto mask = mask_id::expires;
+    static constexpr auto name() noexcept {
+        return make_ref("expires");
+    }
+};
+
+struct redelivered {
+    static constexpr auto num = num_id::redelivered;
+    static constexpr auto mask = mask_id::redelivered;
+    static constexpr auto name() noexcept {
+        return make_ref("redelivered");
+    }
+};
+
+struct max_length {
+    static constexpr auto num = num_id::max_length;
+    static constexpr auto mask = mask_id::max_length;
+    static constexpr auto name() noexcept {
+        return make_ref("x-max-length");
+    }
+};
+
+struct max_length_bytes {
+    static constexpr auto num = num_id::max_length_bytes;
+    static constexpr auto mask = mask_id::max_length_bytes;
+    static constexpr auto name() noexcept {
+        return make_ref("x-max-length-bytes");
+    }
+};
+
+struct max_priority {
+    static constexpr auto num = num_id::max_priority;
+    static constexpr auto mask = mask_id::max_priority;
+    static constexpr auto name() noexcept {
+        return make_ref("x-max-priority");
+    }
+};
+
+struct dead_letter_exchange {
+    static constexpr auto num = num_id::dead_letter_exchange;
+    static constexpr auto mask = mask_id::dead_letter_exchange;
+    static constexpr auto name() noexcept {
+        return make_ref("x-dead-letter-exchange");
+    }
+};
+
+struct dead_letter_routing_key {
+    static constexpr auto num = num_id::dead_letter_routing_key;
+    static constexpr auto mask = mask_id::dead_letter_routing_key;
+    static constexpr auto name() noexcept {
+        return make_ref("x-dead-letter-routing-key");
+    }
+};
+
+struct original_exchange {
+    static constexpr auto num = num_id::original_exchange;
+    static constexpr auto mask = mask_id::original_exchange;
+    static constexpr auto name() noexcept {
+        return make_ref("x-original-exchange");
+    }
+};
+
+struct original_routing_key {
+    static constexpr auto num = num_id::original_routing_key;
+    static constexpr auto mask = mask_id::original_routing_key;
+    static constexpr auto name() noexcept {
+        return make_ref("x-original-routing-key");
     }
 };
 
@@ -525,6 +688,8 @@ public:
     explicit generic(type num_id) noexcept
         : num_id_(num_id)
     {   }
+
+    void eval(std::string_view hdr) noexcept;
 
     virtual bool valid() const noexcept;
 

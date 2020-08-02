@@ -10,10 +10,8 @@ namespace tcp {
 class connection
 {
 public:
-    typedef rabbitmq::header_store header_type;
     typedef std::function<void()> fun_type;
     typedef std::function<void(short)> on_event_type;
-    typedef std::function<void(btpro::buffer, const header_type&)> on_data_type;
 
 private:
     btpro::queue_ref queue_{};
@@ -90,40 +88,6 @@ private:
         assert(input.empty());
     }
 
-//    void exec_on_logon() noexcept
-//    {
-//        try
-//        {
-//            (self_.*logonfn_)();
-//        }
-//        catch (const std::exception& e)
-//        {
-//            std::cerr << e.what() << std::endl;
-//        }
-//        catch (...)
-//        {
-//            std::cerr << "exec_on_logon" << std::endl;
-//        }
-//    }
-
-
-
-//    void exec_on_message(const std::string& subscription_id, btpro::buffer buf) noexcept
-//    {
-//        try
-//        {
-//            subs_.on_message(subscription_id, std::move(buf));
-//        }
-//        catch (const std::exception& e)
-//        {
-//            std::cerr << e.what() << std::endl;
-//        }
-//        catch (...)
-//        {
-//            std::cerr << "exec_on_message" << std::endl;
-//        }
-//    }
-
     void create()
     {
         bev_.destroy();
@@ -185,43 +149,60 @@ public:
         bev_.connect(dns, host, port);
     }
 
-    void logon(tcp::logon frame, tcp::logon::fn_type fn)
+    template<class Rep, class Period>
+    void connect(btpro::dns_ref dns, const std::string& host, int port,
+                 std::chrono::duration<Rep, Period> timeout)
+    {
+        create();
+
+        bev_.connect(dns, host, port);
+
+        auto tv = btpro::make_timeval(timeout);
+        bev_.set_timeout(nullptr, &tv);
+    }
+
+    void logon(tcp::logon frame, stomplay::fun_type fn)
     {
         stomplay_.on_logon(std::move(fn));
 
-        std::cout << std::endl << frame.str() << std::endl << std::endl;
         frame.write(bev_);
     }
 
-    void subscribe(tcp::subscribe frame, receipt_pool::fn_type fn)
+    void subscribe(tcp::subscribe frame, stomplay::fun_type fn)
     {
         assert(fn);
 
-        // id квитанции
+        // генерируем id квитанции
         auto receipt_id = create_receipt_id();
         frame.push(header::receipt(receipt_id));
 
-        // id подписки
-        auto subs_id = create_subs_id();
-        frame.push(header::id(subs_id));
+        // получаем id подписки
+        // если нет - создаем новый
+        // и добавляем во фрейм
+        auto subs_id = std::move(frame.id());
+        if (subs_id.empty())
+        {
+            subs_id = create_subs_id();
+            frame.push(header::id(subs_id));
+        }
 
         auto frame_fn = frame.fn();
-        stomplay_.add_receipt(receipt_id, [=](const stomptalk::rabbitmq::header_store& hdr){
-            stomplay_.add_subscribe(subs_id, std::move(frame_fn));
-            fn(hdr);
+        stomplay_.add_handler(receipt_id,
+            [=](packet p){
+                stomplay_.add_handler(subs_id, std::move(frame_fn));
+            fn(std::move(p));
         });
 
-        std::cout << std::endl << frame.str() << std::endl << std::endl;
         frame.write(bev_);
     }
 
-    void send(tcp::send frame, receipt_pool::fn_type fn)
+    void send(tcp::send frame, stomplay::fun_type fn)
     {
         if (fn)
         {
             auto receipt_id = create_receipt_id();
             frame.push(header::receipt(receipt_id));
-            stomplay_.add_receipt(receipt_id, std::move(fn));
+            stomplay_.add_handler(receipt_id, std::move(fn));
         }
 
         send(std::move(frame));

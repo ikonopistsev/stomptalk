@@ -134,6 +134,43 @@ typedef basic<header::tag::ack> ack;
 typedef basic<header::tag::id> id;
 typedef basic<header::tag::receipt> receipt;
 typedef basic<header::tag::receipt_id> receipt_id;
+typedef basic<header::tag::session> session;
+typedef header::basic<tag::prefetch_count> prefetch_count;
+typedef header::basic<tag::durable> durable;
+typedef header::basic<tag::auto_delete> auto_delete;
+typedef header::basic<tag::persistent> persistent;
+typedef header::basic<tag::message_ttl> message_ttl;
+typedef header::basic<tag::reply_to> reply_to;
+typedef header::basic<tag::expires> expires;
+typedef header::basic<tag::max_length> max_length;
+typedef header::basic<tag::max_length_bytes> max_length_bytes;
+typedef header::basic<tag::max_priority> max_priority;
+typedef header::basic<tag::dead_letter_exchange> dead_letter_exchange;
+typedef header::basic<tag::dead_letter_routing_key> dead_letter_routing_key;
+typedef header::basic<tag::redelivered> redelivered;
+typedef header::basic<tag::original_exchange> original_exchange;
+typedef header::basic<tag::original_routing_key> original_routing_key;
+
+
+constexpr static durable durable_on() noexcept {
+    return durable(tag::enable());
+}
+
+constexpr static durable durable_off() noexcept {
+    return durable(tag::disable());
+}
+
+constexpr static auto_delete auto_delete_on() noexcept {
+    return auto_delete(tag::enable());
+}
+
+constexpr static auto_delete auto_delete_off() noexcept {
+    return auto_delete(tag::disable());
+}
+
+constexpr static persistent persistent_on() noexcept {
+    return persistent(tag::enable());
+}
 
 static constexpr auto ver12() noexcept {
     return accept_version(tag::accept_version::v12());

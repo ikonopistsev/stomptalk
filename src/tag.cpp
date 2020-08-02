@@ -21,11 +21,13 @@ std::size_t eval_stom_method(std::string_view val) noexcept
     case size_of(tag::abort()): {
         auto rc = detect(val, tag::abort());
         if (!rc) {
-            return detect(val, tag::begin());
+            rc = detect(val, tag::begin());
+            if (!rc) {
+                return detect(val, tag::error());
+            }
         }
         return rc;
     }
-
     case size_of(tag::commit()):
         return detect(val, tag::commit());
 
@@ -175,22 +177,36 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
             if (!rc) {
                 rc = detect(hdr, tag::version());
                 if (!rc) {
-                    return detect(hdr, tag::message());
+                    rc = detect(hdr, tag::message());
+                    if (!rc) {
+                        rc = detect(hdr, tag::durable());
+                        if (!rc) {
+                            return detect(hdr, tag::expires());
+                        }
+                    }
                 }
             }
         }
         return rc;
     }
 
-    case size_of(tag::passcode()):
-        return detect(hdr, tag::passcode());
+    case size_of(tag::reply_to()): {
+        auto rc= detect(hdr, tag::reply_to());
+        if (!rc) {
+            return detect(hdr, tag::passcode());
+        }
+        return rc;
+    }
 
     case size_of(tag::message_id()): {
         auto rc = detect(hdr, tag::receipt_id());
         if (!rc) {
             rc = detect(hdr, tag::message_id());
             if (!rc) {
-                return detect(hdr, tag::heart_beat());
+                rc = detect(hdr, tag::heart_beat());
+                if (!rc) {
+                    return detect(hdr, tag::persistent());
+                }
             }
         }
         return rc;
@@ -199,11 +215,17 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
     case size_of(tag::destination()): {
         auto rc = detect(hdr, tag::destination());
         if (!rc) {
-            return detect(hdr, tag::transaction());
+            rc = detect(hdr, tag::transaction());
+            if (!rc) {
+                rc = detect(hdr, tag::redelivered());
+                if (!rc) {
+                    return detect(hdr, tag::auto_delete());
+                }
+            }
         }
         return rc;
     }
-
+                    //x-max-length
     case size_of(tag::content_type()): {
         auto rc = detect(hdr, tag::content_type());
         if (!rc) {
@@ -212,18 +234,52 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         return rc;
     }
 
+    case size_of(tag::message_ttl()):
+        return detect(hdr, tag::message_ttl());
+                    //x-message-ttl
     case size_of(tag::content_length()): {
         auto rc = detect(hdr, tag::content_length());
         if (!rc) {
-            return detect(hdr, tag::accept_version());
+            rc = detect(hdr, tag::prefetch_count());
+            if (!rc) {
+                rc = detect(hdr, tag::max_priority());
+                if (!rc) {
+                    rc = detect(hdr, tag::accept_version());
+                    if (!rc) {
+                        return detect(hdr, tag::max_length());
+                    }
+                }
+            }
         }
         return rc;
     }
+
+    case size_of(tag::max_length_bytes()):
+        return detect(hdr, tag::max_length_bytes());
+
+    case size_of(tag::original_exchange()):
+        return detect(hdr, tag::original_exchange());
+
+    case size_of(tag::dead_letter_exchange()): {
+        auto rc = detect(hdr, tag::dead_letter_exchange());
+        if (!rc) {
+            return detect(hdr, tag::original_routing_key());
+        }
+        return rc;
+    }
+
+    case size_of(tag::dead_letter_routing_key()):
+        return detect(hdr, tag::dead_letter_routing_key());
 
     default: ;
     }
 
     return num_id::none;
+}
+
+void generic::eval(std::string_view hdr) noexcept
+{
+    num_id_ = eval_stomp_header(hdr);
 }
 
 bool generic::valid() const noexcept
@@ -274,6 +330,38 @@ std::string_view generic::str() const noexcept
         return ack::name();
     case receipt::num:
         return receipt::name();
+    case message::num:
+        return message::name();
+    case prefetch_count::num:
+        return prefetch_count::name();
+    case durable::num:
+        return durable::name();
+    case auto_delete::num:
+        return auto_delete::name();
+    case message_ttl::num:
+        return message_ttl::name();
+    case expires::num:
+        return expires::name();
+    case max_length::num:
+        return max_length::name();
+    case max_length_bytes::num:
+        return max_length_bytes::name();
+    case dead_letter_exchange::num:
+        return dead_letter_exchange::name();
+    case dead_letter_routing_key::num:
+        return dead_letter_routing_key::name();
+    case max_priority::num:
+        return max_priority::name();
+    case persistent::num:
+        return persistent::name();
+    case reply_to::num:
+        return reply_to::name();
+    case redelivered::num:
+        return redelivered::name();
+    case original_exchange::num:
+        return original_exchange::name();
+    case original_routing_key::num:
+        return original_routing_key::name();
     default: ;
     }
 
