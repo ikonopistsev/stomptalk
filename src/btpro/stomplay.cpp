@@ -109,16 +109,9 @@ void stomplay::on_frame_end(parser_hook&) noexcept
 {
     switch (method_.num_id())
     {
-    case method::num_id::connected:
-        exec_on_logon();
+    case method::num_id::error:
+        exec_on_error();
         break;
-
-    case method::num_id::message: {
-        auto subs = header_store_.get(stomptalk::header::subscription());
-        if (!subs.empty())
-            exec_on_message(subs);
-        break;
-    }
 
     case method::num_id::receipt: {
         auto id = header_store_.get(stomptalk::header::receipt_id());
@@ -127,8 +120,15 @@ void stomplay::on_frame_end(parser_hook&) noexcept
         break;
     }
 
-    case method::num_id::error:
-        exec_on_error();
+    case method::num_id::message: {
+        auto subs = header_store_.get(stomptalk::header::subscription());
+        if (!subs.empty())
+            exec_on_message(subs);
+        break;
+    }
+
+    case method::num_id::connected:
+        exec_on_logon();
         break;
     }
 }

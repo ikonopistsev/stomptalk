@@ -139,6 +139,22 @@ void connection::subscribe(tcp::subscribe frame, stomplay::fun_type fn)
     frame.write(bev_);
 }
 
+void connection::unsubscribe(const std::string& sub_id, stomplay::fun_type fn)
+{
+    assert(fn);
+
+    auto receipt_id = create_receipt_id();
+
+    tcp::frame frame;
+    frame.push(method::tag::unsubscribe::name());
+    frame.push(header::subscription(sub_id));
+    frame.push(header::receipt(receipt_id));
+
+    stomplay_.add_handler(receipt_id, std::move(fn));
+
+    frame.write(bev_);
+}
+
 void connection::send(tcp::send frame, stomplay::fun_type fn)
 {
     assert(fn);

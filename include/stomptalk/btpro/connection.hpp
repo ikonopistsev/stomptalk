@@ -72,6 +72,8 @@ public:
 
     void subscribe(tcp::subscribe frame, stomplay::fun_type fn);
 
+    void unsubscribe(const std::string& sub_id, stomplay::fun_type fn);
+
     void send(tcp::send frame, stomplay::fun_type fn);
 
     void send(tcp::send frame)
