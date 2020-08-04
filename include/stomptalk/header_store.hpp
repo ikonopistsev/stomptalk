@@ -69,7 +69,7 @@ class header_store
     index_type internal_set(std::string_view key, std::string_view value)
     {
         auto item = emplace_back(key, value);
-        auto rc = std::distance(store_.cbegin(), item);
+        auto rc = static_cast<index_type>(std::distance(store_.cbegin(), item));
         std::hash<std::string_view> hf;
         header_map_[hf(key)] = rc;
         return rc;
@@ -141,9 +141,9 @@ public:
         return end();
     }
 
-    std::size_t size() const noexcept
+    index_type size() const noexcept
     {
-        return std::distance(begin(), end());
+        return static_cast<index_type>(std::distance(begin(), end()));
     }
 
     bool empty() const noexcept

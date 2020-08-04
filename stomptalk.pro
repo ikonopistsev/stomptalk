@@ -29,7 +29,6 @@ HEADERS += \
     include/stomptalk/parser.hpp \
     include/stomptalk/parser_hook.hpp \
     include/stomptalk/stackbuf.hpp \
-    include/stomptalk/v12.hpp \
     include/stomptalk/antoull.hpp \
     include/stomptalk/btpro/frame.hpp \
     include/stomptalk/btpro/connection.hpp \
