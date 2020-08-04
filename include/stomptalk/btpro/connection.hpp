@@ -41,9 +41,11 @@ private:
 
     void do_evcb(short what) noexcept;
 
-    void do_recv(btpro::buffer_ref input);
+    void do_recv(btpro::buffer_ref input) noexcept;
 
     void create();
+
+    void exec_subscribe(const stomplay::fun_type& fn, tcp::packet p);
 
 public:
     connection(btpro::queue_ref queue,

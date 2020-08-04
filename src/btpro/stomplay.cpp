@@ -40,7 +40,7 @@ void stomplay::on_hdr_key(parser_hook& hook, std::string_view text) noexcept
 {
     try
     {
-        current_header_.assign(text);
+        current_header_ = text;
         header_.eval(text);
         return;
     }

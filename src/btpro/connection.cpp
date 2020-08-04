@@ -17,35 +17,67 @@ void connection::do_evcb(short what) noexcept
     }
 }
 
-void connection::do_recv(btpro::buffer_ref input)
+void connection::do_recv(btpro::buffer_ref input) noexcept
 {
-    // такого типа быть не может
-    // буферэвент должен отрабоать дисконнект
-    assert(!input.empty());
-
-    while (!input.empty())
+    try
     {
-        // сколько непрерывных данных мы имеем
-        auto needle = input.contiguous_space();
+        // такого типа быть не может
+        // буферэвент должен отрабоать дисконнект
+        assert(!input.empty());
+
+        while (!input.empty())
+        {
+            // сколько непрерывных данных мы имеем
+            auto needle = input.contiguous_space();
 #ifdef DEBUG
-        // это для тестов
-        if (needle > 1)
-            needle /= 2;
+            // это для тестов
+            if (needle > 1)
+                needle /= 2;
 #endif // DEBUG
-        // получаем указатель
-        auto ptr = reinterpret_cast<const char*>(
-            input.pullup(static_cast<ev_ssize_t>(needle)));
+            // получаем указатель
+            auto ptr = reinterpret_cast<const char*>(
+                input.pullup(static_cast<ev_ssize_t>(needle)));
 
-        // парсим данные
-        auto rc = stomplay_.parse(ptr, needle);
+            // парсим данные
+            auto rc = stomplay_.parse(ptr, needle);
 
-        // очищаем input
-        input.drain(rc);
+            // очищаем input
+            input.drain(rc);
 
-        // если не все пропарсилось
-        // это ошибка
-        if (rc < needle)
-            throw std::runtime_error("parse error");
+            // если не все пропарсилось
+            // это ошибка и хз чо делать
+            // дисконнектимся
+            if (rc < needle)
+                do_evcb(BEV_EVENT_ERROR);
+        }
+
+        return;
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "receive hell" << std::endl;
+    }
+
+    do_evcb(BEV_EVENT_ERROR);
+}
+
+void connection::exec_subscribe(const stomplay::fun_type& fn, tcp::packet p)
+{
+    try
+    {
+        fn(std::move(p));
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "exec_subscribe" << std::endl;
     }
 }
 
@@ -133,7 +165,7 @@ void connection::subscribe(tcp::subscribe frame, stomplay::fun_type fn)
             // добавляем id подписки и ее обработчик
             stomplay_.add_handler(id, std::move(frame_fn));
             // вызываем клиентский обработчки подписки
-            receipt_fn(std::move(p));
+            exec_subscribe(receipt_fn, std::move(p));
     });
 
     frame.write(bev_);
