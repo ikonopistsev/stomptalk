@@ -11,7 +11,7 @@ template<class K, class V>
 class base
 {
     K key_{};
-    K val_{};
+    V val_{};
 
 public:
     base() = default;
