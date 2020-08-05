@@ -3,6 +3,7 @@
 #include "stomptalk/parser_hook.hpp"
 #include <cstring>
 #include <cassert>
+#include <algorithm>
 
 namespace stomptalk {
 
