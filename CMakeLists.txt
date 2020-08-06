@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(source
     src/parser.cpp
     src/parser_hook.cpp
+    src/tag.cpp
 )
 
 set(pub_header
@@ -20,7 +21,9 @@ set(pub_header
     include/stomptalk/parser_hook.hpp
 )
 
-add_library(stomptalk SHARED ${source})
+include_directories(..)
+
+add_library(stomptalk STATIC ${source})
 
 target_include_directories(stomptalk PUBLIC include)
 
