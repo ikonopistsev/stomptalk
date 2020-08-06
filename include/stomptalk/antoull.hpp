@@ -17,7 +17,7 @@ struct antout
     static T conv(const char *ptr) noexcept
     {
         static_assert (std::is_signed<T>::value, "type not signed");
-        auto i = static_cast<std::intptr_t>(*ptr - '0');
+        auto i = static_cast<std::intptr_t>(*ptr) - '0';
         if ((i < 0) || (i > 9))
             return std::numeric_limits<T>::min();
         return static_cast<T>(i * pw) + antout<T, N - 1>::conv(++ptr);
@@ -31,7 +31,7 @@ struct antout<T, 1>
     static T conv(const char *ptr) noexcept
     {
         static_assert (std::is_signed<T>::value, "type not signed");
-        auto i = static_cast<std::intptr_t>(*ptr - '0');
+        auto i = static_cast<std::intptr_t>(*ptr) - '0';
         return ((i < 0) || (i > 9)) ?
             std::numeric_limits<T>::min() : static_cast<T>(i);
     }
