@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(stomptalk VERSION 0.0.2 DESCRIPTION "stomp protocol parser")
+project(stomptalk VERSION 1.0.0 DESCRIPTION "stomp protocol parser")
 
 option(STOMPTALK_DEBUG "show debug" OFF)
 
