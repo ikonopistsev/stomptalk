@@ -28,7 +28,7 @@ jobs:
         os: [windows-2019]
 
     steps:
-      - uses: actions/checkout
+      - uses: actions/checkout@master
 
       - name: Prepare vcpkg
         uses: lukka/run-vcpkg@v2
