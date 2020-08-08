@@ -20,6 +20,7 @@ enum type
     abort,
     begin,
     error,
+    stomp,
     commit,
     connect,
     message,
@@ -47,12 +48,18 @@ struct nack {
     static constexpr auto name() noexcept {
         return make_ref("NACK");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct send {
     static constexpr auto num = num_id::send;
     static constexpr auto name() noexcept {
         return make_ref("SEND");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -61,6 +68,9 @@ struct abort {
     static constexpr auto name() noexcept {
         return make_ref("ABORT");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct begin {
@@ -68,12 +78,28 @@ struct begin {
     static constexpr auto name() noexcept {
         return make_ref("BEGIN");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct error {
     static constexpr auto num = num_id::error;
     static constexpr auto name() noexcept {
         return make_ref("ERROR");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
+};
+
+struct stomp {
+    static constexpr auto num = num_id::stomp;
+    static constexpr auto name() noexcept {
+        return make_ref("STOMP");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -89,12 +115,18 @@ struct connect {
     static constexpr auto name() noexcept {
         return make_ref("CONNECT");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct message {
     static constexpr auto num = num_id::message;
     static constexpr auto name() noexcept {
         return make_ref("MESSAGE");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -103,6 +135,9 @@ struct receipt {
     static constexpr auto name() noexcept {
         return make_ref("RECEIPT");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct connected {
@@ -110,12 +145,18 @@ struct connected {
     static constexpr auto name() noexcept {
         return make_ref("CONNECTED");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct subscribe {
     static constexpr auto num = num_id::subscribe;
     static constexpr auto name() noexcept {
         return make_ref("SUBSCRIBE");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -308,6 +349,9 @@ struct content_length {
     static constexpr auto name() noexcept {
         return make_ref("content-length");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct content_type {
@@ -315,6 +359,9 @@ struct content_type {
     static constexpr auto mask = mask_id::content_type;
     static constexpr auto name() noexcept {
         return make_ref("content-type");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 
     struct content_type_id
@@ -367,6 +414,9 @@ struct accept_version {
     static constexpr auto name() noexcept {
         return make_ref("accept-version");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
     static constexpr auto v12() noexcept {
         return make_ref("1.2");
     }
@@ -385,6 +435,9 @@ struct version {
     static constexpr auto mask = mask_id::version;
     static constexpr auto name() noexcept {
         return make_ref("version");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -410,6 +463,9 @@ struct passcode {
     static constexpr auto name() noexcept {
         return make_ref("passcode");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct heart_beat {
@@ -417,6 +473,9 @@ struct heart_beat {
     static constexpr auto mask = mask_id::heart_beat;
     static constexpr auto name() noexcept {
         return make_ref("heart-beat");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -426,6 +485,9 @@ struct session {
     static constexpr auto name() noexcept {
         return make_ref("session");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct destination {
@@ -433,6 +495,9 @@ struct destination {
     static constexpr auto mask = mask_id::destination;
     static constexpr auto name() noexcept {
         return make_ref("destination");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -442,6 +507,9 @@ struct transaction {
     static constexpr auto name() noexcept {
         return make_ref("transaction");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct message_id {
@@ -450,6 +518,9 @@ struct message_id {
     static constexpr auto name() noexcept {
         return make_ref("message-id");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct subscription {
@@ -457,6 +528,9 @@ struct subscription {
     static constexpr auto mask = mask_id::subscription;
     static constexpr auto name() noexcept {
         return make_ref("subscription");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -488,6 +562,9 @@ struct receipt {
     static constexpr auto name() noexcept {
         return make_ref("receipt");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 static constexpr auto enable() noexcept {
@@ -503,6 +580,9 @@ struct message {
     static constexpr auto name() noexcept {
         return make_ref("message");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct receipt_id {
@@ -510,6 +590,9 @@ struct receipt_id {
     static constexpr auto mask = mask_id::receipt_id;
     static constexpr auto name() noexcept {
         return make_ref("receipt-id");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -519,6 +602,9 @@ struct prefetch_count {
     static constexpr auto name() noexcept {
         return make_ref("prefetch-count");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct durable {
@@ -526,6 +612,9 @@ struct durable {
     static constexpr auto mask = mask_id::durable;
     static constexpr auto name() noexcept {
         return make_ref("durable");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -535,7 +624,9 @@ struct auto_delete {
     static constexpr auto name() noexcept {
         return make_ref("auto-delete");
     }
-
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
     static constexpr auto enable() noexcept {
         return make_ref("true");
     }
@@ -549,6 +640,9 @@ struct persistent {
     static constexpr auto mask = mask_id::durable;
     static constexpr auto name() noexcept {
         return make_ref("persistent");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -566,6 +660,9 @@ struct reply_to {
     static constexpr auto name() noexcept {
         return make_ref("reply-to");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct expires {
@@ -573,6 +670,9 @@ struct expires {
     static constexpr auto mask = mask_id::expires;
     static constexpr auto name() noexcept {
         return make_ref("expires");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -582,6 +682,9 @@ struct redelivered {
     static constexpr auto name() noexcept {
         return make_ref("redelivered");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct max_length {
@@ -589,6 +692,9 @@ struct max_length {
     static constexpr auto mask = mask_id::max_length;
     static constexpr auto name() noexcept {
         return make_ref("x-max-length");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -606,6 +712,9 @@ struct max_priority {
     static constexpr auto name() noexcept {
         return make_ref("x-max-priority");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct dead_letter_exchange {
@@ -613,6 +722,9 @@ struct dead_letter_exchange {
     static constexpr auto mask = mask_id::dead_letter_exchange;
     static constexpr auto name() noexcept {
         return make_ref("x-dead-letter-exchange");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -637,6 +749,9 @@ struct original_routing_key {
     static constexpr auto mask = mask_id::original_routing_key;
     static constexpr auto name() noexcept {
         return make_ref("x-original-routing-key");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 

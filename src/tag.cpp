@@ -1,65 +1,95 @@
 #include "stomptalk/tag.hpp"
+#include <cassert>
 
 namespace stomptalk {
 namespace method {
 
 std::size_t eval_stom_method(std::string_view val) noexcept
 {
+    assert(!val.empty());
+
+    std::size_t rc = num_id::none;
+    auto name = val.data();
     switch (val.size())
     {
     case size_of(tag::ack()):
-        return detect(val, tag::ack());
+        rc = detect(name, tag::ack());
+    break;
 
-    case size_of(tag::nack()): {
-        auto rc = detect(val, tag::send());
-        if (!rc) {
-            return detect(val, tag::nack());
+    case size_of(tag::nack()):
+        switch (name[0])
+        {
+        case tag::send::letter():
+            rc = detect(name, tag::send());
+        break;
+        case tag::nack::letter():
+            rc = detect(name, tag::nack());
+        break;
         }
-        return rc;
-    }
+    break;
 
-    case size_of(tag::abort()): {
-        auto rc = detect(val, tag::abort());
-        if (!rc) {
-            rc = detect(val, tag::begin());
-            if (!rc) {
-                return detect(val, tag::error());
-            }
+    case size_of(tag::abort()):
+        switch (name[0])
+        {
+        case tag::abort::letter():
+            rc = detect(name, tag::abort());
+        break;
+        case tag::begin::letter():
+            rc = detect(name, tag::begin());
+        break;
+        case tag::error::letter():
+            rc = detect(name, tag::error());
+        break;
+        case tag::stomp::letter():
+            rc = detect(name, tag::stomp());
+        break;
         }
-        return rc;
-    }
+    break;
+
     case size_of(tag::commit()):
-        return detect(val, tag::commit());
+        rc = detect(val, tag::commit());
+    break;
 
-    case size_of(tag::message()): {
-        auto rc = detect(val, tag::message());
-        if (!rc) {
-            rc = detect(val, tag::receipt());
-            if (!rc) {
-                return detect(val, tag::connect());
-            }
+    case size_of(tag::message()):
+        switch (name[0])
+        {
+        case tag::message::letter():
+            rc = detect(name, tag::message());
+        break;
+        case tag::receipt::letter():
+            rc = detect(name, tag::receipt());
+        break;
+        case tag::connect::letter():
+            rc = detect(name, tag::connect());
+        break;
         }
-        return rc;
-    }
+    break;
 
-    case size_of(tag::connected()): {
-        auto rc = detect(val, tag::connected());
-        if (!rc) {
-            return detect(val, tag::subscribe());
+    case size_of(tag::connected()):
+        switch (name[0])
+        {
+        case tag::connected::letter():
+            rc = detect(name, tag::connected());
+        break;
+        case tag::subscribe::letter():
+            rc = detect(name, tag::subscribe());
+        break;
         }
-        return rc;
-    }
+    break;
 
     case size_of(tag::disconnect()):
-        return detect(val, tag::disconnect());
+        rc = detect(val, tag::disconnect());
+    break;
 
     case size_of(tag::unsubscribe()):
-        return detect(val, tag::unsubscribe());
+        rc = detect(val, tag::unsubscribe());
+    break;
 
     default:;
+        rc = num_id::unknown;
     }
 
-    return num_id::none;
+    return (rc) ? rc : num_id::unknown;
 }
 
 bool generic::valid() const noexcept
@@ -88,6 +118,8 @@ std::string_view generic::str() const noexcept
         return begin::name();
     case error::num:
         return error::name();
+    case stomp::num:
+        return stomp::name();
     case commit::num:
         return commit::name();
     case connect::num:
@@ -153,128 +185,165 @@ content_type::content_type_id::type
 
 std::size_t eval_stomp_header(std::string_view hdr) noexcept
 {
+    assert(!hdr.empty());
+
+    std::size_t rc = num_id::none;
+    auto name = hdr.data();
+
     switch (hdr.size())
     {
     case size_of(tag::id()):
-        return detect(hdr, tag::id());
+        rc = detect(name, tag::id());
+    break;
 
     case size_of(tag::ack()):
-        return detect(hdr, tag::ack());
+        rc = detect(name, tag::ack());
+    break;
 
     case size_of(tag::host()):
-        return detect(hdr, tag::host());
+        rc = detect(name, tag::host());
+    break;
 
     case size_of(tag::login()):
-        return detect(hdr, tag::login());
+        rc = detect(name, tag::login());
+    break;
 
     case size_of(tag::server()):
-        return detect(hdr, tag::server());
+        rc = detect(name, tag::server());
+    break;
 
-    case size_of(tag::receipt()): {
-        auto rc = detect(hdr, tag::receipt());
-        if (!rc) {
-            rc = detect(hdr, tag::session());
-            if (!rc) {
-                rc = detect(hdr, tag::version());
-                if (!rc) {
-                    rc = detect(hdr, tag::message());
-                    if (!rc) {
-                        rc = detect(hdr, tag::durable());
-                        if (!rc) {
-                            return detect(hdr, tag::expires());
-                        }
-                    }
-                }
-            }
+    case size_of(tag::receipt()):
+        switch (name[0])
+        {
+        case tag::receipt::letter():
+            rc = detect(name, tag::receipt());
+        break;
+        case tag::session::letter():
+            rc = detect(name, tag::session());
+        break;
+        case tag::version::letter():
+            rc = detect(name, tag::version());
+        break;
+        case tag::message::letter():
+            rc = detect(name, tag::message());
+        break;
+        case tag::durable::letter():
+            rc = detect(name, tag::durable());
+        break;
+        case tag::expires::letter():
+            rc = detect(name, tag::expires());
+        break;
         }
-        return rc;
-    }
+    break;
 
-    case size_of(tag::reply_to()): {
-        auto rc= detect(hdr, tag::reply_to());
-        if (!rc) {
-            return detect(hdr, tag::passcode());
+    case size_of(tag::reply_to()):
+        switch (name[0])
+        {
+        case tag::reply_to::letter():
+            rc = detect(name, tag::reply_to());
+        break;
+        case tag::passcode::letter():
+            rc = detect(name, tag::passcode());
+        break;
         }
-        return rc;
-    }
+    break;
 
-    case size_of(tag::message_id()): {
-        auto rc = detect(hdr, tag::receipt_id());
-        if (!rc) {
-            rc = detect(hdr, tag::message_id());
-            if (!rc) {
-                rc = detect(hdr, tag::heart_beat());
-                if (!rc) {
-                    return detect(hdr, tag::persistent());
-                }
-            }
+    case size_of(tag::message_id()):
+        switch (name[0])
+        {
+        case tag::message_id::letter():
+            rc = detect(name, tag::message_id());
+        break;
+        case tag::receipt_id::letter():
+            rc = detect(name, tag::receipt_id());
+        break;
+        case tag::heart_beat::letter():
+            rc = detect(name, tag::heart_beat());
+        break;
+        case tag::persistent::letter():
+            rc = detect(name, tag::persistent());
+        break;
         }
-        return rc;
-    }
+    break;
 
-    case size_of(tag::destination()): {
-        auto rc = detect(hdr, tag::destination());
-        if (!rc) {
-            rc = detect(hdr, tag::transaction());
-            if (!rc) {
-                rc = detect(hdr, tag::redelivered());
-                if (!rc) {
-                    return detect(hdr, tag::auto_delete());
-                }
-            }
+    case size_of(tag::destination()):
+        switch (name[0])
+        {
+        case tag::destination::letter():
+            rc = detect(name, tag::destination());
+        break;
+        case tag::transaction::letter():
+            rc = detect(name, tag::transaction());
+        break;
+        case tag::redelivered::letter():
+            rc = detect(name, tag::redelivered());
+        break;
+        case tag::auto_delete::letter():
+            rc = detect(name, tag::auto_delete());
+        break;
         }
-        return rc;
-    }
-                    //x-max-length
-    case size_of(tag::content_type()): {
-        auto rc = detect(hdr, tag::content_type());
-        if (!rc) {
-            return detect(hdr, tag::subscription());
-        }
-        return rc;
-    }
+    break;
 
-    case size_of(tag::message_ttl()):
-        return detect(hdr, tag::message_ttl());
+    case size_of(tag::content_type()):
+        switch (name[0])
+        {
+        case tag::content_type::letter():
+            rc = detect(name, tag::content_type());
+        break;
+        case tag::subscription::letter():
+            rc = detect(name, tag::subscription());
+        break;  //x-max-length
+        case tag::max_length::letter():
+            rc = detect(name, tag::max_length());
+        break;
+        }
+    break;
                     //x-message-ttl
-    case size_of(tag::content_length()): {
-        auto rc = detect(hdr, tag::content_length());
-        if (!rc) {
-            rc = detect(hdr, tag::prefetch_count());
-            if (!rc) {
-                rc = detect(hdr, tag::max_priority());
-                if (!rc) {
-                    rc = detect(hdr, tag::accept_version());
-                    if (!rc) {
-                        return detect(hdr, tag::max_length());
-                    }
-                }
-            }
+    case size_of(tag::message_ttl()):
+        rc = detect(name, tag::message_ttl());
+    break;
+
+    case size_of(tag::content_length()):
+        switch (name[0])
+        {
+        case tag::content_length::letter():
+            rc = detect(name, tag::content_length());
+        break;
+        case tag::prefetch_count::letter():
+            rc = detect(name, tag::prefetch_count());
+        break;
+        case tag::max_priority::letter():
+            rc = detect(name, tag::max_priority());
+        break;
+        case tag::accept_version::letter():
+            rc = detect(name, tag::accept_version());
+        break;
         }
-        return rc;
-    }
+    break;
 
     case size_of(tag::max_length_bytes()):
-        return detect(hdr, tag::max_length_bytes());
+        rc = detect(name, tag::max_length_bytes());
+    break;
 
     case size_of(tag::original_exchange()):
-        return detect(hdr, tag::original_exchange());
+        rc = detect(name, tag::original_exchange());
+    break;
 
-    case size_of(tag::dead_letter_exchange()): {
-        auto rc = detect(hdr, tag::dead_letter_exchange());
+    case size_of(tag::dead_letter_exchange()):
+        rc = detect(hdr, tag::dead_letter_exchange());
         if (!rc) {
-            return detect(hdr, tag::original_routing_key());
+            rc = detect(name, tag::original_routing_key());
         }
-        return rc;
-    }
+    break;
 
     case size_of(tag::dead_letter_routing_key()):
-        return detect(hdr, tag::dead_letter_routing_key());
+        rc = detect(name, tag::dead_letter_routing_key());
+    break;
 
     default: ;
     }
 
-    return num_id::none;
+    return rc;
 }
 
 void generic::eval(std::string_view hdr) noexcept
