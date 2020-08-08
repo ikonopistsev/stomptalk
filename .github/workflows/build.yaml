@@ -27,9 +27,7 @@ jobs:
             vcpkgPackages: 'sqlite3'
 
     steps:
-      - uses: actions/checkout@v1
-        with:
-          submodules: true
+      - uses: actions/checkout@master
 
       - uses: lukka/get-cmake@latest
       - name: dir
