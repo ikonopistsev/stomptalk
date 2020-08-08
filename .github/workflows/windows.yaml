@@ -11,18 +11,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [windows-latest]
         include:
           - os: windows-latest
             triplet: x64-windows
-            vcpkgCommitId: '8a9a97315aefb3f8bc5d81bf66ca0025938b9c91'
-            vcpkgPackages: 'sqlite3'
-          - os: ubuntu-latest
-            triplet: x64-linux
-            vcpkgCommitId: '8a9a97315aefb3f8bc5d81bf66ca0025938b9c91'
-            vcpkgPackages: 'sqlite3'
-          - os: macos-latest
-            triplet: x64-osx
             vcpkgCommitId: '8a9a97315aefb3f8bc5d81bf66ca0025938b9c91'
             vcpkgPackages: 'sqlite3'
 
