@@ -75,16 +75,7 @@ jobs:
           try {
             cmake --build . -- /nologo /verbosity:minimal
             if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode) }
-            if ("${{ matrix.EVENT_MATRIX }}" -eq "TEST_EXPORT_STATIC") {
               python ../test-export/test-export.py static
-            }
-            elseif ("${{ matrix.EVENT_MATRIX }}" -eq "TEST_EXPORT_SHARED") {
-              python ../test-export/test-export.py shared
-            }
-            else {
-              ctest --output-on-failure -j $EVENT_TESTS_PARALLEL
-              if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode) }
-            }
           } catch {
             $host.SetShouldExit($LastExitCode)
           }
