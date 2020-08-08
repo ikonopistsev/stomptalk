@@ -1,6 +1,6 @@
 [![CI linux](https://github.com/libevent/libevent/workflows/linux/badge.svg)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Ahosted-basic-autocache)
 [![CI windows](https://github.com/libevent/libevent/workflows/windows/badge.svg)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Ahosted-basic-autocache)
-[![CI macos](https://github.com/libevent/libevent/workflows/macos/badge.svg)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Ahosted-basic-autocache/macos-latest-hosted-basic)
+[![CI macos](https://github.com/libevent/libevent/workflows/macos/badge.svg)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Ahosted-basic-autocache)
 
 # stomptalk
 stomp protocol parser http://stomp.github.io
