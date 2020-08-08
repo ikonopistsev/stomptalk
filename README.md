@@ -5,7 +5,9 @@
 # stomptalk
 stomp protocol parser http://stomp.github.io
 
-This library does not perform any I/O operations for its own. You must implement the hook_base interface. The parser can work with Stomp 1.0, 1.1, 1.2 and supports some of the rabbitmq headers.
+This library does not perform any I/O operations for its own, is designed to be used in performance applications. It does not make any syscalls nor allocations, it does not buffer data, it can be interrupted at anytime. The parser can work with Stomp 1.0, 1.1, 1.2 and supports some of the rabbitmq headers.
+
+You must implement the hook_base interface. 
 ```
 class hook_base
 {
