@@ -34,6 +34,7 @@ jobs:
         uses: lukka/run-vcpkg@v2
         id: runvcpkg
         with:
+          vcpkgArguments: openssl:x64-windows
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg/
           vcpkgGitCommitId: 8e76503a769e15
 
