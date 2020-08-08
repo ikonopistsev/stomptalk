@@ -1,6 +1,6 @@
-[![CI linux](https://github.com/ikonopistsev/stomptalk/workflows/hosted-basic-autocache/badge.svg)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Ahosted-basic-autocache)
-[![CI windows](https://github.com/ikonopistsev/stomptalk/workflows/hosted-basic-autocache/badge.svg)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Ahosted-basic-autocache)
-[![CI macos](https://github.com/ikonopistsev/stomptalk/workflows/hosted-basic-autocache/badge.svg)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Amacos)
+[![linux](https://github.com/ikonopistsev/stomptalk/workflows/linux/badge.svg?branch=master)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Alinux)
+[![windows](https://github.com/ikonopistsev/stomptalk/workflows/windows/badge.svg?branch=master)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Awindows)
+[![macos](https://github.com/ikonopistsev/stomptalk/workflows/macos/badge.svg?branch=master)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Amacos)
 
 # stomptalk
 stomp protocol parser http://stomp.github.io
