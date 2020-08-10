@@ -150,6 +150,8 @@ typedef basic<tag::dead_letter_routing_key> dead_letter_routing_key;
 typedef basic<tag::redelivered> redelivered;
 typedef basic<tag::original_exchange> original_exchange;
 typedef basic<tag::original_routing_key> original_routing_key;
+typedef basic<tag::queue_name> queue_name;
+typedef basic<tag::queue_type> queue_type;
 
 
 constexpr static durable durable_on() noexcept {

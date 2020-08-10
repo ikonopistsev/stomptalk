@@ -201,7 +201,15 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
     break;
 
     case size_of(tag::host()):
-        rc = detect(name, tag::host());
+        switch (name[0])
+        {
+        case tag::host::letter():
+            rc = detect(name, tag::host());
+        break;
+        case tag::amqp_type::letter():
+            rc = detect(name, tag::amqp_type());
+        break;
+        }
     break;
 
     case size_of(tag::login()):
@@ -209,9 +217,16 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
     break;
 
     case size_of(tag::server()):
-        rc = detect(name, tag::server());
+        switch (name[0])
+        {
+        case tag::server::letter():
+            rc = detect(name, tag::server());
+        break;
+        case tag::app_id::letter():
+            rc = detect(name, tag::app_id());
+        break;
+        }
     break;
-
     case size_of(tag::receipt()):
         switch (name[0])
         {
@@ -230,20 +245,41 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         case tag::durable::letter():
             rc = detect(name, tag::durable());
         break;
-        case tag::expires::letter():
-            rc = detect(name, tag::expires());
+        case tag::user_id::letter():
+            rc = detect(name, tag::user_id());
         break;
         }
     break;
 
+    //01234567
+    //reply_to
+    //passcode
+    //priority
     case size_of(tag::reply_to()):
-        switch (name[0])
+        switch (name[2])
         {
-        case tag::reply_to::letter():
+        case tag::reply_to::letter(2):
             rc = detect(name, tag::reply_to());
         break;
-        case tag::passcode::letter():
+        case tag::passcode::letter(2):
             rc = detect(name, tag::passcode());
+        break;
+        case tag::priority::letter(2):
+            rc = detect(name, tag::priority());
+        break;
+        }
+    break;
+
+    //timestamp
+    //x-expires
+    case size_of(tag::expires()):
+        switch (name[0])
+        {
+        case tag::expires::letter():
+            rc = detect(name, tag::expires());
+        break;
+        case tag::timestamp::letter():
+            rc = detect(name, tag::timestamp());
         break;
         }
     break;
@@ -262,6 +298,12 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         break;
         case tag::persistent::letter():
             rc = detect(name, tag::persistent());
+        break;
+        case tag::cluster_id::letter():
+          rc = detect(name, tag::cluster_id());
+        break;
+        case tag::expiration::letter():
+          rc = detect(name, tag::expiration());
         break;
         }
     break;
@@ -284,18 +326,31 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         }
     break;
 
+    //0123456789
+    //content_type
+    //subscription
+    //x-max-length
+    //x-queue-name
+    //x-queue-type
     case size_of(tag::content_type()):
-        switch (name[0])
-        {
-        case tag::content_type::letter():
+        if (name[0] == tag::content_type::letter()) {
             rc = detect(name, tag::content_type());
-        break;
-        case tag::subscription::letter():
-            rc = detect(name, tag::subscription());
-        break;  //x-max-length
-        case tag::max_length::letter():
-            rc = detect(name, tag::max_length());
-        break;
+        } else {
+            switch (name[9])
+            {
+            case tag::subscription::letter(9):
+                rc = detect(name, tag::subscription());
+            break;  //x-max-length
+            case tag::max_length::letter(9):
+                rc = detect(name, tag::max_length());
+            break;  //x-queue-name
+            case tag::queue_name::letter(9):
+                rc = detect(name, tag::queue_name());
+            break;  //x-queue-type
+            case tag::queue_type::letter(9):
+                rc = detect(name, tag::queue_type());
+            break;
+            }
         }
     break;
                     //x-message-ttl
@@ -303,24 +358,42 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
         rc = detect(name, tag::message_ttl());
     break;
 
+    // 0123456789
+    // content-length
+    // prefetch-count
+    // x-max-priority
+    // accept-version
+    // correlation-id
     case size_of(tag::content_length()):
-        switch (name[0])
+        switch (name[2])
         {
-        case tag::content_length::letter():
+        case tag::content_length::letter(2):
             rc = detect(name, tag::content_length());
         break;
-        case tag::prefetch_count::letter():
+        case tag::prefetch_count::letter(2):
             rc = detect(name, tag::prefetch_count());
         break;
-        case tag::max_priority::letter():
+        case tag::max_priority::letter(2):
             rc = detect(name, tag::max_priority());
         break;
-        case tag::accept_version::letter():
+        case tag::accept_version::letter(2):
             rc = detect(name, tag::accept_version());
+        break;
+        case tag::correlation_id::letter(2):
+            rc = detect(name, tag::correlation_id());
         break;
         }
     break;
 
+    case size_of(tag::amqp_message_id()):
+        rc = detect(name, tag::amqp_message_id());
+    break;
+
+    case size_of(tag::content_encoding()):
+        rc = detect(name, tag::content_encoding());
+    break;
+
+                    //x-max-length-bytes
     case size_of(tag::max_length_bytes()):
         rc = detect(name, tag::max_length_bytes());
     break;
@@ -431,6 +504,31 @@ std::string_view generic::str() const noexcept
         return original_exchange::name();
     case original_routing_key::num:
         return original_routing_key::name();
+    case queue_name::num:
+        return queue_name::name();
+    case queue_type::num:
+        return queue_type::name();
+    case content_encoding::num:
+        return content_encoding::name();
+    case priority::num:
+        return priority::name();
+    case correlation_id::num:
+        return correlation_id::name();
+    case expiration::num:
+        return expiration::name();
+    case amqp_message_id::num:
+        return amqp_message_id::name();
+    case timestamp::num:
+        return timestamp::name();
+    case amqp_type::num:
+        return amqp_type::name();
+    case user_id::num:
+        return user_id::name();
+    case app_id::num:
+        return app_id::name();
+    case cluster_id::num:
+        return cluster_id::name();
+
     default: ;
     }
 

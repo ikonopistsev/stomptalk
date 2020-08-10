@@ -280,6 +280,7 @@ enum type : std::size_t
     durable,
     auto_delete,
     message_ttl,
+    // https://www.rabbitmq.com/ttl.html#queue-ttl
     expires,
     max_length,
     max_length_bytes,
@@ -291,6 +292,21 @@ enum type : std::size_t
     redelivered,
     original_exchange,
     original_routing_key,
+    // https://www.rabbitmq.com/stomp.html#d.ugqn
+    queue_name,
+    // https://www.rabbitmq.com/stomp.html#queue-parameters
+    queue_type,
+    //https://www.rabbitmq.com/stomp.html#pear.ap
+    content_encoding,
+    priority,
+    correlation_id,
+    expiration,
+    amqp_message_id,
+    timestamp,
+    amqp_type,
+    user_id,
+    app_id,
+    cluster_id,
     count,
     last_num_id = original_routing_key
 };
@@ -336,6 +352,19 @@ enum type : std::uint64_t
     redelivered                 = 1ull << num_id::redelivered,
     original_exchange           = 1ull << num_id::original_exchange,
     original_routing_key        = 1ull << num_id::original_routing_key,
+    queue_name                  = 1ull << num_id::queue_name,
+    queue_type                  = 1ull << num_id::queue_type,
+    //https://www.rabbitmq.com/stomp.html#pear.ap
+    content_encoding            = 1ull << num_id::content_encoding,
+    priority                    = 1ull << num_id::priority,
+    correlation_id              = 1ull << num_id::correlation_id,
+    expiration                  = 1ull << num_id::expiration,
+    amqp_message_id             = 1ull << num_id::amqp_message_id,
+    timestamp                   = 1ull << num_id::timestamp,
+    amqp_type                   = 1ull << num_id::amqp_type,
+    user_id                     = 1ull << num_id::user_id,
+    app_id                      = 1ull << num_id::app_id,
+    cluster_id                  = 1ull << num_id::cluster_id,
     last_mask_id                = original_routing_key
 };
 
@@ -349,8 +378,8 @@ struct content_length {
     static constexpr auto name() noexcept {
         return make_ref("content-length");
     }
-    static constexpr auto letter() noexcept {
-        return name().data()[0];
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
     }
 };
 
@@ -360,8 +389,8 @@ struct content_type {
     static constexpr auto name() noexcept {
         return make_ref("content-type");
     }
-    static constexpr auto letter() noexcept {
-        return name().data()[0];
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
     }
 
     struct content_type_id
@@ -414,8 +443,8 @@ struct accept_version {
     static constexpr auto name() noexcept {
         return make_ref("accept-version");
     }
-    static constexpr auto letter() noexcept {
-        return name().data()[0];
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
     }
     static constexpr auto v12() noexcept {
         return make_ref("1.2");
@@ -427,6 +456,9 @@ struct host {
     static constexpr auto mask = mask_id::host;
     static constexpr auto name() noexcept {
         return make_ref("host");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
     }
 };
 
@@ -455,6 +487,9 @@ struct server {
     static constexpr auto name() noexcept {
         return make_ref("server");
     }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
 };
 
 struct passcode {
@@ -463,8 +498,8 @@ struct passcode {
     static constexpr auto name() noexcept {
         return make_ref("passcode");
     }
-    static constexpr auto letter() noexcept {
-        return name().data()[0];
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
     }
 };
 
@@ -529,8 +564,8 @@ struct subscription {
     static constexpr auto name() noexcept {
         return make_ref("subscription");
     }
-    static constexpr auto letter() noexcept {
-        return name().data()[0];
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
     }
 };
 
@@ -602,8 +637,8 @@ struct prefetch_count {
     static constexpr auto name() noexcept {
         return make_ref("prefetch-count");
     }
-    static constexpr auto letter() noexcept {
-        return name().data()[0];
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
     }
 };
 
@@ -660,16 +695,17 @@ struct reply_to {
     static constexpr auto name() noexcept {
         return make_ref("reply-to");
     }
-    static constexpr auto letter() noexcept {
-        return name().data()[0];
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
     }
 };
 
+// https://www.rabbitmq.com/ttl.html#queue-ttl
 struct expires {
     static constexpr auto num = num_id::expires;
     static constexpr auto mask = mask_id::expires;
     static constexpr auto name() noexcept {
-        return make_ref("expires");
+        return make_ref("x-expires");
     }
     static constexpr auto letter() noexcept {
         return name().data()[0];
@@ -693,8 +729,8 @@ struct max_length {
     static constexpr auto name() noexcept {
         return make_ref("x-max-length");
     }
-    static constexpr auto letter() noexcept {
-        return name().data()[0];
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
     }
 };
 
@@ -712,8 +748,8 @@ struct max_priority {
     static constexpr auto name() noexcept {
         return make_ref("x-max-priority");
     }
-    static constexpr auto letter() noexcept {
-        return name().data()[0];
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
     }
 };
 
@@ -749,6 +785,131 @@ struct original_routing_key {
     static constexpr auto mask = mask_id::original_routing_key;
     static constexpr auto name() noexcept {
         return make_ref("x-original-routing-key");
+    }
+};
+
+// https://www.rabbitmq.com/stomp.html#d.ugqn
+struct queue_name {
+    static constexpr auto num = num_id::queue_name;
+    static constexpr auto mask = mask_id::queue_name;
+    static constexpr auto name() noexcept {
+        return make_ref("x-queue-name");
+    }
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
+    }
+};
+
+// https://www.rabbitmq.com/stomp.html#queue-parameters
+struct queue_type {
+    static constexpr auto num = num_id::queue_type;
+    static constexpr auto mask = mask_id::queue_type;
+    static constexpr auto name() noexcept {
+        return make_ref("x-queue-type");
+    }
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
+    }
+};
+
+struct content_encoding {
+    static constexpr auto num = num_id::content_encoding;
+    static constexpr auto mask = mask_id::content_encoding;
+    static constexpr auto name() noexcept {
+        return make_ref("content-encoding");
+    }
+};
+
+struct priority {
+    static constexpr auto num = num_id::priority;
+    static constexpr auto mask = mask_id::priority;
+    static constexpr auto name() noexcept {
+        return make_ref("priority");
+    }
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
+    }
+};
+
+struct correlation_id {
+    static constexpr auto num = num_id::correlation_id;
+    static constexpr auto mask = mask_id::correlation_id;
+    static constexpr auto name() noexcept {
+        return make_ref("correlation-id");
+    }
+    static constexpr auto letter(std::size_t n = 0) noexcept {
+        return name().data()[n];
+    }
+};
+
+struct expiration {
+    static constexpr auto num = num_id::expiration;
+    static constexpr auto mask = mask_id::expiration;
+    static constexpr auto name() noexcept {
+        return make_ref("expiration");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
+};
+
+struct amqp_message_id {
+    static constexpr auto num = num_id::amqp_message_id;
+    static constexpr auto mask = mask_id::amqp_message_id;
+    static constexpr auto name() noexcept {
+        return make_ref("amqp-message-id");
+    }
+};
+
+struct timestamp {
+    static constexpr auto num = num_id::timestamp;
+    static constexpr auto mask = mask_id::timestamp;
+    static constexpr auto name() noexcept {
+        return make_ref("timestamp");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
+};
+
+struct amqp_type {
+    static constexpr auto num = num_id::amqp_type;
+    static constexpr auto mask = mask_id::amqp_type;
+    static constexpr auto name() noexcept {
+        return make_ref("type");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
+};
+
+struct user_id {
+    static constexpr auto num = num_id::user_id;
+    static constexpr auto mask = mask_id::user_id;
+    static constexpr auto name() noexcept {
+        return make_ref("user-id");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
+};
+
+struct app_id {
+    static constexpr auto num = num_id::app_id;
+    static constexpr auto mask = mask_id::app_id;
+    static constexpr auto name() noexcept {
+        return make_ref("app-id");
+    }
+    static constexpr auto letter() noexcept {
+        return name().data()[0];
+    }
+};
+
+struct cluster_id {
+    static constexpr auto num = num_id::cluster_id;
+    static constexpr auto mask = mask_id::cluster_id;
+    static constexpr auto name() noexcept {
+        return make_ref("cluster-id");
     }
     static constexpr auto letter() noexcept {
         return name().data()[0];
