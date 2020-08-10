@@ -231,6 +231,11 @@ public:
         num_id_ = num_id;
     }
 
+    void reset()
+    {
+        set(num_id::none);
+    }
+
     generic& operator=(type num_id) noexcept
     {
         set(num_id);
@@ -974,6 +979,11 @@ public:
     void set(type num_id) noexcept
     {
         num_id_ = num_id;
+    }
+
+    void reset()
+    {
+        set(num_id::none);
     }
 
     bool is(type num_id) noexcept
