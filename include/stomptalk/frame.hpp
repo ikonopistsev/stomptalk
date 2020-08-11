@@ -17,6 +17,7 @@ public:
 
     virtual void reserve(std::size_t len) = 0;
 
+    // выставить метод
     template<std::size_t N>
     void push(strref<N> val)
     {
@@ -25,9 +26,21 @@ public:
     }
 
     // выставить хидер
-    void push(header::fixed hdr)
+    template<class K, class V>
+    void push(header::base<K, V> hdr)
     {
         append(hdr.key());
+        append_ref(make_ref(":"));
+        append(hdr.value());
+        append_ref(make_ref("\n"));
+    }
+
+    // выставить известный хидер
+    // добавляем ключ как ссылку на строку
+    template<class T>
+    void push(header::basic<T> hdr)
+    {
+        append_ref(hdr.key());
         append_ref(make_ref(":"));
         append(hdr.value());
         append_ref(make_ref("\n"));

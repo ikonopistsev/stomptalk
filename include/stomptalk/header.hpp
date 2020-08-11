@@ -118,35 +118,39 @@ constexpr std::size_t id_of(const basic<T>&) noexcept
     return T::id;
 }
 
-typedef basic<tag::content_type> content_type;
 typedef basic<tag::content_length> content_length;
-typedef basic<tag::heart_beat> heart_beat;
+typedef basic<tag::content_type> content_type;
 typedef basic<tag::accept_version> accept_version;
-typedef basic<tag::version> version;
-typedef basic<tag::server> server;
 typedef basic<tag::host> host;
-typedef basic<tag::login> login;
-typedef basic<tag::passcode> passcode;
+typedef basic<tag::version> version;
 typedef basic<tag::destination> destination;
+typedef basic<tag::id> id;
+typedef basic<tag::transaction> transaction;
+// The Stomp message id (not amqp_message_id)
 typedef basic<tag::message_id> message_id;
 typedef basic<tag::subscription> subscription;
-typedef basic<tag::ack> ack;
-typedef basic<tag::id> id;
-typedef basic<tag::receipt> receipt;
 typedef basic<tag::receipt_id> receipt_id;
+typedef basic<tag::login> login;
+typedef basic<tag::passcode> passcode;
+typedef basic<tag::heart_beat> heart_beat;
 typedef basic<tag::session> session;
+typedef basic<tag::server> server;
+typedef basic<tag::ack> ack;
+typedef basic<tag::receipt> receipt;
+// The ERROR frame SHOULD contain a message header with a short description of the error
+typedef basic<tag::message> message;
 typedef basic<tag::prefetch_count> prefetch_count;
 typedef basic<tag::durable> durable;
 typedef basic<tag::auto_delete> auto_delete;
-typedef basic<tag::persistent> persistent;
 typedef basic<tag::message_ttl> message_ttl;
-typedef basic<tag::reply_to> reply_to;
 typedef basic<tag::expires> expires;
 typedef basic<tag::max_length> max_length;
 typedef basic<tag::max_length_bytes> max_length_bytes;
-typedef basic<tag::max_priority> max_priority;
 typedef basic<tag::dead_letter_exchange> dead_letter_exchange;
 typedef basic<tag::dead_letter_routing_key> dead_letter_routing_key;
+typedef basic<tag::max_priority> max_priority;
+typedef basic<tag::persistent> persistent;
+typedef basic<tag::reply_to> reply_to;
 typedef basic<tag::redelivered> redelivered;
 typedef basic<tag::original_exchange> original_exchange;
 typedef basic<tag::original_routing_key> original_routing_key;

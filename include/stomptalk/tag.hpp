@@ -304,11 +304,11 @@ enum type : std::size_t
     //https://www.rabbitmq.com/stomp.html#pear.ap
     content_encoding,
     priority,
-    correlation_id,
-    expiration,
-    amqp_message_id,
-    timestamp,
-    amqp_type,
+    correlation_id, // Helps correlate requests with responses, see tutorial 6
+    expiration, // https://www.rabbitmq.com/ttl.html
+    amqp_message_id,    // Arbitrary message ID
+    timestamp,  // Application-provided timestamp
+    amqp_type,  // Application-specific message type, e.g. "orders.created"
     user_id,
     app_id,
     cluster_id,
@@ -614,6 +614,7 @@ static constexpr auto disable() noexcept {
     return make_ref("false");
 }
 
+// The ERROR frame SHOULD contain a message header with a short description of the error
 struct message {
     static constexpr auto num = num_id::message;
     static constexpr auto mask = mask_id::message;
