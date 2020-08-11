@@ -823,6 +823,50 @@ struct content_encoding {
     static constexpr auto name() noexcept {
         return make_ref("content-encoding");
     }
+
+    // https://developer.mozilla.org/ru/docs/Web/HTTP/%D0%97%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%B8/Content-Encoding
+    struct content_encoding_id
+    {
+        enum type
+            : std::size_t
+        {
+            none        = 0,
+// Indicates the identity function (i.e., no compression or modification).
+            identity    = 1,    // default type
+// Using the zlib structure (defined in RFC 1950) with the
+// deflate compression algorithm (defined in RFC 1951).
+            deflate     = 2,
+// A format using the Lempel-Ziv-Welch (LZW) algorithm.
+            compress    = 3,
+// A format using the Lempel-Ziv coding (LZ77), with a 32-bit CRC.
+            gzip        = 4,
+// A format using the Brotli algorithm.
+            br          = 5,
+            last_content_type_id = br
+        };
+    };
+
+    static constexpr auto identity() noexcept {
+        return make_ref("identity");
+    }
+    static constexpr auto deflate() noexcept {
+        return make_ref("deflate");
+    }
+    static constexpr auto compress() noexcept {
+        return make_ref("compress");
+    }
+    static constexpr auto gzip() noexcept {
+        return make_ref("gzip");
+    }
+    static constexpr auto xgzip() noexcept {
+        return make_ref("x-gzip");
+    }
+    static constexpr auto br() noexcept {
+        return make_ref("br");
+    }
+
+//    static content_type_id::type
+//        eval_content_encoding(std::string_view val) noexcept;
 };
 
 struct priority {

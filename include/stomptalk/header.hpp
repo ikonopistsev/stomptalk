@@ -152,7 +152,16 @@ typedef basic<tag::original_exchange> original_exchange;
 typedef basic<tag::original_routing_key> original_routing_key;
 typedef basic<tag::queue_name> queue_name;
 typedef basic<tag::queue_type> queue_type;
-
+typedef basic<tag::content_encoding> content_encoding;
+typedef basic<tag::priority> priority;
+typedef basic<tag::correlation_id> correlation_id;
+typedef basic<tag::expiration> expiration;
+typedef basic<tag::amqp_message_id> amqp_message_id;
+typedef basic<tag::timestamp> timestamp;
+typedef basic<tag::amqp_type> amqp_type;
+typedef basic<tag::user_id> user_id;
+typedef basic<tag::app_id> app_id;
+typedef basic<tag::cluster_id> cluster_id;
 
 constexpr static durable durable_on() noexcept {
     return durable(tag::enable());
