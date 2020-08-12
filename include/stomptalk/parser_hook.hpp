@@ -46,6 +46,11 @@ public:
         return error_;
     }
 
+    void set(error::type error) noexcept
+    {
+        error_ = error;
+    }
+
     void set(std::uint64_t content_length) noexcept
     {
         content_len_ = content_length;
