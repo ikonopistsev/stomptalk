@@ -36,6 +36,7 @@ parser::pointer parser::start_state(parser_hook& hook,
 
         // сохраняем стек
         sbuf_.push(ch);
+//        только что сбросили стек, там должен быть хотя бы 1 байт
 //        if (!sbuf_.push(ch))
 //        {
 //            hook.set(parser_hook::error::too_big);
