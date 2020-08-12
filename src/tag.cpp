@@ -183,7 +183,7 @@ content_type::content_type_id::type
 
 } // namespace tag
 
-std::size_t eval_stomp_header(std::string_view hdr) noexcept
+std::size_t eval_header(std::string_view hdr) noexcept
 {
     assert(!hdr.empty());
 
@@ -421,7 +421,7 @@ std::size_t eval_stomp_header(std::string_view hdr) noexcept
 
 void generic::eval(std::string_view hdr) noexcept
 {
-    num_id_ = eval_stomp_header(hdr);
+    num_id_ = eval_header(hdr);
 }
 
 bool generic::valid() const noexcept

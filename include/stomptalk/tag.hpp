@@ -988,7 +988,7 @@ std::size_t detect(V text, T) noexcept
     return detect(text.data(), T());
 }
 
-std::size_t eval_stomp_header(std::string_view hdr) noexcept;
+std::size_t eval_header(std::string_view hdr) noexcept;
 
 class generic
 {
@@ -1008,7 +1008,7 @@ public:
     virtual ~generic() = default;
 
     explicit generic(std::string_view hdr) noexcept
-        : num_id_(eval_stomp_header(hdr))
+        : num_id_(eval_header(hdr))
     {   }
 
     explicit generic(type num_id) noexcept
