@@ -46,10 +46,7 @@ public:
         return error_;
     }
 
-    void set(error::type error) noexcept
-    {
-        error_ = error;
-    }
+    void set(error::type) = delete;
 
     void set(std::uint64_t content_length) noexcept
     {
@@ -73,7 +70,15 @@ public:
 
     void on_frame_end() noexcept;
 
+    void no_error() noexcept;
+    void too_big() noexcept;
+    void inval_reqline() noexcept;
+    void inval_method() noexcept;
+    void inval_frame() noexcept;
     void next_frame() noexcept;
+    void generic_error() noexcept;
+
+    std::string_view error_str() const noexcept;
 };
 
 } // stomptalk

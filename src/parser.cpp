@@ -25,7 +25,7 @@ parser::pointer parser::start_state(parser_hook& hook,
 
         if (!ch_isupper(ch))
         {
-            hook.set(parser_hook::error::inval_reqline);
+            hook.inval_reqline();
             return curr;
         }
 
@@ -87,12 +87,12 @@ parser::pointer parser::method_state(parser_hook& hook,
         }
         else if (!ch_isupper(ch))
         {
-            hook.set(parser_hook::error::inval_method);
+            hook.inval_method();
             return curr;
         }
         else if (!sbuf_.push(ch))
         {
-            hook.set(parser_hook::error::too_big);
+            hook.too_big();
             return curr;
         }
 
@@ -155,8 +155,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
 
             if (!sbuf_.push(ch))
             {
-                hook.set(parser_hook::error::too_big);
-
+                hook.too_big();
                 return curr;
             }
         }
@@ -200,8 +199,7 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
         }
         else if (!sbuf_.push(ch))
         {
-            hook.set(parser_hook::error::too_big);
-
+            hook.too_big();
             return curr;
         }
 
@@ -236,14 +234,14 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
     // иначе это следующий хидер
     if (!ch_isprint_nospace(ch))
     {
-        hook.set(parser_hook::error::inval_reqline);
-        return  curr;
+        hook.inval_reqline();
+        return curr;
     }
 
     if (!sbuf_.push(ch))
     {
-        hook.set(parser_hook::error::too_big);
-        return  curr;
+        hook.too_big();
+        return curr;
     }
 
     state_fn_ = &parser::hdrline_hdr_key;
@@ -259,8 +257,8 @@ parser::pointer parser::hdrline_almost_done(parser_hook& hook,
 {
     if (*curr++ != '\n')
     {
-        hook.set(parser_hook::error::inval_reqline);
-        return  curr;
+        hook.inval_reqline();
+        return curr;
     }
 
     // переходим к поиску конца метода
@@ -315,8 +313,8 @@ parser::pointer parser::almost_done(parser_hook& hook,
 {
     if (*curr++ != '\n')
     {
-        hook.set(parser_hook::error::inval_reqline);
-        return  curr;
+        hook.inval_reqline();
+        return curr;
     }
 
     // переходим к поиску конца метода
@@ -393,7 +391,7 @@ parser::pointer parser::frame_end(parser_hook& hook,
     state_fn_ = &parser::start_state;
 
     if (*curr++ != '\0')
-        hook.set(parser_hook::error::inval_frame);
+        hook.inval_frame();
 
     return curr;
 }
@@ -401,7 +399,7 @@ parser::pointer parser::frame_end(parser_hook& hook,
 std::size_t parser::run(parser_hook& hook,
     const char *begin, std::size_t len) noexcept
 {
-    hook.set(parser_hook::error::none);
+    hook.no_error();
 
     const char* curr = begin;
     const char* end = begin + len;

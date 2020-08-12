@@ -46,7 +46,7 @@ private:
         pointer curr, pointer end) noexcept;
 
     state_fn_type state_fn_{&parser::start_state};
-    stackbuf<char, 2048> sbuf_{};
+    stackbuf<char, 4096> sbuf_{};
 
 public:
     parser() = default;
