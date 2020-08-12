@@ -70,12 +70,19 @@ public:
 
     void on_frame_end() noexcept;
 
+    // errors
     void no_error() noexcept;
+
     void too_big() noexcept;
+
     void inval_reqline() noexcept;
+
     void inval_method() noexcept;
+
     void inval_frame() noexcept;
+
     void next_frame() noexcept;
+
     void generic_error() noexcept;
 
     std::string_view error_str() const noexcept;

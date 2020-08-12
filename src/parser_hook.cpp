@@ -63,7 +63,6 @@ void parser_hook::inval_frame() noexcept
     error_ = error::inval_frame;
 }
 
-
 void parser_hook::next_frame() noexcept
 {
     error_ = error::next_frame;
