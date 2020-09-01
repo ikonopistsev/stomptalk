@@ -12,77 +12,77 @@ std::size_t eval_stom_method(std::string_view val) noexcept
     auto name = val.data();
     switch (val.size())
     {
-    case size_of(tag::ack()):
-        rc = detect(name, tag::ack());
+    case tag::ack::text_size:
+        rc = detect(tag::ack(), name);
     break;
 
-    case size_of(tag::nack()):
+    case tag::nack::text_size:
         switch (name[0])
         {
-        case tag::send::letter():
-            rc = detect(name, tag::send());
+        case tag::send::text[0]:
+            rc = detect(tag::send(), name);
         break;
-        case tag::nack::letter():
-            rc = detect(name, tag::nack());
+        case tag::nack::text[0]:
+            rc = detect(tag::nack(), name);
         break;
         }
     break;
 
-    case size_of(tag::abort()):
+    case tag::abort::text_size:
         switch (name[0])
         {
-        case tag::abort::letter():
-            rc = detect(name, tag::abort());
+        case tag::abort::text[0]:
+            rc = detect(tag::abort(), name);
         break;
-        case tag::begin::letter():
-            rc = detect(name, tag::begin());
+        case tag::begin::text[0]:
+            rc = detect(tag::begin(), name);
         break;
-        case tag::error::letter():
-            rc = detect(name, tag::error());
+        case tag::error::text[0]:
+            rc = detect(tag::error(), name);
         break;
-        case tag::stomp::letter():
-            rc = detect(name, tag::stomp());
+        case tag::stomp::text[0]:
+            rc = detect(tag::stomp(), name);
         break;
         }
     break;
 
-    case size_of(tag::commit()):
-        rc = detect(val, tag::commit());
+    case tag::commit::text_size:
+        rc = detect(tag::commit(), name);
     break;
 
-    case size_of(tag::message()):
+    case tag::message::text_size:
         switch (name[0])
         {
-        case tag::message::letter():
-            rc = detect(name, tag::message());
+        case tag::message::text[0]:
+            rc = detect(tag::message(), name);
         break;
-        case tag::receipt::letter():
-            rc = detect(name, tag::receipt());
+        case tag::receipt::text[0]:
+            rc = detect(tag::receipt(), name);
         break;
-        case tag::connect::letter():
-            rc = detect(name, tag::connect());
+        case tag::connect::text[0]:
+            rc = detect(tag::connect(), name);
         break;
         }
     break;
 
-    case size_of(tag::connected()):
+    case tag::connected::text_size:
         switch (name[0])
         {
-        case tag::connected::letter():
-            rc = detect(name, tag::connected());
+        case tag::connected::text[0]:
+            rc = detect(tag::connected(), name);
         break;
-        case tag::subscribe::letter():
-            rc = detect(name, tag::subscribe());
+        case tag::subscribe::text[0]:
+            rc = detect(tag::subscribe(), name);
         break;
         }
     break;
 
-    case size_of(tag::disconnect()):
-        rc = detect(val, tag::disconnect());
+    case tag::disconnect::text_size:
+        rc = detect(tag::disconnect(), name);
     break;
 
-    case size_of(tag::unsubscribe()):
-        rc = detect(val, tag::unsubscribe());
+    case tag::unsubscribe::text_size:
+        rc = detect(tag::unsubscribe(), name);
     break;
 
     default:;
@@ -101,45 +101,19 @@ bool generic::valid() const noexcept
 std::string_view generic::str() const noexcept
 {
     using namespace tag;
+    static constexpr std::string_view rc[] = {
+        sv("none"),
+        ack::text, nack::text, send::text, abort::text,
+        begin::text, error::text, stomp::text, commit::text, connect::text,
+        message::text, receipt::text, subscribe::text, connected::text,
+        disconnect::text, unsubscribe::text,
+        sv("unknown")
+    };
 
-    switch (num_id_)
-    {
-    case num_id::none:
-        return make_ref("none");
-    case ack::num:
-        return ack::name();
-    case nack::num:
-        return nack::name();
-    case send::num:
-        return send::name();
-    case abort::num:
-        return abort::name();
-    case begin::num:
-        return begin::name();
-    case error::num:
-        return error::name();
-    case stomp::num:
-        return stomp::name();
-    case commit::num:
-        return commit::name();
-    case connect::num:
-        return connect::name();
-    case message::num:
-        return message::name();
-    case receipt::num:
-        return receipt::name();
-    case subscribe::num:
-        return subscribe::name();
-    case connected::num:
-        return connected::name();
-    case disconnect::num:
-        return disconnect::name();
-    case unsubscribe::num:
-        return unsubscribe::name();
-    default: ;
-    }
+    if (num_id_ >= num_id::unknown)
+        return rc[num_id::unknown];
 
-    return make_ref("unknown");
+    return rc[num_id_];
 }
 
 } // namespace method
@@ -151,30 +125,28 @@ content_type::content_type_id::type
     content_type::eval_content_type(std::string_view val) noexcept
 {
     content_type_id::type rc = content_type_id::octet;
-
     switch (val.size())
     {
-    case size_of(text_xml()):
-        if (eqstr(text_xml(), val))
+    case text_xml().size():
+        if (eqstr<text_xml().size()>(text_xml().data(), val.data()))
             rc = content_type_id::xml;
         break;
-    case size_of(text_html()):
-        if (eqstr(text_html(), val))
+    case text_html().size():
+        if (eqstr<text_html().size()>(text_html().data(), val.data()))
             rc = content_type_id::html;
         break;
-    case size_of(text_plain()):
-        if (eqstr(text_plain(), val))
+    case text_plain().size():
+        if (eqstr<text_plain().size()>(text_plain().data(), val.data()))
             rc = content_type_id::html;
         break;
-    case size_of(xml()):
-        if (eqstr(xml(), val))
+    case xml().size():
+        if (eqstr<xml().size()>(xml().data(), val.data()))
             rc = content_type_id::xml;
         break;
-    case size_of(json()):
-        if (eqstr(json(), val))
+    case json().size():
+        if (eqstr<json().size()>(json().data(), val.data()))
             rc = content_type_id::json;
         break;
-    case size_of(octet()):
     default: ;
     }
 
@@ -192,61 +164,62 @@ std::size_t eval_header(std::string_view hdr) noexcept
 
     switch (hdr.size())
     {
-    case size_of(tag::id()):
-        rc = detect(name, tag::id());
+    case tag::id::text_size:
+        rc = detect(tag::id(), name);
     break;
 
-    case size_of(tag::ack()):
-        rc = detect(name, tag::ack());
+    case tag::ack::text_size:
+        rc = detect(tag::ack(), name);
     break;
 
-    case size_of(tag::host()):
+    case tag::host::text_size:
         switch (name[0])
         {
-        case tag::host::letter():
-            rc = detect(name, tag::host());
+        case tag::host::text[0]:
+            rc = detect(tag::host(), name);
         break;
-        case tag::amqp_type::letter():
-            rc = detect(name, tag::amqp_type());
+        case tag::amqp_type::text[0]:
+            rc = detect(tag::amqp_type(), name);
         break;
         }
     break;
 
-    case size_of(tag::login()):
-        rc = detect(name, tag::login());
+    case tag::login::text_size:
+        rc = detect(tag::login(), name);
     break;
 
-    case size_of(tag::server()):
+    case tag::server::text_size:
         switch (name[0])
         {
-        case tag::server::letter():
-            rc = detect(name, tag::server());
+        case tag::server::text[0]:
+            rc = detect(tag::server(), name);
         break;
-        case tag::app_id::letter():
-            rc = detect(name, tag::app_id());
+        case tag::app_id::text[0]:
+            rc = detect(tag::app_id(), name);
         break;
         }
     break;
-    case size_of(tag::receipt()):
+
+    case tag::receipt::text_size:
         switch (name[0])
         {
-        case tag::receipt::letter():
-            rc = detect(name, tag::receipt());
+        case tag::receipt::text[0]:
+            rc = detect(tag::receipt(), name);
         break;
-        case tag::session::letter():
-            rc = detect(name, tag::session());
+        case tag::session::text[0]:
+            rc = detect(tag::session(), name);
         break;
-        case tag::version::letter():
-            rc = detect(name, tag::version());
+        case tag::version::text[0]:
+            rc = detect(tag::version(), name);
         break;
-        case tag::message::letter():
-            rc = detect(name, tag::message());
+        case tag::message::text[0]:
+            rc = detect(tag::message(), name);
         break;
-        case tag::durable::letter():
-            rc = detect(name, tag::durable());
+        case tag::durable::text[0]:
+            rc = detect(tag::durable(), name);
         break;
-        case tag::user_id::letter():
-            rc = detect(name, tag::user_id());
+        case tag::user_id::text[0]:
+            rc = detect(tag::user_id(), name);
         break;
         }
     break;
@@ -255,73 +228,73 @@ std::size_t eval_header(std::string_view hdr) noexcept
     //reply_to
     //passcode
     //priority
-    case size_of(tag::reply_to()):
+    case tag::reply_to::text_size:
         switch (name[2])
         {
-        case tag::reply_to::letter(2):
-            rc = detect(name, tag::reply_to());
+        case tag::reply_to::text[2]:
+            rc = detect(tag::reply_to(), name);
         break;
-        case tag::passcode::letter(2):
-            rc = detect(name, tag::passcode());
+        case tag::passcode::text[2]:
+            rc = detect(tag::passcode(), name);
         break;
-        case tag::priority::letter(2):
-            rc = detect(name, tag::priority());
+        case tag::priority::text[2]:
+            rc = detect(tag::priority(), name);
         break;
         }
     break;
 
     //timestamp
     //x-expires
-    case size_of(tag::expires()):
+    case tag::expires::text_size:
         switch (name[0])
         {
-        case tag::expires::letter():
-            rc = detect(name, tag::expires());
+        case tag::expires::text[0]:
+            rc = detect(tag::expires(), name);
         break;
-        case tag::timestamp::letter():
-            rc = detect(name, tag::timestamp());
+        case tag::timestamp::text[0]:
+            rc = detect(tag::timestamp(), name);
         break;
         }
     break;
 
-    case size_of(tag::message_id()):
+    case tag::message_id::text_size:
         switch (name[0])
         {
-        case tag::message_id::letter():
-            rc = detect(name, tag::message_id());
+        case tag::message_id::text[0]:
+            rc = detect(tag::message_id(), name);
         break;
-        case tag::receipt_id::letter():
-            rc = detect(name, tag::receipt_id());
+        case tag::receipt_id::text[0]:
+            rc = detect(tag::receipt_id(), name);
         break;
-        case tag::heart_beat::letter():
-            rc = detect(name, tag::heart_beat());
+        case tag::heart_beat::text[0]:
+            rc = detect(tag::heart_beat(), name);
         break;
-        case tag::persistent::letter():
-            rc = detect(name, tag::persistent());
+        case tag::persistent::text[0]:
+            rc = detect(tag::persistent(), name);
         break;
-        case tag::cluster_id::letter():
-          rc = detect(name, tag::cluster_id());
+        case tag::cluster_id::text[0]:
+            rc = detect(tag::cluster_id(), name);
         break;
-        case tag::expiration::letter():
-          rc = detect(name, tag::expiration());
+        case tag::expiration::text[0]:
+            rc = detect(tag::expiration(), name);
         break;
         }
     break;
 
-    case size_of(tag::destination()):
+    case tag::destination::text_size:
         switch (name[0])
         {
-        case tag::destination::letter():
-            rc = detect(name, tag::destination());
+        case tag::destination::text[0]:
+            rc = detect(tag::destination(), name);
         break;
-        case tag::transaction::letter():
-            rc = detect(name, tag::transaction());
+        case tag::transaction::text[0]:
+            rc = detect(tag::transaction(), name);
         break;
-        case tag::redelivered::letter():
-            rc = detect(name, tag::redelivered());
+        case tag::redelivered::text[0]:
+            rc = detect(tag::redelivered(), name);
         break;
-        case tag::auto_delete::letter():
-            rc = detect(name, tag::auto_delete());
+        case tag::auto_delete::text[0]:
+            rc = detect(tag::auto_delete(), name);
         break;
         }
     break;
@@ -332,30 +305,30 @@ std::size_t eval_header(std::string_view hdr) noexcept
     //x-max-length
     //x-queue-name
     //x-queue-type
-    case size_of(tag::content_type()):
-        if (name[0] == tag::content_type::letter()) {
-            rc = detect(name, tag::content_type());
+    case tag::content_type::text_size:
+        if (name[0] == tag::content_type::text[0]) {
+            rc = detect(tag::content_type(), name);
         } else {
             switch (name[9])
             {
-            case tag::subscription::letter(9):
-                rc = detect(name, tag::subscription());
+            case tag::subscription::text[9]:
+                rc = detect(tag::subscription(), name);
             break;  //x-max-length
-            case tag::max_length::letter(9):
-                rc = detect(name, tag::max_length());
+            case tag::max_length::text[9]:
+                rc = detect(tag::max_length(), name);
             break;  //x-queue-name
-            case tag::queue_name::letter(9):
-                rc = detect(name, tag::queue_name());
+            case tag::queue_name::text[9]:
+                rc = detect(tag::queue_name(), name);
             break;  //x-queue-type
-            case tag::queue_type::letter(9):
-                rc = detect(name, tag::queue_type());
+            case tag::queue_type::text[9]:
+                rc = detect(tag::queue_type(), name);
             break;
             }
         }
     break;
                     //x-message-ttl
-    case size_of(tag::message_ttl()):
-        rc = detect(name, tag::message_ttl());
+    case tag::message_ttl::text_size:
+        rc = detect(tag::message_ttl(), name);
     break;
 
     // 0123456789
@@ -364,53 +337,53 @@ std::size_t eval_header(std::string_view hdr) noexcept
     // x-max-priority
     // accept-version
     // correlation-id
-    case size_of(tag::content_length()):
+    case tag::content_length::text_size:
         switch (name[2])
         {
-        case tag::content_length::letter(2):
-            rc = detect(name, tag::content_length());
+        case tag::content_length::text[2]:
+            rc = detect(tag::content_length(), name);
         break;
-        case tag::prefetch_count::letter(2):
-            rc = detect(name, tag::prefetch_count());
+        case tag::prefetch_count::text[2]:
+            rc = detect(tag::prefetch_count(), name);
         break;
-        case tag::max_priority::letter(2):
-            rc = detect(name, tag::max_priority());
+        case tag::max_priority::text[2]:
+            rc = detect(tag::max_priority(), name);
         break;
-        case tag::accept_version::letter(2):
-            rc = detect(name, tag::accept_version());
+        case tag::accept_version::text[2]:
+            rc = detect(tag::accept_version(), name);
         break;
-        case tag::correlation_id::letter(2):
-            rc = detect(name, tag::correlation_id());
+        case tag::correlation_id::text[2]:
+            rc = detect(tag::correlation_id(), name);
         break;
         }
     break;
 
-    case size_of(tag::amqp_message_id()):
-        rc = detect(name, tag::amqp_message_id());
+    case tag::amqp_message_id::text_size:
+        rc = detect(tag::amqp_message_id(), name);
     break;
 
-    case size_of(tag::content_encoding()):
-        rc = detect(name, tag::content_encoding());
+    case tag::content_encoding::text_size:
+        rc = detect(tag::content_encoding(), name);
     break;
 
                     //x-max-length-bytes
-    case size_of(tag::max_length_bytes()):
-        rc = detect(name, tag::max_length_bytes());
+    case tag::max_length_bytes::text_size:
+        rc = detect(tag::max_length_bytes(), name);
     break;
 
-    case size_of(tag::original_exchange()):
-        rc = detect(name, tag::original_exchange());
+    case tag::original_exchange::text_size:
+        rc = detect(tag::original_exchange(), name);
     break;
 
-    case size_of(tag::dead_letter_exchange()):
-        rc = detect(hdr, tag::dead_letter_exchange());
+    case tag::dead_letter_exchange::text_size:
+        rc = detect(tag::dead_letter_exchange(), name);
         if (!rc) {
-            rc = detect(name, tag::original_routing_key());
+            rc = detect(tag::original_routing_key(), name);
         }
     break;
 
-    case size_of(tag::dead_letter_routing_key()):
-        rc = detect(name, tag::dead_letter_routing_key());
+    case tag::dead_letter_routing_key::text_size:
+        rc = detect(tag::dead_letter_routing_key(), name);
     break;
 
     default: ;
@@ -434,105 +407,29 @@ std::string_view generic::str() const noexcept
 {
     using namespace tag;
 
-    switch (num_id_)
-    {
-    case num_id::none:
-        return make_ref("none");
-    case content_length::num:
-        return content_length::name();
-    case content_type::num:
-        return content_length::name();
-    case accept_version::num:
-        return accept_version::name();
-    case host::num:
-        return host::name();
-    case version::num:
-        return version::name();
-    case destination::num:
-        return destination::name();
-    case id::num:
-        return id::name();
-    case message_id::num:
-        return message_id::name();
-    case subscription::num:
-        return subscription::name();
-    case receipt_id::num:
-        return receipt_id::name();
-    case login::num:
-        return login::name();
-    case passcode::num:
-        return passcode::name();
-    case heart_beat::num:
-        return heart_beat::name();
-    case session::num:
-        return session::name();
-    case server::num:
-        return server::name();
-    case ack::num:
-        return ack::name();
-    case receipt::num:
-        return receipt::name();
-    case message::num:
-        return message::name();
-    case prefetch_count::num:
-        return prefetch_count::name();
-    case durable::num:
-        return durable::name();
-    case auto_delete::num:
-        return auto_delete::name();
-    case message_ttl::num:
-        return message_ttl::name();
-    case expires::num:
-        return expires::name();
-    case max_length::num:
-        return max_length::name();
-    case max_length_bytes::num:
-        return max_length_bytes::name();
-    case dead_letter_exchange::num:
-        return dead_letter_exchange::name();
-    case dead_letter_routing_key::num:
-        return dead_letter_routing_key::name();
-    case max_priority::num:
-        return max_priority::name();
-    case persistent::num:
-        return persistent::name();
-    case reply_to::num:
-        return reply_to::name();
-    case redelivered::num:
-        return redelivered::name();
-    case original_exchange::num:
-        return original_exchange::name();
-    case original_routing_key::num:
-        return original_routing_key::name();
-    case queue_name::num:
-        return queue_name::name();
-    case queue_type::num:
-        return queue_type::name();
-    case content_encoding::num:
-        return content_encoding::name();
-    case priority::num:
-        return priority::name();
-    case correlation_id::num:
-        return correlation_id::name();
-    case expiration::num:
-        return expiration::name();
-    case amqp_message_id::num:
-        return amqp_message_id::name();
-    case timestamp::num:
-        return timestamp::name();
-    case amqp_type::num:
-        return amqp_type::name();
-    case user_id::num:
-        return user_id::name();
-    case app_id::num:
-        return app_id::name();
-    case cluster_id::num:
-        return cluster_id::name();
+    static constexpr std::string_view rc[] = {
+        sv("none"),
+        content_length::text, content_type::text, accept_version::text,
+        host::text, version::text, destination::text, id::text,
+        transaction::text, message_id::text, subscription::text,
+        receipt_id::text, login::text, passcode::text, heart_beat::text,
+        session::text, server::text, ack::text, receipt::text, message::text,
+        prefetch_count::text, durable::text, auto_delete::text,
+        message_ttl::text, expires::text, max_length::text,
+        max_length_bytes::text, dead_letter_exchange::text,
+        dead_letter_routing_key::text, max_priority::text, persistent::text,
+        reply_to::text, redelivered::text, original_exchange::text,
+        original_routing_key::text, queue_name::text, queue_type::text,
+        content_encoding::text, priority::text, correlation_id::text,
+        expiration::text, amqp_message_id::text, timestamp::text,
+        amqp_type::text, user_id::text, app_id::text, cluster_id::text,
+        sv("unknown")
+    };
 
-    default: ;
-    }
+    if (num_id_ >= num_id::unknown)
+        return rc[num_id::unknown];
 
-    return make_ref("unknown");
+    return rc[num_id_];
 }
 
 

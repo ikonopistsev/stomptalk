@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stomptalk/strref.hpp"
+#include <iterator>
 #include <string_view>
 
 namespace stomptalk {

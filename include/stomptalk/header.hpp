@@ -1,8 +1,7 @@
 #pragma once
 
 #include "stomptalk/tag.hpp"
-#include "stomptalk/memeq.hpp"
-#include <string_view>
+#include <string>
 
 namespace stomptalk {
 namespace header {
@@ -98,25 +97,13 @@ public:
     constexpr static auto num_id = T::num;
 
     constexpr explicit basic() noexcept
-        : fixed(T::name())
+        : fixed(T::text)
     {   }
 
     explicit constexpr basic(std::string_view val) noexcept
-        : fixed(T::name(), val)
+        : fixed(T::text, val)
     {   }
 };
-
-template <class T>
-constexpr std::size_t size_of(const basic<T>&) noexcept
-{
-    return size_of(T::name());
-}
-
-template <class T>
-constexpr std::size_t id_of(const basic<T>&) noexcept
-{
-    return T::id;
-}
 
 typedef basic<tag::content_length> content_length;
 typedef basic<tag::content_type> content_type;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cassert>
 #include <string_view>
 
 namespace stomptalk {
@@ -110,21 +111,11 @@ struct memeq
 };
 
 template<int L>
-bool eqstr(const char (&str)[L], const char *target) noexcept
+bool eqstr(const char* needle, const char* val) noexcept
 {
-    return memeq<L-1>::cmp(str, target);
-}
-
-template<std::size_t N, template<std::size_t> class S, class T>
-bool eqstr(S<N> str_ref, T val) noexcept
-{
-    return memeq<N>::cmp(str_ref.data(), val.data());
-}
-
-template<std::size_t N, template<std::size_t> class S>
-bool eqstr(S<N> str_ref, const char* val) noexcept
-{
-    return memeq<N>::cmp(str_ref.data(), val);
+    assert(val);
+    assert(needle);
+    return memeq<L>::cmp(needle, val);
 }
 
 } // namepsace stomptalk

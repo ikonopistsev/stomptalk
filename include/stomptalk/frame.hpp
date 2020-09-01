@@ -18,11 +18,11 @@ public:
     virtual void reserve(std::size_t len) = 0;
 
     // выставить метод
-    template<std::size_t N>
-    void push(strref<N> val)
+    template<class T>
+    void push(T)
     {
-        append_ref(val);
-        append_ref(make_ref("\n"));
+        append_ref(T::text);
+        append_ref(sv("\n"));
     }
 
     // выставить хидер
@@ -30,9 +30,9 @@ public:
     void push(header::base<K, V> hdr)
     {
         append(hdr.key());
-        append_ref(make_ref(":"));
+        append_ref(sv(":"));
         append(hdr.value());
-        append_ref(make_ref("\n"));
+        append_ref(sv("\n"));
     }
 
     // выставить известный хидер
@@ -41,9 +41,9 @@ public:
     void push(header::basic<T> hdr)
     {
         append_ref(hdr.key());
-        append_ref(make_ref(":"));
+        append_ref(sv(":"));
         append(hdr.value());
-        append_ref(make_ref("\n"));
+        append_ref(sv("\n"));
     }
 };
 
