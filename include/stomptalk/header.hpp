@@ -41,7 +41,6 @@ public:
 };
 
 typedef base<std::string, std::string> custom;
-typedef base<std::string_view, std::string_view> incoming;
 
 template<>
 class base<std::string_view, std::string_view>
@@ -87,6 +86,12 @@ typedef base<std::string_view, std::string_view> fixed;
 static constexpr auto make(std::string_view key, std::string_view val) noexcept
 {
     return fixed(key, val);
+}
+
+template <class K, class V>
+static constexpr auto make(K key, V val) noexcept
+{
+    return base<K, V>(key, val);
 }
 
 template<class T>
