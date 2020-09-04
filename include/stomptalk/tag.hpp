@@ -272,7 +272,7 @@ struct mask_id {
 enum type : std::uint64_t
 {
     none                        = 0,
-    content_length              = 1ull << num_id::content_length,
+    content_length              = 1ull << num_id::none,
     content_type                = 1ull << num_id::content_type,
     accept_version              = 1ull << num_id::accept_version,
     host                        = 1ull << num_id::host,
