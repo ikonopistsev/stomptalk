@@ -2,6 +2,7 @@
 
 #include "stomptalk/tag.hpp"
 #include <string>
+#include <chrono>
 
 namespace stomptalk {
 namespace header {
@@ -217,6 +218,11 @@ constexpr static inline auto prefetch_count(std::string_view val) noexcept
 {
     return known<tag::prefetch_count, std::string_view>(val);
 }
+
+static inline auto prefetch_count(std::size_t val) noexcept
+{
+    return known<tag::prefetch_count, std::string>(std::to_string(val));
+}
 //typedef basic<tag::durable> durable;
 constexpr static inline auto durable(std::string_view val) noexcept
 {
@@ -234,10 +240,36 @@ constexpr static inline auto message_ttl(std::string_view val) noexcept
     return known<tag::message_ttl, std::string_view>(val);
 }
 
+static inline auto message_ttl(std::size_t val) noexcept
+{
+    return known<tag::message_ttl, std::string>(std::to_string(val));
+}
+
+template<class Rep, class Period>
+static inline auto message_ttl(
+    std::chrono::duration<Rep, Period> timeout) noexcept
+{
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(timeout);
+    return message_ttl(static_cast<std::size_t>(time));
+}
+
 //typedef basic<tag::expires> expires;
 constexpr static inline auto expires(std::string_view val) noexcept
 {
     return known<tag::expires, std::string_view>(val);
+}
+
+static inline auto expires(std::size_t val) noexcept
+{
+    return known<tag::expires, std::string>(std::to_string(val));
+}
+
+template<class Rep, class Period>
+static inline auto expires(
+    std::chrono::duration<Rep, Period> timeout) noexcept
+{
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(timeout);
+    return expires(static_cast<std::size_t>(time));
 }
 
 //typedef basic<tag::max_length> max_length;
@@ -246,10 +278,20 @@ constexpr static inline auto max_length(std::string_view val) noexcept
     return known<tag::max_length, std::string_view>(val);
 }
 
+static inline auto max_length(std::size_t val) noexcept
+{
+    return known<tag::max_length, std::string>(std::to_string(val));
+}
+
 //typedef basic<tag::max_length_bytes> max_length_bytes;
 constexpr static inline auto max_length_bytes(std::string_view val) noexcept
 {
     return known<tag::max_length_bytes, std::string_view>(val);
+}
+
+static inline auto max_length_bytes(std::size_t val) noexcept
+{
+    return known<tag::max_length_bytes, std::string>(std::to_string(val));
 }
 
 //typedef basic<tag::dead_letter_exchange> dead_letter_exchange;
