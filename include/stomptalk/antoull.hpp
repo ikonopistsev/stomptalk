@@ -27,7 +27,7 @@ struct antout
 template<class T>
 struct antout<T, 1>
 {
-    static constexpr auto pw = std::int64_t{1};
+    static constexpr auto pw = std::int64_t(1);
     static T conv(const char *ptr) noexcept
     {
         static_assert (std::is_signed<T>::value, "type not signed");

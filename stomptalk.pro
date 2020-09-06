@@ -8,7 +8,8 @@ CONFIG -= app_bundle
 SOURCES += \
     src/parser.cpp \
     src/parser_hook.cpp \
-    src/tag.cpp
+    src/tag.cpp \
+    src/version.cpp
 
 HEADERS += \
     include/stomptalk/header.hpp \
@@ -22,7 +23,8 @@ HEADERS += \
     include/stomptalk/antoull.hpp \
     include/stomptalk/btpro/frame.hpp \
     include/stomptalk/btpro/connection.hpp \
-    include/stomptalk/frame.hpp
+    include/stomptalk/frame.hpp \
+    include/stomptalk/version.hpp
 
 INCLUDEPATH += include \
     ..
