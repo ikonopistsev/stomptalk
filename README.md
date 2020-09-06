@@ -21,13 +21,6 @@ class hook_base
 ```
 > If the request body is large, the on_body method will be called multiple times.
 
-Also, you must detect the 'content-length' header, then parse its value and pass to the parser.
-```
-void on_hdr_val(stomptalk::parser_hook& hook, std::string_view val) noexcept
-{
-    hook.set(static_cast<std::uint64_t>(std::atoll(val.data())));
-}
-```
 You can see example of integration in [stompconn](https://github.com/ikonopistsev/stompconn).
 
 ## 1. Building
