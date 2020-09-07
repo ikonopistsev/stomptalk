@@ -42,6 +42,12 @@ public:
 };
 
 template<class K, class V>
+constexpr static inline auto make(K key, V val) noexcept
+{
+    return base<K, V>(std::move(key), std::move(val));
+}
+
+template<class K, class V>
 class base_ref
 {
     K key_{};
@@ -74,6 +80,12 @@ public:
         val_ = std::move(val);
     }
 };
+
+template<class K, class V>
+constexpr static inline auto make_ref(K key, V val) noexcept
+{
+    return base_ref<K, V>(std::move(key), std::move(val));
+}
 
 template<class T, class V>
 class known
