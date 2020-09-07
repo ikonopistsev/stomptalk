@@ -2,7 +2,7 @@
 
 namespace stomptalk {
 
-constexpr std::string_view version() noexcept
+std::string_view version() noexcept
 {
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)

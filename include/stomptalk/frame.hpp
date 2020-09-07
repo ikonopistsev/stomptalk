@@ -51,6 +51,9 @@ public:
     template<class K, class V>
     void push(header::known<K, V> hdr)
     {
+        // проверка на повторное задание уже существующего известного хидера
+        assert(!set_mask(K()));
+
         append_ref(hdr.key());
         append_ref(sv(":"));
         append(hdr.value());
@@ -63,31 +66,28 @@ public:
     template<class K, class V>
     void push(header::known_ref<K, V> hdr)
     {
+        // проверка на повторное задание уже существующего известного хидера
+        assert(!set_mask(K()));
+
         append_ref(hdr.key());
         append_ref(sv(":"));
         append_ref(hdr.value());
         append_ref(sv("\n"));
-        set_mask(K());
     }
 
     template<class T>
-    constexpr void set_mask(T) noexcept
+    bool set_mask(T)
     {
+        bool rc = (header_mask_ & T::mask) > 0;
         header_mask_ |= T::mask;
-    }
-
-    std::size_t mask() const noexcept
-    {
-        return header_mask_;
+        return rc;
     }
 
     template<class T>
     bool mask(T) const noexcept
     {
-        std::cout << T::mask << ' ' << (header_mask_ & T::mask) << std::endl;
         return (header_mask_ & T::mask) > 0;
     }
-
 };
 
 } // namespace frame

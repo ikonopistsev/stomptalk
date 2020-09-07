@@ -4,6 +4,6 @@
 
 namespace stomptalk {
 
-constexpr std::string_view version() noexcept;
+std::string_view version() noexcept;
 
 } // namespace stomptalk
