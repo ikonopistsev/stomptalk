@@ -763,20 +763,6 @@ struct cluster_id {
 
 } // namespace tag
 
-//template <class T>
-//constexpr std::size_t detect(T, const char *val) noexcept
-//{
-//    return eqstr(T::text, val) ?
-//        std::size_t(T::num) : std::size_t(num_id::none);
-//}
-
-//template <class T>
-//constexpr std::size_t detect(T, std::string_view val) noexcept
-//{
-//    return eqstr(T::text, val) ?
-//        std::size_t(T::num) : std::size_t(num_id::none);
-//}
-
 template <class T>
 std::size_t detect(T, const char *val) noexcept
 {

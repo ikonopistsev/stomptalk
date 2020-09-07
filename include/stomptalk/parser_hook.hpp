@@ -18,6 +18,7 @@ public:
             inval_reqline,
             inval_method,
             inval_frame,
+            inval_content_size,
             next_frame,
             generic
         };
@@ -28,6 +29,8 @@ protected:
 
     error::type error_{error::none};
     std::uint64_t content_len_{};
+    std::size_t next_{};
+    std::size_t mask_{};
 
 public:
     parser_hook(hook_base& hook)
@@ -80,6 +83,8 @@ public:
     void inval_method() noexcept;
 
     void inval_frame() noexcept;
+
+    void inval_content_size() noexcept;
 
     void next_frame() noexcept;
 
