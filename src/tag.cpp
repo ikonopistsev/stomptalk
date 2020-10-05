@@ -326,9 +326,19 @@ std::size_t eval_header(std::string_view hdr) noexcept
             }
         }
     break;
-                    //x-message-ttl
+
+    //x-message-ttl
+    //delivery_mode
     case tag::message_ttl::text_size:
-        rc = detect(tag::message_ttl(), name);
+        switch (name[0])
+        {
+        case tag::delivery_mode::text[0]:
+            rc = detect(tag::delivery_mode(), name);
+        break;
+        case tag::message_ttl::text[0]:
+            rc = detect(tag::message_ttl(), name);
+        break;
+        }
     break;
 
     // 0123456789
@@ -423,6 +433,7 @@ std::string_view generic::str() const noexcept
         content_encoding::text, priority::text, correlation_id::text,
         expiration::text, amqp_message_id::text, timestamp::text,
         amqp_type::text, user_id::text, app_id::text, cluster_id::text,
+        delivery_mode::text,
         sv("unknown")
     };
 

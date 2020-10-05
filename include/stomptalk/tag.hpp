@@ -260,6 +260,7 @@ enum type : std::size_t
     user_id,
     app_id,
     cluster_id,
+    delivery_mode,
     count,
     unknown = count,
     last_num_id = cluster_id
@@ -319,6 +320,7 @@ enum type : std::uint64_t
     user_id                     = 1ull << num_id::user_id,
     app_id                      = 1ull << num_id::app_id,
     cluster_id                  = 1ull << num_id::cluster_id,
+    delivery_mode               = 1ull << num_id::delivery_mode,
     last_mask_id                = original_routing_key
 };
 
@@ -758,6 +760,13 @@ struct cluster_id {
     static constexpr auto num = num_id::cluster_id;
     static constexpr auto mask = mask_id::cluster_id;
     static constexpr auto text = sv("cluster-id");
+    static constexpr auto text_size = text.size();
+};
+
+struct delivery_mode {
+    static constexpr auto num = num_id::delivery_mode;
+    static constexpr auto mask = mask_id::delivery_mode;
+    static constexpr auto text = sv("delivery-mode");
     static constexpr auto text_size = text.size();
 };
 

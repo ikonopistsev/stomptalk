@@ -514,5 +514,17 @@ static constexpr auto content_type_octet() noexcept {
     return kr<tag::content_type>(tag::content_type::octet());
 }
 
+//typedef basic<tag::timestamp> timestamp;
+constexpr static auto delivery_mode(std::string_view val) noexcept
+{
+    return known<tag::delivery_mode, std::string_view>(val);
+}
+
+//typedef basic<tag::timestamp> timestamp;
+static auto delivery_mode(std::size_t val) noexcept
+{
+    return known<tag::delivery_mode, std::string>(std::to_string(val));
+}
+
 } // namespace header
 } // namespace stomptalk
