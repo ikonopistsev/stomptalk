@@ -128,7 +128,7 @@ constexpr static auto content_length(std::string_view val) noexcept
     return known<tag::content_length, std::string_view>(val);
 }
 
-static auto content_length(std::size_t size) noexcept
+static inline auto content_length(std::size_t size) noexcept
 {
     return known<tag::content_length, std::string>(std::to_string(size));
 }
@@ -242,7 +242,7 @@ constexpr static auto prefetch_count(std::string_view val) noexcept
     return known<tag::prefetch_count, std::string_view>(val);
 }
 
-static auto prefetch_count(std::size_t val) noexcept
+static inline auto prefetch_count(std::size_t val) noexcept
 {
     return known<tag::prefetch_count, std::string>(std::to_string(val));
 }
@@ -312,7 +312,7 @@ constexpr static auto max_length_bytes(std::string_view val) noexcept
     return known<tag::max_length_bytes, std::string_view>(val);
 }
 
-static auto max_length_bytes(std::size_t val) noexcept
+static inline auto max_length_bytes(std::size_t val) noexcept
 {
     return known<tag::max_length_bytes, std::string>(std::to_string(val));
 }
@@ -407,7 +407,7 @@ constexpr static auto amqp_message_id(std::string_view val) noexcept
     return known<tag::amqp_message_id, std::string_view>(val);
 }
 
-static auto amqp_message_id(std::size_t val) noexcept
+static inline auto amqp_message_id(std::size_t val) noexcept
 {
     return known<tag::amqp_message_id, std::string>(std::to_string(val));
 }
@@ -432,7 +432,7 @@ static auto timestamp(std::chrono::duration<Rep, Period> timeout) noexcept
     return timestamp(static_cast<std::size_t>(time));
 }
 
-static auto time_since_epoch() noexcept
+static inline auto time_since_epoch() noexcept
 {
     return timestamp(std::chrono::system_clock::now().time_since_epoch());
 }
@@ -521,7 +521,7 @@ constexpr static auto delivery_mode(std::string_view val) noexcept
 }
 
 //typedef basic<tag::timestamp> timestamp;
-static auto delivery_mode(std::size_t val) noexcept
+static inline auto delivery_mode(std::size_t val) noexcept
 {
     return known<tag::delivery_mode, std::string>(std::to_string(val));
 }
