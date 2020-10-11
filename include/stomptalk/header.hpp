@@ -419,7 +419,7 @@ constexpr static auto timestamp(std::string_view val) noexcept
 }
 
 //typedef basic<tag::timestamp> timestamp;
-static auto timestamp(std::size_t val) noexcept
+static inline auto timestamp(std::size_t val) noexcept
 {
     return known<tag::timestamp, std::string>(std::to_string(val));
 }
