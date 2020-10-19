@@ -13,7 +13,7 @@ namespace {
 template<class T, std::size_t N>
 struct antout
 {
-    static constexpr auto pw = 10 * antout<T, N - 1>::pw;
+    constexpr static auto pw = 10 * antout<T, N - 1>::pw;
     static T conv(const char *ptr) noexcept
     {
         static_assert (std::is_signed<T>::value, "type not signed");
@@ -27,7 +27,7 @@ struct antout
 template<class T>
 struct antout<T, 1>
 {
-    static constexpr auto pw = std::int64_t(1);
+    constexpr static auto pw = std::int64_t(1);
     static T conv(const char *ptr) noexcept
     {
         static_assert (std::is_signed<T>::value, "type not signed");

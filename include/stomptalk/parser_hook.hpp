@@ -26,9 +26,8 @@ public:
 
 protected:
     hook_base& hook_;
-
-    error::type error_{error::none};
     std::uint64_t content_len_{};
+    error::type error_{error::none};
     std::size_t next_{};
     std::size_t mask_{};
 

@@ -93,8 +93,8 @@ class known
 {
     using super = base<decltype (T::text), V>;
 public:
-    static constexpr auto num = T::num;
-    static constexpr auto mask = T::mask;
+    constexpr static auto num = T::num;
+    constexpr static auto mask = T::mask;
 
     constexpr known() noexcept
         : super(T::text)
@@ -105,21 +105,16 @@ public:
     {   }
 };
 
-template<class T, class V>
+template<class T>
 class known_ref
-    : public base_ref<decltype (T::text), V>
 {
-    using super = base_ref<decltype (T::text), V>;
 public:
-    static constexpr auto num = T::num;
-    static constexpr auto mask = T::mask;
+    using value_type = decltype (T::text);
+    value_type key_val_{};
 
-    constexpr known_ref()
-        : super(T::text)
-    {   }
-
-    constexpr explicit known_ref(V val) noexcept
-        : super(T::text, std::move(val))
+public:
+    constexpr known_ref(value_type value)
+        : key_val_(value)
     {   }
 };
 
@@ -460,71 +455,75 @@ constexpr static auto cluster_id(std::string_view val) noexcept
     return known<tag::cluster_id, std::string_view>(val);
 }
 
-template<class T>
-using kr = known_ref<T, std::string_view>;
-
-constexpr static auto durable_on() noexcept {
-    return kr<tag::durable>(tag::enable());
+constexpr static auto accept_version_v12() noexcept {
+    return known_ref<tag::accept_version>(tag::accept_version::header_v12());
 }
 
-constexpr static auto durable_off() noexcept {
-    return kr<tag::durable>(tag::disable());
-}
+//template<class T>
+//using kr = known_ref<T, std::string_view>;
 
-constexpr static auto auto_delete_on() noexcept {
-    return kr<tag::auto_delete>(tag::enable());
-}
+//constexpr static auto durable_on() noexcept {
+//    return known_ref<tag::durable>(tag::enable());
+//}
 
-constexpr static auto auto_delete_off() noexcept {
-    return kr<tag::auto_delete>(tag::disable());
-}
+//constexpr static auto durable_off() noexcept {
+//    return kr<tag::durable>(tag::disable());
+//}
 
-constexpr static auto persistent_on() noexcept {
-    return persistent(tag::enable());
-}
+//constexpr static auto auto_delete_on() noexcept {
+//    return kr<tag::auto_delete>(tag::enable());
+//}
 
-static constexpr auto ver12() noexcept {
-    return kr<tag::accept_version>(tag::accept_version::v12());
-}
+//constexpr static auto auto_delete_off() noexcept {
+//    return kr<tag::auto_delete>(tag::disable());
+//}
 
-static constexpr auto ack_client_individual() noexcept {
-    return kr<tag::ack>(tag::ack::client_individual());
-}
+//constexpr static auto persistent_on() noexcept {
+//    return persistent(tag::enable());
+//}
 
-static constexpr auto ack_client() noexcept {
-    return kr<tag::ack>(tag::ack::client());
-}
+//constexpr static auto ver12() noexcept {
+//    return kr<tag::accept_version>(tag::accept_version::v12());
+//}
 
-static constexpr auto content_type_text_xml() noexcept {
-    return kr<tag::content_type>(tag::content_type::text_xml());
-}
-static constexpr auto content_type_text_html() noexcept {
-    return kr<tag::content_type>(tag::content_type::text_html());
-}
-static constexpr auto content_type_text_plain() noexcept {
-    return kr<tag::content_type>(tag::content_type::text_plain());
-}
-static constexpr auto content_type_xml() noexcept {
-    return kr<tag::content_type>(tag::content_type::xml());
-}
-static constexpr auto content_type_json() noexcept {
-    return kr<tag::content_type>(tag::content_type::json());
-}
-static constexpr auto content_type_octet() noexcept {
-    return kr<tag::content_type>(tag::content_type::octet());
-}
+//constexpr static auto ack_client_individual() noexcept {
+//    return kr<tag::ack>(tag::ack::client_individual());
+//}
 
-//typedef basic<tag::timestamp> timestamp;
-constexpr static auto delivery_mode(std::string_view val) noexcept
-{
-    return known<tag::delivery_mode, std::string_view>(val);
-}
+//constexpr static auto ack_client() noexcept {
+//    return kr<tag::ack>(tag::ack::client());
+//}
 
-//typedef basic<tag::timestamp> timestamp;
-static inline auto delivery_mode(std::size_t val) noexcept
-{
-    return known<tag::delivery_mode, std::string>(std::to_string(val));
-}
+//constexpr static auto content_type_text_xml() noexcept {
+//    return kr<tag::content_type>(tag::content_type::text_xml());
+//}
+//constexpr static auto content_type_text_html() noexcept {
+//    return kr<tag::content_type>(tag::content_type::text_html());
+//}
+//constexpr static auto content_type_text_plain() noexcept {
+//    return kr<tag::content_type>(tag::content_type::text_plain());
+//}
+//constexpr static auto content_type_xml() noexcept {
+//    return kr<tag::content_type>(tag::content_type::xml());
+//}
+//constexpr static auto content_type_json() noexcept {
+//    return kr<tag::content_type>(tag::content_type::json());
+//}
+//constexpr static auto content_type_octet() noexcept {
+//    return kr<tag::content_type>(tag::content_type::octet());
+//}
+
+////typedef basic<tag::timestamp> timestamp;
+//constexpr static auto delivery_mode(std::string_view val) noexcept
+//{
+//    return known<tag::delivery_mode, std::string_view>(val);
+//}
+
+////typedef basic<tag::timestamp> timestamp;
+//static inline auto delivery_mode(std::size_t val) noexcept
+//{
+//    return known<tag::delivery_mode, std::string>(std::to_string(val));
+//}
 
 } // namespace header
 } // namespace stomptalk

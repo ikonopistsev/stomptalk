@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <cassert>
-#include <string_view>
+#include <cstring>
 
 namespace stomptalk {
 
@@ -97,7 +97,6 @@ struct memeq<8>
     }
 };
 
-
 template <int L>
 struct memeq
 {
@@ -110,12 +109,23 @@ struct memeq
     }
 };
 
+//template <int L>
+//struct memeq
+//{
+//    static bool cmp(const void *ptr1, const void *ptr2) noexcept
+//    {
+//        return std::memcmp(ptr1, ptr2, L) == 0;
+//    }
+//};
+
 template<int L>
 bool eqstr(const char* needle, const char* val) noexcept
 {
     assert(val);
     assert(needle);
-    return memeq<L>::cmp(needle, val);
+    // switch to memcmp
+    return std::memcmp(needle, val, L) == 0;
+    //return memeq<L>::cmp(needle, val);
 }
 
 } // namepsace stomptalk

@@ -62,39 +62,45 @@ parser::pointer parser::method_state(parser_hook& hook,
     do {
         auto ch = *curr++;
 
-        if (ch == '\r')
+        if (ch_isupper(ch))
         {
-            // определяем метод
-            // вызываем каллбек
-            hook.on_method(sbuf_.pop());
-
-            // переходим к поиску конца метода
-            state_fn_ = &parser::hdrline_almost_done;
-
-            return (curr < end) ?
-                hdrline_almost_done(hook, curr, end) : curr;
+            if (!sbuf_.push(ch))
+            {
+                hook.too_big();
+                return curr;
+            }
         }
-        else if (ch == '\n')
+        else
         {
-            // определяем метод
-            // вызываем каллбек
-            hook.on_method(sbuf_.pop());
+            if (ch == '\n')
+            {
+                // определяем метод
+                // вызываем каллбек
+                hook.on_method(sbuf_.pop());
 
-            // переходим к поиску конца метода
-            state_fn_ = &parser::hdrline_done;
+                // переходим к поиску конца метода
+                state_fn_ = &parser::hdrline_done;
 
-            return (curr < end) ?
-                hdrline_done(hook, curr, end) : curr;
-        }
-        else if (!ch_isupper(ch))
-        {
-            hook.inval_method();
-            return curr;
-        }
-        else if (!sbuf_.push(ch))
-        {
-            hook.too_big();
-            return curr;
+                return (curr < end) ?
+                    hdrline_done(hook, curr, end) : curr;
+            }
+            else if (ch == '\r')
+            {
+                // определяем метод
+                // вызываем каллбек
+                hook.on_method(sbuf_.pop());
+
+                // переходим к поиску конца метода
+                state_fn_ = &parser::hdrline_almost_done;
+
+                return (curr < end) ?
+                    hdrline_almost_done(hook, curr, end) : curr;
+            }
+            else
+            {
+                hook.inval_method();
+                return curr;
+            }
         }
 
     } while (curr < end);
@@ -134,30 +140,39 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
         }
         else
         {
-            if (ch == '\r')
+            if (ch_isprint_nospace(ch))
             {
-                sbuf_.pop();
-
-                state_fn_ = &parser::hdrline_almost_done;
-
-                return (curr < end) ?
-                    hdrline_almost_done(hook, curr, end) : curr;
+                if (!sbuf_.push(ch))
+                {
+                    hook.too_big();
+                    return curr;
+                }
             }
-
-            if (ch == '\n')
+            else
             {
-                sbuf_.pop();
+                if (ch == '\n')
+                {
+                    sbuf_.pop();
 
-                state_fn_ = &parser::hdrline_done;
+                    state_fn_ = &parser::hdrline_done;
 
-                return (curr < end) ?
-                    hdrline_done(hook, curr, end) : curr;
-            }
+                    return (curr < end) ?
+                        hdrline_done(hook, curr, end) : curr;
+                }
+                else if (ch == '\r')
+                {
+                    sbuf_.pop();
 
-            if (!sbuf_.push(ch))
-            {
-                hook.too_big();
-                return curr;
+                    state_fn_ = &parser::hdrline_almost_done;
+
+                    return (curr < end) ?
+                        hdrline_almost_done(hook, curr, end) : curr;
+                }
+                else
+                {
+                    hook.inval_frame();
+                    return curr;
+                }
             }
         }
 
@@ -166,42 +181,58 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
     return curr;
 }
 
+static inline bool ch_isprint(char ch) noexcept
+{
+    return (ch >= 32) && (ch <= 126);
+}
+
 parser::pointer parser::hdrline_val(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
     do {
         auto ch = *curr++;
 
-        if (ch == '\r')
+        if (ch_isprint(ch))
         {
-            // сохраняем параметры стека
-            auto text = sbuf_.pop();
-
-            hook.on_hdr_val(text);
-
-            // переходим к поиску конца метода
-            state_fn_ = &parser::hdrline_almost_done;
-
-            return (curr < end) ?
-                hdrline_almost_done(hook, curr, end) : curr;
+            if (!sbuf_.push(ch))
+            {
+                hook.too_big();
+                return curr;
+            }
         }
-        else if (ch == '\n')
+        else
         {
-            // сохраняем параметры стека
-            auto text = sbuf_.pop();
+            if (ch == '\r')
+            {
+                // сохраняем параметры стека
+                auto text = sbuf_.pop();
 
-            hook.on_hdr_val(text);
+                hook.on_hdr_val(text);
 
-            // переходим к поиску конца метода
-            state_fn_ = &parser::hdrline_done;
+                // переходим к поиску конца метода
+                state_fn_ = &parser::hdrline_almost_done;
 
-            return (curr < end) ?
-                hdrline_done(hook, curr, end) : curr;
-        }
-        else if (!sbuf_.push(ch))
-        {
-            hook.too_big();
-            return curr;
+                return (curr < end) ?
+                    hdrline_almost_done(hook, curr, end) : curr;
+            }
+            else if (ch == '\n')
+            {
+                // сохраняем параметры стека
+                auto text = sbuf_.pop();
+
+                hook.on_hdr_val(text);
+
+                // переходим к поиску конца метода
+                state_fn_ = &parser::hdrline_done;
+
+                return (curr < end) ?
+                    hdrline_done(hook, curr, end) : curr;
+            }
+            else
+            {
+                hook.inval_frame();
+                return curr;
+            }
         }
 
     } while (curr < end);

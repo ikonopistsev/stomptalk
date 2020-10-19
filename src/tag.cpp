@@ -101,13 +101,14 @@ bool generic::valid() const noexcept
 std::string_view generic::str() const noexcept
 {
     using namespace tag;
+    using namespace std::literals;
     static constexpr std::string_view rc[] = {
-        sv("none"),
+        "none"sv,
         ack::text, nack::text, send::text, abort::text,
         begin::text, error::text, stomp::text, commit::text, connect::text,
         message::text, receipt::text, subscribe::text, connected::text,
         disconnect::text, unsubscribe::text,
-        sv("unknown")
+        "unknown"sv
     };
 
     if (num_id_ >= num_id::unknown)
@@ -416,9 +417,9 @@ bool generic::valid() const noexcept
 std::string_view generic::str() const noexcept
 {
     using namespace tag;
-
-    static constexpr std::string_view rc[] = {
-        sv("none"),
+    using namespace std::literals;
+    constexpr static std::string_view rc[] = {
+        "none"sv,
         content_length::text, content_type::text, accept_version::text,
         host::text, version::text, destination::text, id::text,
         transaction::text, message_id::text, subscription::text,
@@ -434,7 +435,7 @@ std::string_view generic::str() const noexcept
         expiration::text, amqp_message_id::text, timestamp::text,
         amqp_type::text, user_id::text, app_id::text, cluster_id::text,
         delivery_mode::text,
-        sv("unknown")
+        "unknown"sv
     };
 
     if (num_id_ >= num_id::unknown)
@@ -443,6 +444,37 @@ std::string_view generic::str() const noexcept
     return rc[num_id_];
 }
 
+std::size_t generic::hash() const noexcept
+{
+    using namespace tag;
+
+    constexpr static std::size_t rc[] = {
+        0u,
+        content_length::text_hash, content_type::text_hash,
+        accept_version::text_hash, host::text_hash, version::text_hash,
+        destination::text_hash, id::text_hash, transaction::text_hash,
+        message_id::text_hash, subscription::text_hash, receipt_id::text_hash,
+        login::text_hash, passcode::text_hash, heart_beat::text_hash,
+        session::text_hash, server::text_hash, ack::text_hash,
+        receipt::text_hash, message::text_hash, prefetch_count::text_hash,
+        durable::text_hash, auto_delete::text_hash, message_ttl::text_hash,
+        expires::text_hash, max_length::text_hash, max_length_bytes::text_hash,
+        dead_letter_exchange::text_hash, dead_letter_routing_key::text_hash,
+        max_priority::text_hash, persistent::text_hash, reply_to::text_hash,
+        redelivered::text_hash, original_exchange::text_hash,
+        original_routing_key::text_hash, queue_name::text_hash,
+        queue_type::text_hash, content_encoding::text_hash, priority::text_hash,
+        correlation_id::text_hash, expiration::text_hash,
+        amqp_message_id::text_hash, timestamp::text_hash,
+        amqp_type::text_hash, user_id::text_hash, app_id::text_hash,
+        cluster_id::text_hash, delivery_mode::text_hash
+    };
+
+    if (num_id_ > num_id::unknown)
+        return std::numeric_limits<std::size_t>::max();
+
+    return rc[num_id_];
+}
 
 } // namespace header
 } // namespace stomptalk

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.2.3 DESCRIPTION "stomp protocol parser")
+project(stomptalk VERSION 1.3.1 DESCRIPTION "stomp protocol parser")
 
 option(STOMPTALK_DEBUG "show debug" OFF)
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
@@ -14,7 +14,10 @@ set(source
     src/tag.cpp
     src/parser.cpp
     src/version.cpp
+    src/stomplay.cpp
     src/parser_hook.cpp
+    src/header_store.cpp
+    src/stomplay_hook.cpp
 )
 
 set(pub_header
