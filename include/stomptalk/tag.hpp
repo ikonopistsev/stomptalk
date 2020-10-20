@@ -489,6 +489,13 @@ struct version {
     constexpr static auto text = header.substr(1, header_size - 2);
     constexpr static auto text_size = text.size();
     constexpr static auto text_hash = get_hash(text);
+
+    constexpr static auto header_v12() noexcept {
+        return "\nversion:1.2"sv;
+    }
+    constexpr static auto v12() noexcept {
+        return header_v12().substr(header_size);
+    }
 };
 
 struct login {
@@ -1110,7 +1117,7 @@ public:
                 if (i != j)
                 {
                     h2.set(j);
-                    assrt(h.hash() == h2.hash())
+                    assert(h.hash() == h2.hash());
                 }
             }
         }

@@ -13,9 +13,9 @@ void parser_hook::reset() noexcept
     mask_ = mask_id::none;
 }
 
-void parser_hook::on_frame() noexcept
+void parser_hook::on_frame(const char *frame_start) noexcept
 {
-    hook_.on_frame(*this);
+    hook_.on_frame(*this, frame_start);
 }
 
 void parser_hook::on_method(std::string_view text) noexcept
@@ -71,9 +71,9 @@ void parser_hook::on_body(const void* ptr, std::size_t size) noexcept
     hook_.on_body(*this, ptr, size);
 }
 
-void parser_hook::on_frame_end() noexcept
+void parser_hook::on_frame_end(const char *frame_end) noexcept
 {
-    hook_.on_frame_end(*this);
+    hook_.on_frame_end(*this, frame_end);
 }
 
 void parser_hook::no_error() noexcept

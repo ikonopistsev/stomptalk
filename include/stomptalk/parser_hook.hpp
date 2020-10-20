@@ -60,7 +60,7 @@ public:
         return content_len_;
     }
 
-    void on_frame() noexcept;
+    void on_frame(const char *frame_start) noexcept;
 
     void on_method(std::string_view text) noexcept;
 
@@ -70,7 +70,7 @@ public:
 
     void on_body(const void* ptr, std::size_t size) noexcept;
 
-    void on_frame_end() noexcept;
+    void on_frame_end(const char *frame_end) noexcept;
 
     // errors
     void no_error() noexcept;

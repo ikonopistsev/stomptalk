@@ -17,7 +17,6 @@ parser::pointer parser::start_state(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
     do {
-
         auto ch = *curr++;
         // пропускаем символы до первого значимого
         if ((ch == '\r') || (ch == '\n') || (ch == '\0'))
@@ -31,17 +30,11 @@ parser::pointer parser::start_state(parser_hook& hook,
 
         sbuf_.reset();
         hook.reset();
-        // вызываем каллбек
-        hook.on_frame();
+        // передаем позицию в буфере
+        hook.on_frame(curr - 1);
 
         // сохраняем стек
         sbuf_.push(ch);
-//        только что сбросили стек, там должен быть хотя бы 1 байт
-//        if (!sbuf_.push(ch))
-//        {
-//            hook.set(parser_hook::error::too_big);
-//            return curr;
-//        }
 
         // переходим к разбору метода
         state_fn_ = &parser::method_state;
@@ -310,11 +303,11 @@ parser::pointer parser::done(parser_hook& hook,
     {
         state_fn_ = &parser::start_state;
 
+        // закончили
+        hook.on_frame_end(curr);
+
         // сдвигаем курсор
         ++curr;
-
-        // закончили
-        hook.on_frame_end();
     }
     else
     {
@@ -417,13 +410,14 @@ parser::pointer parser::body_read_no_length(parser_hook& hook,
 parser::pointer parser::frame_end(parser_hook& hook,
     parser::pointer curr, parser::pointer) noexcept
 {
-    // закончили
-    hook.on_frame_end();
 
     state_fn_ = &parser::start_state;
 
     if (*curr++ != '\0')
         hook.inval_frame();
+
+    // закончили
+    hook.on_frame_end(curr - 1);
 
     return curr;
 }

@@ -6,6 +6,10 @@
 
 namespace stomptalk {
 
+#ifndef STOMPTALK_PARSER_STACK_SIZE
+#define STOMPTALK_PARSER_STACK_SIZE 4096
+#endif
+
 class parser
 {
     typedef const char* pointer;
@@ -46,7 +50,7 @@ private:
         pointer curr, pointer end) noexcept;
 
     state_fn_type state_fn_{&parser::start_state};
-    stackbuf<char, 4096> sbuf_{};
+    stackbuf<char, STOMPTALK_PARSER_STACK_SIZE> sbuf_{};
 
 public:
     parser() = default;

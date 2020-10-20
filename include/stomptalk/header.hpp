@@ -5,6 +5,100 @@
 #include <chrono>
 
 namespace stomptalk {
+namespace method {
+
+template<class T>
+class known_ref
+{
+public:
+    using value_type = decltype (T::text);
+
+public:
+    constexpr known_ref() = default;
+
+    constexpr const value_type& value() const noexcept
+    {
+        return T::text;
+    }
+};
+
+constexpr static auto ack() noexcept
+{
+    return known_ref<tag::ack>();
+}
+
+constexpr static auto nack() noexcept
+{
+    return known_ref<tag::nack>();
+}
+
+constexpr static auto send() noexcept
+{
+    return known_ref<tag::send>();
+}
+
+constexpr static auto abort() noexcept
+{
+    return known_ref<tag::abort>();
+}
+
+constexpr static auto begin() noexcept
+{
+    return known_ref<tag::begin>();
+}
+
+constexpr static auto error() noexcept
+{
+    return known_ref<tag::error>();
+}
+
+constexpr static auto stomp() noexcept
+{
+    return known_ref<tag::stomp>();
+}
+
+constexpr static auto commit() noexcept
+{
+    return known_ref<tag::commit>();
+}
+
+constexpr static auto connect() noexcept
+{
+    return known_ref<tag::connect>();
+}
+
+constexpr static auto message() noexcept
+{
+    return known_ref<tag::message>();
+}
+
+constexpr static auto receipt() noexcept
+{
+    return known_ref<tag::receipt>();
+}
+
+constexpr static auto subscribe() noexcept
+{
+    return known_ref<tag::subscribe>();
+}
+
+constexpr static auto connected() noexcept
+{
+    return known_ref<tag::connected>();
+}
+
+constexpr static auto disconnect() noexcept
+{
+    return known_ref<tag::disconnect>();
+}
+
+constexpr static auto unsubscribe() noexcept
+{
+    return known_ref<tag::unsubscribe>();
+}
+
+} // namespace method
+
 namespace header {
 
 template<class K, class V>
@@ -116,6 +210,11 @@ public:
     constexpr known_ref(value_type value)
         : key_val_(value)
     {   }
+
+    constexpr const value_type& key_val() const noexcept
+    {
+        return key_val_;
+    }
 };
 
 constexpr static auto content_length(std::string_view val) noexcept
@@ -457,6 +556,10 @@ constexpr static auto cluster_id(std::string_view val) noexcept
 
 constexpr static auto accept_version_v12() noexcept {
     return known_ref<tag::accept_version>(tag::accept_version::header_v12());
+}
+
+constexpr static auto version_v12() noexcept {
+    return known_ref<tag::version>(tag::version::header_v12());
 }
 
 //template<class T>
