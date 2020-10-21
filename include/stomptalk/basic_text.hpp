@@ -1,7 +1,8 @@
 #pragma once
 
+#include "stomptalk/fnv1a.hpp"
 #include <string_view>
-#include "btdef/text.hpp"
+#include <cstring>
 
 namespace stomptalk {
 
@@ -288,3 +289,245 @@ public:
 };
 
 } // namespace stomptalk
+
+template<class C, std::size_t N>
+bool operator==(const stomptalk::basic_text<C, N>& lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return sv(lhs) == sv(rhs);
+}
+
+template<class C, std::size_t N1, std::size_t N2>
+bool operator==(const stomptalk::basic_text<C, N1>& lhs,
+    const stomptalk::basic_text<C, N2>& rhs) noexcept
+{
+    return sv(lhs) == sv(rhs);
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator==(const stomptalk::basic_text<C, N>& lhs,
+    const basic_other_string<C, O...>& rhs) noexcept
+{
+    return sv(lhs) == rhs;
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator==(const basic_other_string<C, O...>& lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return lhs == sv(rhs);
+}
+
+template<class C, std::size_t N>
+bool operator==(const stomptalk::basic_text<C, N>& lhs,
+    std::basic_string_view<C> rhs) noexcept
+{
+    return sv(lhs) == rhs;
+}
+
+template<class C, std::size_t N>
+bool operator==(std::basic_string_view<C> lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return lhs == sv(rhs);
+}
+
+template<class C, std::size_t N1, std::size_t N2>
+bool operator!=(const stomptalk::basic_text<C, N1>& lhs,
+    const stomptalk::basic_text<C, N2>& rhs) noexcept
+{
+    return !(lhs == rhs);
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator!=(const stomptalk::basic_text<C, N>& lhs,
+    const basic_other_string<C, O...>& rhs) noexcept
+{
+    return !(lhs == rhs);
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator!=(const basic_other_string<C, O...>& lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return !(lhs == rhs);
+}
+
+template<class C, std::size_t N>
+bool operator!=(const stomptalk::basic_text<C, N>& lhs,
+    std::basic_string_view<C> rhs) noexcept
+{
+    return !(lhs == rhs);
+}
+
+template<class C, std::size_t N>
+bool operator!=(std::basic_string_view<C> lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return !(lhs == rhs);
+}
+
+template<class C, std::size_t N1, std::size_t N2>
+bool operator<(const stomptalk::basic_text<C, N1>& lhs,
+    const stomptalk::basic_text<C, N2>& rhs) noexcept
+{
+    return sv(lhs) < sv(rhs);
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator<(const stomptalk::basic_text<C, N>& lhs,
+    const basic_other_string<C, O...>& rhs) noexcept
+{
+    return sv(lhs) < rhs;
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator<(const basic_other_string<C, O...>& lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return lhs < sv(rhs);
+}
+
+template<class C, std::size_t N>
+bool operator<(const stomptalk::basic_text<C, N>& lhs,
+    std::basic_string_view<C> rhs) noexcept
+{
+    return sv(lhs) < rhs;
+}
+
+template<class C, std::size_t N>
+bool operator<(std::basic_string_view<C> lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return lhs < sv(rhs);
+}
+
+template<class C, std::size_t N1, std::size_t N2>
+bool operator>(const stomptalk::basic_text<C, N1>& lhs,
+    const stomptalk::basic_text<C, N2>& rhs) noexcept
+{
+    return rhs < lhs;
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator>(const stomptalk::basic_text<C, N>& lhs,
+    const basic_other_string<C, O...>& rhs) noexcept
+{
+    return rhs < lhs;
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator>(const basic_other_string<C, O...>& lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return rhs < lhs;
+}
+
+template<class C, std::size_t N>
+bool operator>(const stomptalk::basic_text<C, N>& lhs,
+    std::basic_string_view<C> rhs) noexcept
+{
+    return rhs < lhs;
+}
+
+template<class C, std::size_t N>
+bool operator>(std::basic_string_view<C> lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return rhs < lhs;
+}
+
+template<class C, std::size_t N1, std::size_t N2>
+bool operator<=(const stomptalk::basic_text<C, N1>& lhs,
+    const stomptalk::basic_text<C, N2>& rhs) noexcept
+{
+    return !(lhs > rhs);
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator<=(const stomptalk::basic_text<C, N>& lhs,
+    const basic_other_string<C, O...>& rhs) noexcept
+{
+    return !(lhs > rhs);
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator<=(const basic_other_string<C, O...>& lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return !(lhs > rhs);
+}
+
+template<class C, std::size_t N>
+bool operator<=(const stomptalk::basic_text<C, N>& lhs,
+    std::basic_string_view<C> rhs) noexcept
+{
+    return !(lhs > rhs);
+}
+
+template<class C, std::size_t N>
+bool operator<=(std::basic_string_view<C> lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return !(lhs > rhs);
+}
+
+template<class C, std::size_t N1, std::size_t N2>
+bool operator>=(const stomptalk::basic_text<C, N1>& lhs,
+    const stomptalk::basic_text<C, N2>& rhs) noexcept
+{
+    return !(lhs < rhs);
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator>=(const stomptalk::basic_text<C, N>& lhs,
+    const basic_other_string<C, O...>& rhs) noexcept
+{
+    return !(lhs < rhs);
+}
+
+template<class C, std::size_t N,
+         template<class...> class basic_other_string, class ...O>
+bool operator>=(const basic_other_string<C, O...>& lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return !(lhs < rhs);
+}
+
+template<class C, std::size_t N>
+bool operator>=(const stomptalk::basic_text<C, N>& lhs,
+    std::basic_string_view<C> rhs) noexcept
+{
+    return !(lhs < rhs);
+}
+
+template<class C, std::size_t N>
+bool operator>=(std::basic_string_view<C> lhs,
+    const stomptalk::basic_text<C, N>& rhs) noexcept
+{
+    return !(lhs < rhs);
+}
+
+namespace std {
+
+template<std::size_t N>
+struct hash<stomptalk::basic_text<char, N>>
+{
+    auto operator()(const stomptalk::basic_text<char, N>& t) const noexcept
+    {
+        return stomptalk::get_hash(t);
+    }
+};
+
+} // namespace std
