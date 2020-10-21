@@ -151,7 +151,7 @@ typedef basic_fnv1a<sizeof(std::size_t) == sizeof(std::uint64_t),
 constexpr
 static auto get_hash(const char* ptr) noexcept
 {
-    fnv1a hf;
+    constexpr fnv1a hf = { };
     auto rc = hf(ptr);
     return rc;
 }
@@ -160,7 +160,7 @@ template<class T>
 constexpr
 static auto get_hash(const T& text) noexcept
 {
-    fnv1a hf;
+    constexpr fnv1a hf = { };
     auto rc = hf(text);
     return rc;
 }
@@ -168,7 +168,7 @@ static auto get_hash(const T& text) noexcept
 constexpr
 static auto get_hash(const void *ptr, std::size_t len) noexcept
 {
-    fnv1a hf;
+    constexpr fnv1a hf = { };
     auto rc = hf(ptr, len);
     return rc;
 }
