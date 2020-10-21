@@ -183,19 +183,19 @@ constexpr static inline auto make_ref(K key, V val) noexcept
 
 template<class T, class V>
 class known
-    : public base<decltype (T::text), V>
+    : public base<decltype (T::header), V>
 {
-    using super = base<decltype (T::text), V>;
+    using super = base<decltype (T::header), V>;
 public:
     constexpr static auto num = T::num;
     constexpr static auto mask = T::mask;
 
     constexpr known() noexcept
-        : super(T::text)
+        : super(T::header)
     {   }
 
     constexpr explicit known(V val) noexcept
-        : super(T::text, std::move(val))
+        : super(T::header, std::move(val))
     {   }
 };
 
@@ -589,9 +589,9 @@ constexpr static auto version_v12() noexcept {
 //    return kr<tag::accept_version>(tag::accept_version::v12());
 //}
 
-//constexpr static auto ack_client_individual() noexcept {
-//    return kr<tag::ack>(tag::ack::client_individual());
-//}
+constexpr static auto ack_client_individual() noexcept {
+    return known_ref<tag::ack>(tag::ack::header_client_individual());
+}
 
 //constexpr static auto ack_client() noexcept {
 //    return kr<tag::ack>(tag::ack::client());
@@ -603,9 +603,9 @@ constexpr static auto version_v12() noexcept {
 //constexpr static auto content_type_text_html() noexcept {
 //    return kr<tag::content_type>(tag::content_type::text_html());
 //}
-//constexpr static auto content_type_text_plain() noexcept {
-//    return kr<tag::content_type>(tag::content_type::text_plain());
-//}
+constexpr static auto content_type_text_plain() noexcept {
+    return known_ref<tag::content_type>(tag::content_type::header_text_plain());
+}
 //constexpr static auto content_type_xml() noexcept {
 //    return kr<tag::content_type>(tag::content_type::xml());
 //}
