@@ -141,7 +141,7 @@ struct basic_fnv1a<x86_64, 8>
     template<class T>
     constexpr auto operator()(const T& text) const noexcept
     {
-        return this->operator()(text.begin(), text.end());
+        return this->operator()(text.data(), text.end());
     }
 };
 
@@ -151,26 +151,16 @@ typedef basic_fnv1a<sizeof(std::size_t) == sizeof(std::uint64_t),
 constexpr
 static auto get_hash(const char* ptr) noexcept
 {
-    constexpr fnv1a hf = { };
-    auto rc = hf(ptr);
-    return rc;
+    fnv1a hf;
+    return hf(ptr);
 }
 
 template<class T>
 constexpr
 static auto get_hash(const T& text) noexcept
 {
-    constexpr fnv1a hf = { };
-    auto rc = hf(text);
-    return rc;
-}
-
-constexpr
-static auto get_hash(const void *ptr, std::size_t len) noexcept
-{
-    constexpr fnv1a hf = { };
-    auto rc = hf(ptr, len);
-    return rc;
+    fnv1a hf;
+    return hf(text.begin(), text.end());
 }
 
 } // namespace stomptalk
