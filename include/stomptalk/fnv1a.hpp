@@ -74,7 +74,7 @@ struct basic_fnv1a<x86_64, 4>
         return hval;
     }
 
-    constexpr auto operator()(const void *ptr, std::size_t len) const noexcept
+    constexpr auto operator()(const char *ptr, std::size_t len) const noexcept
     {
         auto p = static_cast<const char*>(ptr);
         return this->operator()(p, p + len);
@@ -132,7 +132,7 @@ struct basic_fnv1a<x86_64, 8>
         return hval;
     }
 
-    constexpr auto operator()(const void *ptr, std::size_t len) const noexcept
+    constexpr auto operator()(const char *ptr, std::size_t len) const noexcept
     {
         auto p = static_cast<const char*>(ptr);
         return this->operator()(p, p + len);
@@ -145,8 +145,8 @@ struct basic_fnv1a<x86_64, 8>
     }
 };
 
-typedef basic_fnv1a<sizeof(std::size_t) == sizeof(std::uint64_t),
-    sizeof(std::size_t)> fnv1a;
+using fnv1a = basic_fnv1a<sizeof(std::size_t) == sizeof(std::uint64_t),
+    sizeof(std::size_t)> ;
 
 constexpr
 static auto get_hash(const char* ptr) noexcept
