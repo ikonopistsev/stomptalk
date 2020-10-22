@@ -148,18 +148,11 @@ struct basic_fnv1a<x86_64, 8>
 using fnv1a = basic_fnv1a<sizeof(std::size_t) == sizeof(std::uint64_t),
     sizeof(std::size_t)> ;
 
-constexpr
-static auto get_hash(const char* ptr) noexcept
-{
-    fnv1a hf;
-    return hf(ptr);
-}
-
 template<class T>
 constexpr
 static auto get_hash(const T& text) noexcept
 {
-    fnv1a hf;
+    fnv1a hf{};
     return hf(text.begin(), text.end());
 }
 
