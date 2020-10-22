@@ -48,6 +48,8 @@ private:
 
 public:
     basic_text() = default;
+    basic_text(const basic_text&) = default;
+    basic_text& operator=(const basic_text&) = default;
 
     basic_text(const_pointer value, size_type len) noexcept
     {
@@ -68,7 +70,7 @@ public:
     template<class T>
     basic_text(const T& other) noexcept
     {
-        assign(other.begin(), other.size());
+        assign(other.data(), other.size());
     }
 
     size_type assign(const_pointer value, size_type len) noexcept

@@ -257,6 +257,11 @@ constexpr static auto id(std::string_view val) noexcept
     return known<tag::id, std::string_view>(val);
 }
 
+static inline auto id(std::size_t val) noexcept
+{
+    return known<tag::id, std::string>(std::to_string(val));
+}
+
 constexpr static auto transaction(std::string_view val) noexcept
 {
     return known<tag::transaction, std::string_view>(val);
