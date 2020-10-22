@@ -1101,12 +1101,11 @@ public:
     {
         bool rc = true;
         generic h;
-        fnv1a hf;
         for (std::size_t i = 1; i < num_id::unknown; ++i)
         {
             h.set(i);
             auto hdr = h.str();
-            auto ch = hf(hdr);
+            auto ch = stomptalk::get_hash(hdr);
             auto mh = h.hash();
             //std::cout << h.str() << ' ' << ch << ' ' << mh << std::endl;
             assert(ch != mh);

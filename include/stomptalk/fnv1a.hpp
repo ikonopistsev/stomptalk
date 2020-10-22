@@ -133,9 +133,8 @@ struct basic_fnv1a<x86_64, 8>
     }
 
     template<class T>
-    constexpr
-    static auto calc_hash(typename T::const_iterator p,
-                          typename T::const_iterator e) noexcept
+    constexpr static auto calc_hash(typename T::const_iterator p,
+        typename T::const_iterator e) noexcept
     {
         auto hval = salt;
         while (p < e)
@@ -152,8 +151,7 @@ using fnv1a = basic_fnv1a<sizeof(std::size_t) == sizeof(std::uint64_t),
     sizeof(std::size_t)> ;
 
 template<class T>
-constexpr
-static auto get_hash(const T& text) noexcept
+constexpr static auto get_hash(const T& text) noexcept
 {
     return fnv1a::calc_hash<T>(text.begin(), text.end());
 }
