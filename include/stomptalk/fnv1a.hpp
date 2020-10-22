@@ -79,12 +79,6 @@ struct basic_fnv1a<x86_64, 4>
         auto p = static_cast<const char*>(ptr);
         return this->operator()(p, p + len);
     }
-
-    template<class T>
-    constexpr auto operator()(const T& text) const noexcept
-    {
-        return this->operator()(text.begin(), text.end());
-    }
 };
 
 // x86_64
@@ -136,12 +130,6 @@ struct basic_fnv1a<x86_64, 8>
     {
         auto p = static_cast<const char*>(ptr);
         return this->operator()(p, p + len);
-    }
-
-    template<class T>
-    constexpr auto operator()(const T& text) const noexcept
-    {
-        return this->operator()(text.data(), text.end());
     }
 };
 

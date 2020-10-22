@@ -51,8 +51,7 @@ private:
 
     index_type internal_set(std::string_view key, std::string_view value)
     {
-        stomptalk::fnv1a hf;
-        return internal_set(hf(key), key, value);
+        return internal_set(stomptalk::get_hash(key), key, value);
     }
 
     index_type internal_set(std::size_t key_hash,
@@ -84,8 +83,7 @@ public:
 
     std::string_view get(std::string_view key) const noexcept
     {
-        stomptalk::fnv1a hf;
-        auto i = header_map_.find(hf(key));
+        auto i = header_map_.find(stomptalk::get_hash(key));
         return (i != header_map_.end()) ?
             get(std::get<1>(*i)) : std::string_view();
     }
