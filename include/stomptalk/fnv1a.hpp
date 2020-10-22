@@ -131,6 +131,21 @@ struct basic_fnv1a<x86_64, 8>
         auto p = static_cast<const char*>(ptr);
         return this->operator()(p, p + len);
     }
+
+    template<class T>
+    constexpr
+    static auto calc_hash(typename T::const_iterator p,
+                          typename T::const_iterator e) noexcept
+    {
+        auto hval = salt;
+        while (p < e)
+        {
+            hval ^= static_cast<std::size_t>(*p++);
+            hval += (hval << 1) + (hval << 4) + (hval << 5) +
+                (hval << 7) + (hval << 8) + (hval << 40);
+        }
+        return hval;
+    }
 };
 
 using fnv1a = basic_fnv1a<sizeof(std::size_t) == sizeof(std::uint64_t),
@@ -140,8 +155,7 @@ template<class T>
 constexpr
 static auto get_hash(const T& text) noexcept
 {
-    fnv1a hf{};
-    return hf(text.begin(), text.end());
+    return fnv1a::calc_hash<T>(text.begin(), text.end());
 }
 
 } // namespace stomptalk
