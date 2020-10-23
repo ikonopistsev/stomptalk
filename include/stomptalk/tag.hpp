@@ -703,6 +703,19 @@ struct persistent {
     constexpr static auto text = header.substr(1, header_size - 2);
     constexpr static auto text_size = text.size();
     constexpr static auto text_hash = get_hash(text);
+
+    constexpr static auto header_enable() noexcept {
+        return "\npersistent:true"sv;
+    }
+    constexpr static auto enable() noexcept {
+        return header_enable().substr(header_size);
+    }
+    constexpr static auto header_disable() noexcept {
+        return "\npersistent:false"sv;
+    }
+    constexpr static auto disable() noexcept {
+        return header_disable().substr(header_size);
+    }
 };
 
 struct message_ttl {

@@ -586,9 +586,9 @@ constexpr static auto version_v12() noexcept {
 //    return kr<tag::auto_delete>(tag::disable());
 //}
 
-//constexpr static auto persistent_on() noexcept {
-//    return persistent(tag::enable());
-//}
+constexpr static auto persistent_on() noexcept {
+    return persistent(tag::persistent::header_enable());
+}
 
 //constexpr static auto ver12() noexcept {
 //    return kr<tag::accept_version>(tag::accept_version::v12());
@@ -614,9 +614,9 @@ constexpr static auto content_type_text_plain() noexcept {
 //constexpr static auto content_type_xml() noexcept {
 //    return kr<tag::content_type>(tag::content_type::xml());
 //}
-//constexpr static auto content_type_json() noexcept {
-//    return kr<tag::content_type>(tag::content_type::json());
-//}
+constexpr static auto content_type_json() noexcept {
+    return known_ref<tag::content_type>(tag::content_type::header_json());
+}
 //constexpr static auto content_type_octet() noexcept {
 //    return kr<tag::content_type>(tag::content_type::octet());
 //}
