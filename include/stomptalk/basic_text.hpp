@@ -48,29 +48,51 @@ private:
 
 public:
     basic_text() = default;
-    basic_text(const basic_text&) = default;
-    basic_text& operator=(const basic_text&) = default;
+
+    basic_text(const basic_text& text) noexcept
+    {
+        assign(text);
+    }
+
+    basic_text& operator=(const basic_text& text) noexcept
+    {
+        assign(text);
+        return *this;
+    }
 
     basic_text(const_pointer value, size_type len) noexcept
     {
+        assert(len <= cache_size);
         assign(value, len);
     }
 
     basic_text(string_view text) noexcept
     {
+        assert(text.size() <= cache_size);
         assign(text.data(), text.size());
     }
 
     template<std::size_t N>
-    basic_text(const basic_text<char, N>& other) noexcept
+    basic_text(const basic_text<char, N>& text) noexcept
     {
-        assign(other.begin(), other.size());
+        assert(text.size() <= cache_size);
+        assign(text.begin(), text.size());
     }
 
-    template<class T>
-    basic_text(const T& other) noexcept
+    template<template<class, class...> class basic_other_string, class ...O>
+    basic_text(const basic_other_string<char, O...>& text) noexcept
     {
-        assign(other.data(), other.size());
+        assert(text.size() <= cache_size);
+        assign(text.data(), text.size());
+    }
+
+    size_type assign(const basic_text& text) noexcept
+    {
+        auto size = text.size();
+        size_ = size;
+        if (size)
+            std::memcpy(data_, text.data(), size);
+        return size;
     }
 
     size_type assign(const_pointer value, size_type len) noexcept
@@ -88,21 +110,21 @@ public:
         return 0;
     }
 
-    size_type assign(string_view other) noexcept
+    size_type assign(string_view text) noexcept
     {
-        return assign(other.begin(), other.size());
+        return assign(text.begin(), text.size());
     }
 
     template<std::size_t N>
-    size_type assign(const basic_text<char, N>& other) noexcept
+    size_type assign(const basic_text<char, N>& text) noexcept
     {
-        return assign(other.begin(), other.size());
+        return assign(text.begin(), text.size());
     }
 
-    template<class T>
-    size_type assign(const T& other) noexcept
+    template<template<class, class...> class basic_other_string, class ...O>
+    size_type assign(const basic_other_string<char, O...>& text) noexcept
     {
-        return assign(other.begin(), other.size());
+        return assign(text.begin(), text.size());
     }
 
     size_type assign(value_type value) noexcept
