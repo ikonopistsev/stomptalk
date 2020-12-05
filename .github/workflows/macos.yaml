@@ -8,6 +8,8 @@ jobs:
   job:
     name: ${{ matrix.os }}-hosted-basic
     runs-on: ${{ matrix.os }}
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
     strategy:
       fail-fast: false
       matrix:
