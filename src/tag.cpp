@@ -1,5 +1,6 @@
 #include "stomptalk/tag.hpp"
 #include <cassert>
+#include <limits>
 
 namespace stomptalk {
 namespace method {
