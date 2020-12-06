@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.3.2 DESCRIPTION "stomp protocol parser")
+project(stomptalk VERSION 1.3.3 DESCRIPTION "stomp protocol parser")
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
@@ -48,8 +48,8 @@ if (STOMPTALK_LIBRARY_STATIC)
     add_library(stomptalk STATIC ${source})
 else()
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-    set_target_properties(stomptalk PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
     add_library(stomptalk SHARED ${source})
+    set_target_properties(stomptalk PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
 endif()
 
 target_include_directories(stomptalk PUBLIC include)
@@ -59,4 +59,3 @@ if (STOMPTALK_LIBRARY_INSTALL)
     install(TARGETS stomptalk LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(FILES ${pub_header} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/stomptalk)
 endif()
-
