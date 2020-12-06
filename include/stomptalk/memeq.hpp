@@ -123,9 +123,12 @@ bool eqstr(const char* needle, const char* val) noexcept
 {
     assert(val);
     assert(needle);
-    // switch to memcmp
+
+#ifdef STOMPTALK_USE_MEMEQ
+    return memeq<L>::cmp(needle, val);
+#else
     return std::memcmp(needle, val, L) == 0;
-    //return memeq<L>::cmp(needle, val);
+#endif
 }
 
 } // namepsace stomptalk
