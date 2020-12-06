@@ -59,3 +59,4 @@ if (STOMPTALK_LIBRARY_INSTALL)
     install(TARGETS stomptalk LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(FILES ${pub_header} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/stomptalk)
 endif()
+
