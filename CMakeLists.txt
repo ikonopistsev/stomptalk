@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 
 project(stomptalk VERSION 1.3.2 DESCRIPTION "stomp protocol parser")
 
-option(STOMPTALK_DEBUG "show debug" OFF)
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
 option(STOMPTALK_USE_MEMEQ "use memeq" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_definitions("-DSTOMPTALK_VERSION=${PROJECT_VERSION}")
 
 if (STOMPTALK_USE_MEMEQ)
     add_definitions("-DSTOMPTALK_USE_MEMEQ")
