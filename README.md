@@ -1,6 +1,7 @@
 [![linux](https://github.com/ikonopistsev/stomptalk/workflows/linux/badge.svg?branch=master)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Alinux)
 [![windows](https://github.com/ikonopistsev/stomptalk/workflows/windows/badge.svg?branch=master)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Awindows)
 [![macos](https://github.com/ikonopistsev/stomptalk/workflows/macos/badge.svg?branch=master)](https://github.com/ikonopistsev/stomptalk/actions?query=workflow%3Amacos)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/ikonopistsev/stomptalk.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ikonopistsev/stomptalk/alerts/)
 
 # stomptalk
 stomp protocol parser http://stomp.github.io
