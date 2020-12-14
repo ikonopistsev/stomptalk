@@ -462,7 +462,21 @@ public:
 
     void set(const stomptalk_parser_hook *user, void *arg) noexcept
     {
-        user_ = user;
+        if (user)
+        {
+            on_frame_ = user->on_frame;
+            on_method_ = user->on_method;
+            on_hdr_key_ = user->on_hdr_key;
+            on_hdr_val_ = user->on_hdr_val;
+            on_body_ = user->on_body;
+            on_frame_end_ = user->on_frame_end;
+        }
+        else
+        {
+            on_frame_ = on_frame_end_ = nullptr;
+            on_method_ = on_hdr_key_ = on_hdr_val_ = on_body_ = nullptr;
+        }
+
         user_arg_ = arg;
     }
 
@@ -474,21 +488,26 @@ public:
 private:
     stomptalk::parser parser_{};
     stomptalk::parser_hook hook_{*this};
-    const stomptalk_parser_hook *user_{};
-    void *user_arg_{};
+    stomptalk_cb on_frame_{};
+    stomptalk_data_cb on_method_{};
+    stomptalk_data_cb on_hdr_key_{};
+    stomptalk_data_cb on_hdr_val_{};
+    stomptalk_data_cb on_body_{};
+    stomptalk_cb on_frame_end_{};
+    void* user_arg_{};
 
     virtual void on_frame(stomptalk::parser_hook&, const char* ptr) noexcept
     {
-        if (user_ && user_->on_frame)
-            user_->on_frame(this, ptr);
+        if (on_frame_)
+            on_frame_(this, ptr);
     }
 
     virtual void on_method(stomptalk::parser_hook& hook,
                            std::string_view method) noexcept
     {
-        if (user_ && user_->on_method)
+        if (on_method_)
         {
-            if (user_->on_method(this, method.data(), method.size()))
+            if (on_method_(this, method.data(), method.size()))
                 hook.generic_error();
         }
     }
@@ -496,9 +515,9 @@ private:
     virtual void on_hdr_key(stomptalk::parser_hook& hook,
                             std::string_view key) noexcept
     {
-        if (user_ && user_->on_hdr_key)
+        if (on_hdr_key_)
         {
-            if (user_->on_hdr_key(this, key.data(), key.size()))
+            if (on_hdr_key_(this, key.data(), key.size()))
                 hook.generic_error();
         }
     }
@@ -506,9 +525,9 @@ private:
     virtual void on_hdr_val(stomptalk::parser_hook& hook,
                             std::string_view val) noexcept
     {
-        if (user_ && user_->on_hdr_val)
+        if (on_hdr_val_)
         {
-            if (user_->on_hdr_val(this, val.data(), val.size()))
+            if (on_hdr_val_(this, val.data(), val.size()))
                  hook.generic_error();
         }
     }
@@ -516,17 +535,17 @@ private:
     virtual void on_body(stomptalk::parser_hook& hook,
                          const void* ptr, std::size_t size) noexcept
     {
-        if (user_ && user_->on_body)
+        if (on_body_)
         {
-            if (user_->on_body(this, static_cast<const char*>(ptr), size))
+            if (on_body_(this, static_cast<const char*>(ptr), size))
                  hook.generic_error();
         }
     }
 
     virtual void on_frame_end(stomptalk::parser_hook&, const char* ptr) noexcept
     {
-        if (user_ && user_->on_frame_end)
-            user_->on_frame_end(this, ptr);
+        if (on_frame_end_)
+            on_frame_end_(this, ptr);
     }
 };
 
