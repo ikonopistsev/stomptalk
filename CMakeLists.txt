@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.3.3 DESCRIPTION "stomp protocol parser")
+project(stomptalk VERSION 1.3.4 DESCRIPTION "stomp protocol parser")
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)

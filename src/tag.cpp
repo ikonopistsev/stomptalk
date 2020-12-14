@@ -7,90 +7,7 @@ namespace method {
 
 std::size_t eval_stom_method(std::string_view val) noexcept
 {
-    assert(!val.empty());
-
-    std::size_t rc = num_id::none;
-    auto name = val.data();
-    switch (val.size())
-    {
-    case tag::ack::text_size:
-        rc = detect(tag::ack(), name);
-    break;
-
-    case tag::nack::text_size:
-        switch (name[0])
-        {
-        case tag::send::text[0]:
-            rc = detect(tag::send(), name);
-        break;
-        case tag::nack::text[0]:
-            rc = detect(tag::nack(), name);
-        break;
-        }
-    break;
-
-    case tag::abort::text_size:
-        switch (name[0])
-        {
-        case tag::abort::text[0]:
-            rc = detect(tag::abort(), name);
-        break;
-        case tag::begin::text[0]:
-            rc = detect(tag::begin(), name);
-        break;
-        case tag::error::text[0]:
-            rc = detect(tag::error(), name);
-        break;
-        case tag::stomp::text[0]:
-            rc = detect(tag::stomp(), name);
-        break;
-        }
-    break;
-
-    case tag::commit::text_size:
-        rc = detect(tag::commit(), name);
-    break;
-
-    case tag::message::text_size:
-        switch (name[0])
-        {
-        case tag::message::text[0]:
-            rc = detect(tag::message(), name);
-        break;
-        case tag::receipt::text[0]:
-            rc = detect(tag::receipt(), name);
-        break;
-        case tag::connect::text[0]:
-            rc = detect(tag::connect(), name);
-        break;
-        }
-    break;
-
-    case tag::connected::text_size:
-        switch (name[0])
-        {
-        case tag::connected::text[0]:
-            rc = detect(tag::connected(), name);
-        break;
-        case tag::subscribe::text[0]:
-            rc = detect(tag::subscribe(), name);
-        break;
-        }
-    break;
-
-    case tag::disconnect::text_size:
-        rc = detect(tag::disconnect(), name);
-    break;
-
-    case tag::unsubscribe::text_size:
-        rc = detect(tag::unsubscribe(), name);
-    break;
-
-    default:;
-        rc = num_id::unknown;
-    }
-
-    return (rc) ? rc : num_id::unknown;
+    return stomptalk_eval_method(val.data(), val.size());
 }
 
 bool generic::valid() const noexcept
@@ -479,3 +396,97 @@ std::size_t generic::hash() const noexcept
 
 } // namespace header
 } // namespace stomptalk
+
+size_t stomptalk_eval_method(const char *name, size_t name_size)
+{
+    assert(name);
+
+    using namespace stomptalk::method;
+    size_t rc = num_id::none;
+    switch (name_size)
+    {
+    case tag::ack::text_size:
+        rc = detect(tag::ack(), name);
+    break;
+
+    case tag::nack::text_size:
+        switch (name[0])
+        {
+        case tag::send::text[0]:
+            rc = detect(tag::send(), name);
+        break;
+        case tag::nack::text[0]:
+            rc = detect(tag::nack(), name);
+        break;
+        }
+    break;
+
+    case tag::abort::text_size:
+        switch (name[0])
+        {
+        case tag::abort::text[0]:
+            rc = detect(tag::abort(), name);
+        break;
+        case tag::begin::text[0]:
+            rc = detect(tag::begin(), name);
+        break;
+        case tag::error::text[0]:
+            rc = detect(tag::error(), name);
+        break;
+        case tag::stomp::text[0]:
+            rc = detect(tag::stomp(), name);
+        break;
+        }
+    break;
+
+    case tag::commit::text_size:
+        rc = detect(tag::commit(), name);
+    break;
+
+    case tag::message::text_size:
+        switch (name[0])
+        {
+        case tag::message::text[0]:
+            rc = detect(tag::message(), name);
+        break;
+        case tag::receipt::text[0]:
+            rc = detect(tag::receipt(), name);
+        break;
+        case tag::connect::text[0]:
+            rc = detect(tag::connect(), name);
+        break;
+        }
+    break;
+
+    case tag::connected::text_size:
+        switch (name[0])
+        {
+        case tag::connected::text[0]:
+            rc = detect(tag::connected(), name);
+        break;
+        case tag::subscribe::text[0]:
+            rc = detect(tag::subscribe(), name);
+        break;
+        }
+    break;
+
+    case tag::disconnect::text_size:
+        rc = detect(tag::disconnect(), name);
+    break;
+
+    case tag::unsubscribe::text_size:
+        rc = detect(tag::unsubscribe(), name);
+    break;
+
+    default:;
+        rc = num_id::unknown;
+    }
+
+    return (rc) ? rc : num_id::unknown;
+}
+
+const char* stomptalk_method_str(size_t method)
+{
+    stomptalk::method::generic m(method);
+    return m.str().data();
+}

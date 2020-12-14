@@ -1,6 +1,7 @@
 #include "stomptalk/parser.hpp"
 #include "stomptalk/header.hpp"
 #include "stomptalk/parser_hook.hpp"
+#include "stomptalk/parser.h"
 #include <cstring>
 #include <cassert>
 #include <algorithm>
@@ -437,3 +438,123 @@ std::size_t parser::run(parser_hook& hook,
 }
 
 } // namespace stomptalk
+
+struct stomptalk_parser
+    : public stomptalk::hook_base
+{
+public:
+    stomptalk_parser() = default;
+
+    std::size_t run(const stomptalk_parser_hook *hook,
+        const char *begin, std::size_t len) noexcept
+    {
+        user_ = hook;
+        return parser_.run(hook_, begin, len);
+    }
+
+    std::uint64_t content_length() const noexcept
+    {
+        return hook_.content_length();
+    }
+
+    std::size_t get_error() const noexcept
+    {
+        return hook_.error();
+    }
+
+private:
+    stomptalk::parser parser_{};
+    stomptalk::parser_hook hook_{*this};
+    const stomptalk_parser_hook *user_{};
+
+    virtual void on_frame(stomptalk::parser_hook&, const char* ptr) noexcept
+    {
+        if (user_ && user_->on_frame)
+            user_->on_frame(this, ptr);
+    }
+
+    virtual void on_method(stomptalk::parser_hook& hook,
+                           std::string_view method) noexcept
+    {
+        if (user_ && user_->on_method)
+        {
+            if (user_->on_method(this, method.data(), method.size()))
+                hook.generic_error();
+        }
+    }
+
+    virtual void on_hdr_key(stomptalk::parser_hook& hook,
+                            std::string_view key) noexcept
+    {
+        if (user_ && user_->on_hdr_key)
+        {
+            if (user_->on_hdr_key(this, key.data(), key.size()))
+                hook.generic_error();
+        }
+    }
+
+    virtual void on_hdr_val(stomptalk::parser_hook& hook,
+                            std::string_view val) noexcept
+    {
+        if (user_ && user_->on_hdr_val)
+        {
+            if (user_->on_hdr_val(this, val.data(), val.size()))
+                 hook.generic_error();
+        }
+    }
+
+    virtual void on_body(stomptalk::parser_hook& hook,
+                         const void* ptr, std::size_t size) noexcept
+    {
+        if (user_ && user_->on_body)
+        {
+            if (user_->on_body(this, static_cast<const char*>(ptr), size))
+                 hook.generic_error();
+        }
+    }
+
+    virtual void on_frame_end(stomptalk::parser_hook&, const char* ptr) noexcept
+    {
+        if (user_ && user_->on_frame_end)
+            user_->on_frame_end(this, ptr);
+    }
+};
+
+struct stomptalk_parser* stomptalk_parser_new()
+{
+    return new (std::nothrow) stomptalk_parser();
+}
+
+void stomptalk_parser_free(struct stomptalk_parser *parser)
+{
+    delete parser;
+}
+
+size_t stomptalk_parser_execute(stomptalk_parser *parser,
+    const stomptalk_parser_hook *user, const char *data, size_t len)
+{
+    assert(data);
+    assert(user);
+    assert(parser);
+
+    return static_cast<size_t>(parser->run(user, data, len));
+}
+
+uint64_t stomptalk_get_content_length(stomptalk_parser *parser)
+{
+    assert(parser);
+
+    return parser->content_length();
+}
+
+size_t stomptalk_get_error(stomptalk_parser *parser)
+{
+    assert(parser);
+
+    return parser->get_error();
+}
+
+const char* stomptalk_get_error_str(size_t error)
+{
+    return "";
+}

@@ -2,6 +2,7 @@
 
 #include "stomptalk/memeq.hpp"
 #include "stomptalk/fnv1a.hpp"
+#include "stomptalk/method.h"
 #include <string_view>
 #include <cstdint>
 
@@ -13,23 +14,23 @@ struct num_id {
 enum type
     : std::size_t
 {
-    none = 0,
-    ack,
-    nack,
-    send,
-    abort,
-    begin,
-    error,
-    stomp,
-    commit,
-    connect,
-    message,
-    receipt,
-    subscribe,
-    connected,
-    disconnect,
-    unsubscribe,
-    unknown
+    none            = stomptalk_method::stomtalk_none,
+    ack             = stomptalk_method::stomtalk_ack,
+    nack            = stomptalk_method::stomtalk_nack,
+    send            = stomptalk_method::stomtalk_send,
+    abort           = stomptalk_method::stomtalk_abort,
+    begin           = stomptalk_method::stomtalk_begin,
+    error           = stomptalk_method::stomtalk_error,
+    stomp           = stomptalk_method::stomtalk_stomp,
+    commit          = stomptalk_method::stomtalk_commit,
+    connect         = stomptalk_method::stomtalk_connect,
+    message         = stomptalk_method::stomtalk_message,
+    receipt         = stomptalk_method::stomtalk_receipt,
+    subscribe       = stomptalk_method::stomtalk_subscribe,
+    connected       = stomptalk_method::stomtalk_connected,
+    disconnect      = stomptalk_method::stomtalk_disconnect,
+    unsubscribe     = stomptalk_method::stomtalk_unsubscribe,
+    unknown         = stomptalk_method::stomtalk_unknown
 };
 
 };

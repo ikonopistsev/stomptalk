@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>ikonopistsev@dev4.fun</email>
+		<name>Igor Ikonopistsev</name>
+	</maintainer>
+	<use>
+		<flag name="memeq">Use library memcmp for headers detect</flag>
+	</use>
+</pkgmetadata>
