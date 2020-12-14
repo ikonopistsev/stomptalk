@@ -14,23 +14,23 @@ struct num_id {
 enum type
     : std::size_t
 {
-    none            = stomptalk_method::stomtalk_none,
-    ack             = stomptalk_method::stomtalk_ack,
-    nack            = stomptalk_method::stomtalk_nack,
-    send            = stomptalk_method::stomtalk_send,
-    abort           = stomptalk_method::stomtalk_abort,
-    begin           = stomptalk_method::stomtalk_begin,
-    error           = stomptalk_method::stomtalk_error,
-    stomp           = stomptalk_method::stomtalk_stomp,
-    commit          = stomptalk_method::stomtalk_commit,
-    connect         = stomptalk_method::stomtalk_connect,
-    message         = stomptalk_method::stomtalk_message,
-    receipt         = stomptalk_method::stomtalk_receipt,
-    subscribe       = stomptalk_method::stomtalk_subscribe,
-    connected       = stomptalk_method::stomtalk_connected,
-    disconnect      = stomptalk_method::stomtalk_disconnect,
-    unsubscribe     = stomptalk_method::stomtalk_unsubscribe,
-    unknown         = stomptalk_method::stomtalk_unknown
+    none            = stomptalk_method::stomptalk_none,
+    ack             = stomptalk_method::stomptalk_ack,
+    nack            = stomptalk_method::stomptalk_nack,
+    send            = stomptalk_method::stomptalk_send,
+    abort           = stomptalk_method::stomptalk_abort,
+    begin           = stomptalk_method::stomptalk_begin,
+    error           = stomptalk_method::stomptalk_error,
+    stomp           = stomptalk_method::stomptalk_stomp,
+    commit          = stomptalk_method::stomptalk_commit,
+    connect         = stomptalk_method::stomptalk_connect,
+    message         = stomptalk_method::stomptalk_message,
+    receipt         = stomptalk_method::stomptalk_receipt,
+    subscribe       = stomptalk_method::stomptalk_subscribe,
+    connected       = stomptalk_method::stomptalk_connected,
+    disconnect      = stomptalk_method::stomptalk_disconnect,
+    unsubscribe     = stomptalk_method::stomptalk_unsubscribe,
+    unknown         = stomptalk_method::stomptalk_unknown
 };
 
 };
