@@ -22,6 +22,8 @@ typedef struct stomptalk_parser_hook stomptalk_parser_hook;
 
 typedef int (*stomptalk_data_cb) (stomptalk_parser*,
     const char *at, size_t length);
+
+// result != 0 -> error
 typedef int (*stomptalk_cb) (stomptalk_parser*, const char* at);
 
 struct stomptalk_parser;
