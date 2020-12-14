@@ -39,6 +39,8 @@ set(pub_header
     include/stomptalk/header_store.hpp
     include/stomptalk/memeq.hpp
     include/stomptalk/parser.hpp
+    include/stomptalk/parser.h
+    include/stomptalk/method.h
     include/stomptalk/stomplay_hook.hpp
     include/stomptalk/sv.hpp
     include/stomptalk/version.hpp
