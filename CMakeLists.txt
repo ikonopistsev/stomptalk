@@ -30,6 +30,7 @@ set(pub_header
     include/stomptalk/antoull.hpp
     include/stomptalk/fnv1a.hpp
     include/stomptalk/header.hpp
+    include/stomptalk/header.h
     include/stomptalk/hook_base.hpp
     include/stomptalk/parser_hook.hpp
     include/stomptalk/stackbuf.hpp

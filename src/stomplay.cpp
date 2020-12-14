@@ -32,7 +32,7 @@ void stomplay::on_method(stomptalk::parser_hook& hook,
 {
     try
     {
-        auto method_id = stomptalk::method::eval_stom_method(method);
+        auto method_id = stomptalk_eval_method(method.data(), method.size());
         method_.set(method_id);
 
         auto rc = (method_id == stomptalk::method::num_id::unknown) ?

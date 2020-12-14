@@ -5,23 +5,23 @@
 
 enum stomptalk_method
 {
-    stomptalk_none = 0,
-    stomptalk_ack,
-    stomptalk_nack,
-    stomptalk_send,
-    stomptalk_abort,
-    stomptalk_begin,
-    stomptalk_error,
-    stomptalk_stomp,
-    stomptalk_commit,
-    stomptalk_connect,
-    stomptalk_message,
-    stomptalk_receipt,
-    stomptalk_subscribe,
-    stomptalk_connected,
-    stomptalk_disconnect,
-    stomptalk_unsubscribe,
-    stomptalk_unknown
+    st_method_none = 0,
+    st_method_ack,
+    st_method_nack,
+    st_method_send,
+    st_method_abort,
+    st_method_begin,
+    st_method_error,
+    st_method_stomp,
+    st_method_commit,
+    st_method_connect,
+    st_method_message,
+    st_method_receipt,
+    st_method_subscribe,
+    st_method_connected,
+    st_method_disconnect,
+    st_method_unsubscribe,
+    st_method_unknown
 };
 
 #ifdef __cplusplus

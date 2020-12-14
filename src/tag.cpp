@@ -5,11 +5,6 @@
 namespace stomptalk {
 namespace method {
 
-std::size_t eval_stom_method(std::string_view val) noexcept
-{
-    return stomptalk_eval_method(val.data(), val.size());
-}
-
 bool generic::valid() const noexcept
 {
     auto id = num_id();
@@ -74,14 +69,184 @@ content_type::content_type_id::type
 
 } // namespace tag
 
-std::size_t eval_header(std::string_view hdr) noexcept
+void generic::eval(std::string_view hdr) noexcept
 {
-    assert(!hdr.empty());
+    num_id_ = stomptalk_eval_header(hdr.data(), hdr.size());
+}
 
-    std::size_t rc = num_id::none;
-    auto name = hdr.data();
+bool generic::valid() const noexcept
+{
+    auto id = num_id();
+    return (num_id::none < id) && (id <= num_id::last_num_id);
+}
 
-    switch (hdr.size())
+std::string_view generic::str() const noexcept
+{
+    using namespace tag;
+    using namespace std::literals;
+    constexpr static std::string_view rc[] = {
+        "none"sv,
+        content_length::text, content_type::text, accept_version::text,
+        host::text, version::text, destination::text, id::text,
+        transaction::text, message_id::text, subscription::text,
+        receipt_id::text, login::text, passcode::text, heart_beat::text,
+        session::text, server::text, ack::text, receipt::text, message::text,
+        prefetch_count::text, durable::text, auto_delete::text,
+        message_ttl::text, expires::text, max_length::text,
+        max_length_bytes::text, dead_letter_exchange::text,
+        dead_letter_routing_key::text, max_priority::text, persistent::text,
+        reply_to::text, redelivered::text, original_exchange::text,
+        original_routing_key::text, queue_name::text, queue_type::text,
+        content_encoding::text, priority::text, correlation_id::text,
+        expiration::text, amqp_message_id::text, timestamp::text,
+        amqp_type::text, user_id::text, app_id::text, cluster_id::text,
+        delivery_mode::text,
+        "unknown"sv
+    };
+
+    if (num_id_ >= num_id::unknown)
+        return rc[num_id::unknown];
+
+    return rc[num_id_];
+}
+
+std::size_t generic::hash() const noexcept
+{
+    using namespace tag;
+
+    constexpr static std::size_t rc[] = {
+        0u,
+        content_length::text_hash, content_type::text_hash,
+        accept_version::text_hash, host::text_hash, version::text_hash,
+        destination::text_hash, id::text_hash, transaction::text_hash,
+        message_id::text_hash, subscription::text_hash, receipt_id::text_hash,
+        login::text_hash, passcode::text_hash, heart_beat::text_hash,
+        session::text_hash, server::text_hash, ack::text_hash,
+        receipt::text_hash, message::text_hash, prefetch_count::text_hash,
+        durable::text_hash, auto_delete::text_hash, message_ttl::text_hash,
+        expires::text_hash, max_length::text_hash, max_length_bytes::text_hash,
+        dead_letter_exchange::text_hash, dead_letter_routing_key::text_hash,
+        max_priority::text_hash, persistent::text_hash, reply_to::text_hash,
+        redelivered::text_hash, original_exchange::text_hash,
+        original_routing_key::text_hash, queue_name::text_hash,
+        queue_type::text_hash, content_encoding::text_hash, priority::text_hash,
+        correlation_id::text_hash, expiration::text_hash,
+        amqp_message_id::text_hash, timestamp::text_hash,
+        amqp_type::text_hash, user_id::text_hash, app_id::text_hash,
+        cluster_id::text_hash, delivery_mode::text_hash
+    };
+
+    if (num_id_ > num_id::unknown)
+        return std::numeric_limits<std::size_t>::max();
+
+    return rc[num_id_];
+}
+
+} // namespace header
+} // namespace stomptalk
+
+size_t stomptalk_eval_method(const char *name, size_t name_size)
+{
+    assert(name);
+
+    using namespace stomptalk::method;
+    size_t rc = num_id::none;
+    switch (name_size)
+    {
+    case tag::ack::text_size:
+        rc = detect(tag::ack(), name);
+    break;
+
+    case tag::nack::text_size:
+        switch (name[0])
+        {
+        case tag::send::text[0]:
+            rc = detect(tag::send(), name);
+        break;
+        case tag::nack::text[0]:
+            rc = detect(tag::nack(), name);
+        break;
+        }
+    break;
+
+    case tag::abort::text_size:
+        switch (name[0])
+        {
+        case tag::abort::text[0]:
+            rc = detect(tag::abort(), name);
+        break;
+        case tag::begin::text[0]:
+            rc = detect(tag::begin(), name);
+        break;
+        case tag::error::text[0]:
+            rc = detect(tag::error(), name);
+        break;
+        case tag::stomp::text[0]:
+            rc = detect(tag::stomp(), name);
+        break;
+        }
+    break;
+
+    case tag::commit::text_size:
+        rc = detect(tag::commit(), name);
+    break;
+
+    case tag::message::text_size:
+        switch (name[0])
+        {
+        case tag::message::text[0]:
+            rc = detect(tag::message(), name);
+        break;
+        case tag::receipt::text[0]:
+            rc = detect(tag::receipt(), name);
+        break;
+        case tag::connect::text[0]:
+            rc = detect(tag::connect(), name);
+        break;
+        }
+    break;
+
+    case tag::connected::text_size:
+        switch (name[0])
+        {
+        case tag::connected::text[0]:
+            rc = detect(tag::connected(), name);
+        break;
+        case tag::subscribe::text[0]:
+            rc = detect(tag::subscribe(), name);
+        break;
+        }
+    break;
+
+    case tag::disconnect::text_size:
+        rc = detect(tag::disconnect(), name);
+    break;
+
+    case tag::unsubscribe::text_size:
+        rc = detect(tag::unsubscribe(), name);
+    break;
+
+    default:;
+        rc = num_id::unknown;
+    }
+
+    return (rc) ? rc : num_id::unknown;
+}
+
+const char* stomptalk_method_str(size_t num_id)
+{
+    stomptalk::method::generic m(num_id);
+    return m.str().data();
+}
+
+size_t stomptalk_eval_header(const char *name, size_t name_size)
+{
+    assert(name);
+
+    using namespace stomptalk::header;
+    size_t rc = num_id::none;
+
+    switch (name_size)
     {
     case tag::id::text_size:
         rc = detect(tag::id(), name);
@@ -321,172 +486,8 @@ std::size_t eval_header(std::string_view hdr) noexcept
     return rc;
 }
 
-void generic::eval(std::string_view hdr) noexcept
+const char* stomptalk_header_str(size_t num_id)
 {
-    num_id_ = eval_header(hdr);
-}
-
-bool generic::valid() const noexcept
-{
-    auto id = num_id();
-    return (num_id::none < id) && (id <= num_id::last_num_id);
-}
-
-std::string_view generic::str() const noexcept
-{
-    using namespace tag;
-    using namespace std::literals;
-    constexpr static std::string_view rc[] = {
-        "none"sv,
-        content_length::text, content_type::text, accept_version::text,
-        host::text, version::text, destination::text, id::text,
-        transaction::text, message_id::text, subscription::text,
-        receipt_id::text, login::text, passcode::text, heart_beat::text,
-        session::text, server::text, ack::text, receipt::text, message::text,
-        prefetch_count::text, durable::text, auto_delete::text,
-        message_ttl::text, expires::text, max_length::text,
-        max_length_bytes::text, dead_letter_exchange::text,
-        dead_letter_routing_key::text, max_priority::text, persistent::text,
-        reply_to::text, redelivered::text, original_exchange::text,
-        original_routing_key::text, queue_name::text, queue_type::text,
-        content_encoding::text, priority::text, correlation_id::text,
-        expiration::text, amqp_message_id::text, timestamp::text,
-        amqp_type::text, user_id::text, app_id::text, cluster_id::text,
-        delivery_mode::text,
-        "unknown"sv
-    };
-
-    if (num_id_ >= num_id::unknown)
-        return rc[num_id::unknown];
-
-    return rc[num_id_];
-}
-
-std::size_t generic::hash() const noexcept
-{
-    using namespace tag;
-
-    constexpr static std::size_t rc[] = {
-        0u,
-        content_length::text_hash, content_type::text_hash,
-        accept_version::text_hash, host::text_hash, version::text_hash,
-        destination::text_hash, id::text_hash, transaction::text_hash,
-        message_id::text_hash, subscription::text_hash, receipt_id::text_hash,
-        login::text_hash, passcode::text_hash, heart_beat::text_hash,
-        session::text_hash, server::text_hash, ack::text_hash,
-        receipt::text_hash, message::text_hash, prefetch_count::text_hash,
-        durable::text_hash, auto_delete::text_hash, message_ttl::text_hash,
-        expires::text_hash, max_length::text_hash, max_length_bytes::text_hash,
-        dead_letter_exchange::text_hash, dead_letter_routing_key::text_hash,
-        max_priority::text_hash, persistent::text_hash, reply_to::text_hash,
-        redelivered::text_hash, original_exchange::text_hash,
-        original_routing_key::text_hash, queue_name::text_hash,
-        queue_type::text_hash, content_encoding::text_hash, priority::text_hash,
-        correlation_id::text_hash, expiration::text_hash,
-        amqp_message_id::text_hash, timestamp::text_hash,
-        amqp_type::text_hash, user_id::text_hash, app_id::text_hash,
-        cluster_id::text_hash, delivery_mode::text_hash
-    };
-
-    if (num_id_ > num_id::unknown)
-        return std::numeric_limits<std::size_t>::max();
-
-    return rc[num_id_];
-}
-
-} // namespace header
-} // namespace stomptalk
-
-size_t stomptalk_eval_method(const char *name, size_t name_size)
-{
-    assert(name);
-
-    using namespace stomptalk::method;
-    size_t rc = num_id::none;
-    switch (name_size)
-    {
-    case tag::ack::text_size:
-        rc = detect(tag::ack(), name);
-    break;
-
-    case tag::nack::text_size:
-        switch (name[0])
-        {
-        case tag::send::text[0]:
-            rc = detect(tag::send(), name);
-        break;
-        case tag::nack::text[0]:
-            rc = detect(tag::nack(), name);
-        break;
-        }
-    break;
-
-    case tag::abort::text_size:
-        switch (name[0])
-        {
-        case tag::abort::text[0]:
-            rc = detect(tag::abort(), name);
-        break;
-        case tag::begin::text[0]:
-            rc = detect(tag::begin(), name);
-        break;
-        case tag::error::text[0]:
-            rc = detect(tag::error(), name);
-        break;
-        case tag::stomp::text[0]:
-            rc = detect(tag::stomp(), name);
-        break;
-        }
-    break;
-
-    case tag::commit::text_size:
-        rc = detect(tag::commit(), name);
-    break;
-
-    case tag::message::text_size:
-        switch (name[0])
-        {
-        case tag::message::text[0]:
-            rc = detect(tag::message(), name);
-        break;
-        case tag::receipt::text[0]:
-            rc = detect(tag::receipt(), name);
-        break;
-        case tag::connect::text[0]:
-            rc = detect(tag::connect(), name);
-        break;
-        }
-    break;
-
-    case tag::connected::text_size:
-        switch (name[0])
-        {
-        case tag::connected::text[0]:
-            rc = detect(tag::connected(), name);
-        break;
-        case tag::subscribe::text[0]:
-            rc = detect(tag::subscribe(), name);
-        break;
-        }
-    break;
-
-    case tag::disconnect::text_size:
-        rc = detect(tag::disconnect(), name);
-    break;
-
-    case tag::unsubscribe::text_size:
-        rc = detect(tag::unsubscribe(), name);
-    break;
-
-    default:;
-        rc = num_id::unknown;
-    }
-
-    return (rc) ? rc : num_id::unknown;
-}
-
-const char* stomptalk_method_str(size_t method)
-{
-    stomptalk::method::generic m(method);
-    return m.str().data();
+    stomptalk::header::generic h(num_id);
+    return h.str().data();
 }

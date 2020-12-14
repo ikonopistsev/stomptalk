@@ -3,6 +3,7 @@
 #include "stomptalk/memeq.hpp"
 #include "stomptalk/fnv1a.hpp"
 #include "stomptalk/method.h"
+#include "stomptalk/header.h"
 #include <string_view>
 #include <cstdint>
 
@@ -14,23 +15,23 @@ struct num_id {
 enum type
     : std::size_t
 {
-    none            = stomptalk_method::stomptalk_none,
-    ack             = stomptalk_method::stomptalk_ack,
-    nack            = stomptalk_method::stomptalk_nack,
-    send            = stomptalk_method::stomptalk_send,
-    abort           = stomptalk_method::stomptalk_abort,
-    begin           = stomptalk_method::stomptalk_begin,
-    error           = stomptalk_method::stomptalk_error,
-    stomp           = stomptalk_method::stomptalk_stomp,
-    commit          = stomptalk_method::stomptalk_commit,
-    connect         = stomptalk_method::stomptalk_connect,
-    message         = stomptalk_method::stomptalk_message,
-    receipt         = stomptalk_method::stomptalk_receipt,
-    subscribe       = stomptalk_method::stomptalk_subscribe,
-    connected       = stomptalk_method::stomptalk_connected,
-    disconnect      = stomptalk_method::stomptalk_disconnect,
-    unsubscribe     = stomptalk_method::stomptalk_unsubscribe,
-    unknown         = stomptalk_method::stomptalk_unknown
+    none            = st_method_none,
+    ack             = st_method_ack,
+    nack            = st_method_nack,
+    send            = st_method_send,
+    abort           = st_method_abort,
+    begin           = st_method_begin,
+    error           = st_method_error,
+    stomp           = st_method_stomp,
+    commit          = st_method_commit,
+    connect         = st_method_connect,
+    message         = st_method_message,
+    receipt         = st_method_receipt,
+    subscribe       = st_method_subscribe,
+    connected       = st_method_connected,
+    disconnect      = st_method_disconnect,
+    unsubscribe     = st_method_unsubscribe,
+    unknown         = st_method_unknown
 };
 
 };
@@ -185,8 +186,6 @@ constexpr std::size_t detect(T, std::string_view val) noexcept
         std::size_t(T::num) : std::size_t(num_id::none);
 }
 
-std::size_t eval_stom_method(std::string_view val) noexcept;
-
 class generic
 {
 public:
@@ -209,7 +208,7 @@ public:
     {   }
 
     explicit generic(std::string_view val) noexcept
-        : num_id_(eval_stom_method(val))
+        : num_id_(stomptalk_eval_method(val.data(), val.size()))
     {   }
 
     virtual bool valid() const noexcept;
@@ -251,61 +250,66 @@ struct num_id {
 
 enum type : std::size_t
 {
-    none = 0,
-    content_length,
-    content_type,
-    accept_version,
-    host,
-    version,
-    destination,
-    id,
-    transaction,
-    message_id,
-    subscription,
-    receipt_id,
-    login,
-    passcode,
-    heart_beat,
-    session,
-    server,
-    ack,
-    receipt,
-    message,
-    prefetch_count,
-    durable,
-    auto_delete,
-    message_ttl,
+    none = st_header_none,
+    content_length = st_header_content_length,
+    content_type = st_header_content_type,
+    accept_version = st_header_accept_version,
+    host = st_header_host,
+    version = st_header_version,
+    destination = st_header_destination,
+    id = st_header_id,
+    transaction = st_header_transaction,
+    message_id = st_header_message_id,
+    subscription = st_header_subscription,
+    receipt_id = st_header_receipt_id,
+    login = st_header_login,
+    passcode = st_header_passcode,
+    heart_beat = st_header_heart_beat,
+    session = st_header_session,
+    server = st_header_server,
+    ack = st_header_ack,
+    receipt = st_header_receipt,
+    message = st_header_message,
+    prefetch_count = st_header_prefetch_count,
+    durable = st_header_durable,
+    auto_delete = st_header_auto_delete,
+    message_ttl = st_header_message_ttl,
     // https://www.rabbitmq.com/ttl.html#queue-ttl
-    expires,
-    max_length,
-    max_length_bytes,
-    dead_letter_exchange,
-    dead_letter_routing_key,
-    max_priority,
-    persistent,
-    reply_to,
-    redelivered,
-    original_exchange,
-    original_routing_key,
+    expires = st_header_expires,
+    max_length = st_header_max_length,
+    max_length_bytes = st_header_max_length_bytes,
+    dead_letter_exchange = st_header_dead_letter_exchange,
+    dead_letter_routing_key = st_header_dead_letter_routing_key,
+    max_priority = st_header_max_priority,
+    persistent = st_header_persistent,
+    reply_to = st_header_reply_to,
+    redelivered = st_header_redelivered,
+    original_exchange = st_header_original_exchange,
+    original_routing_key = st_header_original_routing_key,
     // https://www.rabbitmq.com/stomp.html#d.ugqn
-    queue_name,
+    queue_name = st_header_queue_name,
     // https://www.rabbitmq.com/stomp.html#queue-parameters
-    queue_type,
+    queue_type = st_header_queue_type,
     //https://www.rabbitmq.com/stomp.html#pear.ap
-    content_encoding,
-    priority,
-    correlation_id, // Helps correlate requests with responses, see tutorial 6
-    expiration, // https://www.rabbitmq.com/ttl.html
-    amqp_message_id,    // Arbitrary message ID
-    timestamp,  // Application-provided timestamp
-    amqp_type,  // Application-specific message type, e.g. "orders.created"
-    user_id,
-    app_id,
-    cluster_id,
-    delivery_mode,
-    count,
+    content_encoding = st_header_content_encoding,
+    priority = st_header_priority,
+    // Helps correlate requests with responses, see tutorial 6
+    correlation_id = st_header_correlation_id,
+     // https://www.rabbitmq.com/ttl.html
+    expiration = st_header_expiration,
+    // Arbitrary message ID
+    amqp_message_id = st_header_amqp_message_id,
+    // Application-provided timestamp
+    timestamp = st_header_timestamp,
+    // Application-specific message type, e.g. "orders.created"
+    amqp_type = st_header_amqp_type,
+    user_id = st_header_user_id,
+    app_id = st_header_app_id,
+    cluster_id = st_header_cluster_id,
+    delivery_mode = st_header_delivery_mode,
+    count = st_header_count,
     unknown = count,
-    last_num_id = cluster_id
+    last_num_id = delivery_mode
 };
 
 };
@@ -1039,8 +1043,6 @@ constexpr std::size_t detect(T, std::string_view val) noexcept
         std::size_t(T::num) : std::size_t(num_id::none);
 }
 
-std::size_t eval_header(std::string_view hdr) noexcept;
-
 class generic
 {
 public:
@@ -1059,7 +1061,7 @@ public:
     virtual ~generic() = default;
 
     explicit generic(std::string_view hdr) noexcept
-        : num_id_(eval_header(hdr))
+        : num_id_(stomptalk_eval_header(hdr.data(), hdr.size()))
     {   }
 
     explicit generic(type num_id) noexcept
