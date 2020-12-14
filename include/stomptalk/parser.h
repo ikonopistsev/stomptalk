@@ -21,7 +21,7 @@ typedef struct stomptalk_parser stomptalk_parser;
 typedef struct stomptalk_parser_hook stomptalk_parser_hook;
 
 typedef int (*stomptalk_data_cb) (stomptalk_parser*,
-                                  const char *at, size_t length);
+    const char *at, size_t length);
 typedef int (*stomptalk_cb) (stomptalk_parser*, const char* at);
 
 struct stomptalk_parser;
@@ -41,7 +41,12 @@ void stomptalk_parser_free(stomptalk_parser *parser);
 
 // Executes the parser. Returns number of parsed bytes.
 size_t stomptalk_parser_execute(stomptalk_parser *parser,
-    const stomptalk_parser_hook *hook, const char *data, size_t len);
+                                const char *data, size_t len);
+
+void stomptalk_set_hook(stomptalk_parser *parser,
+                        const stomptalk_parser_hook *hook, void *arg);
+
+void *stomptalk_get_hook_arg(stomptalk_parser *parser);
 
 // Returns a string version of the stomp method.
 const char* stomptalk_method_str(size_t method);

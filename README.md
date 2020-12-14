@@ -9,6 +9,8 @@ stomp protocol parser http://stomp.github.io
 
 This library does not perform any I/O operations for its own, is designed to be used in performance applications. It does not make any syscalls nor allocations, it does not buffer data, it can be interrupted at anytime. The parser can work with Stomp 1.0, 1.1, 1.2 and supports some of the rabbitmq headers.
 
+## using
+
 You must implement the hook_base interface. 
 ```
 class hook_base
@@ -26,9 +28,36 @@ public:
 ```
 > If the request body is large, the on_body method will be called multiple times.
 
-You can see example of integration in [stompconn](https://github.com/ikonopistsev/stompconn).
+You can see example of integration at [stompconn](https://github.com/ikonopistsev/stompconn).
 
-## 1. Building
+## Pure C using
+
+One stomptalk_parser object is used per TCP connection. Initialize the struct using stomptalk_parser_new() and set the callbacks. That might look something like this for a request parser:
+```
+#include "stomptalk/parser.h"
+
+// create parser instance
+stomptalk_parser *parser = stomptalk_parser_new();
+
+stomptalk_parser_hook hook = {
+    .on_frame = &at_frame,
+    .on_method = &at_method,
+    .on_hdr_key = &at_hdr_key,
+    .on_hdr_val = &at_hdr_val,
+    .on_frame_end = &at_frame_end
+};
+
+// setup user callabacks
+stomptalk_set_hook(parser, &hook, my_connection_ptr);
+
+// parse some data from socket
+size_t rc = stomptalk_parser_execute(parser, data, data_size);
+
+```
+See the example at [purestomp](https://github.com/ikonopistsev/purestomp).
+
+## Building
+
 ###### CMake (Windows)
 
 Install CMake: <https://www.cmake.org>

@@ -445,10 +445,8 @@ struct stomptalk_parser
 public:
     stomptalk_parser() = default;
 
-    std::size_t run(const stomptalk_parser_hook *hook,
-        const char *begin, std::size_t len) noexcept
+    std::size_t run(const char *begin, std::size_t len) noexcept
     {
-        user_ = hook;
         return parser_.run(hook_, begin, len);
     }
 
@@ -462,10 +460,22 @@ public:
         return hook_.error();
     }
 
+    void set(const stomptalk_parser_hook *user, void *arg) noexcept
+    {
+        user_ = user;
+        user_arg_ = arg;
+    }
+
+    void* user_arg() const noexcept
+    {
+        return user_arg_;
+    }
+
 private:
     stomptalk::parser parser_{};
     stomptalk::parser_hook hook_{*this};
     const stomptalk_parser_hook *user_{};
+    void *user_arg_{};
 
     virtual void on_frame(stomptalk::parser_hook&, const char* ptr) noexcept
     {
@@ -531,13 +541,27 @@ void stomptalk_parser_free(stomptalk_parser *parser)
 }
 
 size_t stomptalk_parser_execute(stomptalk_parser *parser,
-    const stomptalk_parser_hook *user, const char *data, size_t len)
+                                const char *data, size_t len)
 {
     assert(data);
-    assert(user);
     assert(parser);
 
-    return static_cast<size_t>(parser->run(user, data, len));
+    return static_cast<size_t>(parser->run(data, len));
+}
+
+void stomptalk_set_hook(stomptalk_parser *parser,
+                        const stomptalk_parser_hook *hook, void *arg)
+{
+    assert(parser);
+
+    parser->set(hook, arg);
+}
+
+void *stomptalk_get_hook_arg(stomptalk_parser *parser)
+{
+    assert(parser);
+
+    return parser->user_arg();
 }
 
 uint64_t stomptalk_get_content_length(stomptalk_parser *parser)
