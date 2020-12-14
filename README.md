@@ -40,19 +40,26 @@ One stomptalk_parser object is used per TCP connection. Initialize the struct us
 stomptalk_parser *parser = stomptalk_parser_new();
 
 stomptalk_parser_hook hook = {
-    .on_frame = &at_frame,
-    .on_method = &at_method,
-    .on_hdr_key = &at_hdr_key,
-    .on_hdr_val = &at_hdr_val,
-    .on_frame_end = &at_frame_end
+    .on_frame = at_frame,
+    .on_method = at_method,
+    .on_hdr_key = at_hdr_key,
+    .on_hdr_val = at_hdr_val,
+    .on_body = at_body,
+    .on_frame_end = at_frame_end
 };
 
 // setup user callabacks
 stomptalk_set_hook(parser, &hook, my_connection_ptr);
 
+// ...
+
 // parse some data from socket
 size_t rc = stomptalk_parser_execute(parser, data, data_size);
 
+// ...
+
+// cleanup
+stomptalk_parser_free(parser);
 ```
 See the example at [purestomp](https://github.com/ikonopistsev/purestomp).
 
