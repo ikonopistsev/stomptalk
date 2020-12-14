@@ -520,12 +520,12 @@ private:
     }
 };
 
-struct stomptalk_parser* stomptalk_parser_new()
+stomptalk_parser* stomptalk_parser_new()
 {
     return new (std::nothrow) stomptalk_parser();
 }
 
-void stomptalk_parser_free(struct stomptalk_parser *parser)
+void stomptalk_parser_free(stomptalk_parser *parser)
 {
     delete parser;
 }

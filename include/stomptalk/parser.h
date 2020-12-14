@@ -19,7 +19,6 @@ extern "C" {
 
 typedef struct stomptalk_parser stomptalk_parser;
 typedef struct stomptalk_parser_hook stomptalk_parser_hook;
-typedef struct stomptalk_parser_internal stomptalk_parser_internal;
 
 typedef int (*stomptalk_data_cb) (stomptalk_parser*,
                                   const char *at, size_t length);
@@ -36,16 +35,15 @@ struct stomptalk_parser_hook {
     stomptalk_cb      on_frame_end;
 };
 
-struct stomptalk_parser* stomptalk_parser_new();
+stomptalk_parser* stomptalk_parser_new();
 
-void stomptalk_parser_free(struct stomptalk_parser *parser);
+void stomptalk_parser_free(stomptalk_parser *parser);
 
-/* Executes the parser. Returns number of parsed bytes. Sets
- * `parser->stomptalk_errno` on error. */
+// Executes the parser. Returns number of parsed bytes.
 size_t stomptalk_parser_execute(stomptalk_parser *parser,
     const stomptalk_parser_hook *hook, const char *data, size_t len);
 
-/* Returns a string version of the stomp method. */
+// Returns a string version of the stomp method.
 const char* stomptalk_method_str(size_t method);
 
 uint64_t stomptalk_get_content_length(stomptalk_parser *parser);
