@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.3.4 DESCRIPTION "stomp protocol parser")
+project(stomptalk VERSION 1.3.5 DESCRIPTION "stomp protocol parser")
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
+option(STOMPTALK_LIBRARY_STATIC_LIBSTDCXX "use -static-libstdc++" OFF)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
 option(STOMPTALK_USE_MEMEQ "use memeq" OFF)
 
@@ -50,6 +51,9 @@ if (STOMPTALK_LIBRARY_STATIC)
     add_library(stomptalk STATIC ${source})
 else()
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    if (STOMPTALK_LIBRARY_STATIC_LIBSTDCXX)
+         add_link_options(-static-libstdc++)
+    endif()
     add_library(stomptalk SHARED ${source})
     set_target_properties(stomptalk PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
 endif()
