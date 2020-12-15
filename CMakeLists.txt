@@ -27,6 +27,7 @@ set(source
 )
 
 set(pub_header
+    include/stomptalk/antoull.h
     include/stomptalk/antoull.hpp
     include/stomptalk/fnv1a.hpp
     include/stomptalk/header.hpp

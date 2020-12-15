@@ -3,16 +3,7 @@
 
 #include "stomptalk/method.h"
 #include "stomptalk/header.h"
-
-#if defined(_WIN32) && !defined(__MINGW32__) && \
-  (!defined(_MSC_VER) || _MSC_VER<1600) && !defined(__WINE__)
-#include <BaseTsd.h>
-typedef unsigned __int64 uint64_t;
-#elif (defined(__sun) || defined(__sun__)) && defined(__SunOS_5_9)
-#include <sys/inttypes.h>
-#else
-#include <stdint.h>
-#endif
+#include "stomptalk/antoull.h"
 
 #ifdef __cplusplus
 extern "C" {

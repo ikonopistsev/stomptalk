@@ -1,5 +1,6 @@
 #include "stomptalk/parser_hook.hpp"
 #include "stomptalk/antoull.hpp"
+#include "stomptalk/antoull.h"
 
 namespace stomptalk {
 
@@ -129,3 +130,8 @@ std::string_view parser_hook::error_str() const noexcept
 }
 
 } // stomptalk
+
+int64_t stomptalk_antoull(const char *text, size_t len)
+{
+    return static_cast<int64_t>(stomptalk::antoull(text, len));
+}

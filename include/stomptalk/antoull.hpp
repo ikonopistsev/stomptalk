@@ -36,11 +36,14 @@ struct antout<T, 1>
             std::numeric_limits<T>::min() : static_cast<T>(i);
     }
 };
+
 }
 
 static inline
 std::int64_t antoull(const char *ptr, std::size_t n) noexcept
 {
+    assert(ptr);
+
     switch (n)
     {
     case 0x12: return antout<std::int64_t, 0x12>::conv(ptr);
@@ -61,7 +64,6 @@ std::int64_t antoull(const char *ptr, std::size_t n) noexcept
     case 0x03: return antout<std::int64_t, 0x03>::conv(ptr);
     case 0x02: return antout<std::int64_t, 0x02>::conv(ptr);
     case 0x01: return antout<std::int64_t, 0x01>::conv(ptr);
-    case 0x00: return 0;
     default:;
     }
 
