@@ -5,6 +5,11 @@
 namespace stomptalk {
 namespace method {
 
+void generic::eval(std::string_view method) noexcept
+{
+    num_id_ = stomptalk_eval_method(method.data(), method.size());
+}
+
 bool generic::valid() const noexcept
 {
     auto id = num_id();

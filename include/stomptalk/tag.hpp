@@ -211,6 +211,8 @@ public:
         : num_id_(stomptalk_eval_method(val.data(), val.size()))
     {   }
 
+    void eval(std::string_view method) noexcept;
+
     virtual bool valid() const noexcept;
 
     virtual std::string_view str() const noexcept;
