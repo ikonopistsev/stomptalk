@@ -1,14 +1,23 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.7)
 
-project(stomptalk VERSION 1.3.5 DESCRIPTION "stomp protocol parser")
+project(stomptalk VERSION 1.3.5 LANGUAGES CXX)
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_STATIC_LIBSTDCXX "use -static-libstdc++" OFF)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
 option(STOMPTALK_USE_MEMEQ "use memeq" OFF)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+macro(use_cxx17)
+  if (CMAKE_VERSION VERSION_LESS "3.8.2")
+    message(STATUS "stomptalk enable c++17")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+  else ()
+    set (CMAKE_CXX_STANDARD 17)
+    set (CMAKE_CXX_STANDARD_REQUIRED ON)
+  endif ()
+endmacro(use_cxx17)
+
+use_cxx17()
 
 add_definitions("-DSTOMPTALK_VERSION=${PROJECT_VERSION}")
 
