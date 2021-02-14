@@ -5,6 +5,7 @@ project(stomptalk VERSION 1.3.5 LANGUAGES CXX)
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
 option(STOMPTALK_USE_MEMEQ "use memeq" OFF)
+option(STOMPTALK_USE_MEMCMP "use builtin memcmp" OFF)
 
 # unsing clang libc++ if needed
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -32,6 +33,10 @@ add_definitions("-DSTOMPTALK_VERSION=${PROJECT_VERSION}")
 
 if (STOMPTALK_USE_MEMEQ)
     add_definitions("-DSTOMPTALK_USE_MEMEQ")
+endif()
+
+if (STOMPTALK_USE_MEMCMP)
+    add_definitions("-DSTOMPTALK_USE_MEMCMP")
 endif()
 
 set(source

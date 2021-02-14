@@ -109,15 +109,6 @@ struct memeq
     }
 };
 
-//template <int L>
-//struct memeq
-//{
-//    static bool cmp(const void *ptr1, const void *ptr2) noexcept
-//    {
-//        return std::memcmp(ptr1, ptr2, L) == 0;
-//    }
-//};
-
 template<int L>
 bool eqstr(const char* needle, const char* val) noexcept
 {
@@ -126,6 +117,8 @@ bool eqstr(const char* needle, const char* val) noexcept
 
 #ifdef STOMPTALK_USE_MEMEQ
     return memeq<L>::cmp(needle, val);
+#elif STOMPTALK_USE_MEMCMP
+    return __builtin_memcmp(needle, val, L) == 0;
 #else
     return std::memcmp(needle, val, L) == 0;
 #endif
