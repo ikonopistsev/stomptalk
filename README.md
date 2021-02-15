@@ -28,7 +28,7 @@ public:
 ```
 > If the request body is large, the on_body method will be called multiple times.
 
-You can see example of integration at [stompconn](https://github.com/ikonopistsev/stompconn).
+You can see example of integration at [stompdemo](https://github.com/ikonopistsev/stompdemo) or [stompconn](https://github.com/ikonopistsev/stompconn).
 
 ## Pure C using
 
