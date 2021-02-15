@@ -11,18 +11,16 @@
 
 namespace stomptalk {
 
-class header_store
+template<class K, class V>
+class basic_header_store
 {
 public:
-    using key_type = std::string;
-    using val_type = std::string;
-    //using key_type = basic_text<char, 64>;
-    //using val_type = basic_text<char, 256>;
-
-    using value_type = std::pair<key_type, val_type>;
+    using key_type = K;
+    using val_type = V;
+    using value_type = typename std::pair<K, V>;
     using store_type = std::vector<value_type>;
-    using iterator = store_type::iterator;
-    using const_iterator = store_type::const_iterator;
+    using iterator = typename store_type::iterator;
+    using const_iterator = typename store_type::const_iterator;
 
     using index_type = std::size_t;
     using hash_type = std::size_t;
@@ -39,9 +37,26 @@ private:
     map_index_type header_map_{};
 
 private:
-    const_iterator assign_back(std::string_view key, std::string_view value);
+    const_iterator assign_back(std::string_view key, std::string_view value)
+    {
+        auto& pair = *cursor_;
+        std::get<0>(pair) = key;
+        std::get<1>(pair) = value;
+        // возвращаем позицию текущего элемента
+        // и смещаем курсор
+        return cursor_++;
+    }
 
-    const_iterator emplace_back(std::string_view key, std::string_view value);
+    const_iterator emplace_back(std::string_view key, std::string_view value)
+    {
+        if (cursor_ < store_.end())
+            return assign_back(key, value);
+
+        cursor_ = store_.emplace(cursor_, key, value);
+
+        // возвращаем позицию добавленного элемента
+        return cursor_++;
+    }
 
     std::string_view get(index_type index) const noexcept
     {
@@ -55,10 +70,16 @@ private:
     }
 
     index_type internal_set(std::size_t key_hash,
-        std::string_view key, std::string_view value);
+        std::string_view key, std::string_view value)
+    {
+        auto item = emplace_back(key, value);
+        auto rc = static_cast<index_type>(std::distance(store_.cbegin(), item));
+        header_map_[key_hash] = rc;
+        return rc;
+    }
 
 public:
-    header_store() noexcept
+    basic_header_store() noexcept
     {
         // зануляем индекс известных типов
         header_index_.fill(peeled);
@@ -88,7 +109,19 @@ public:
             get(std::get<1>(*i)) : std::string_view();
     }
 
-    void clear() noexcept;
+    void clear() noexcept
+    {
+        // сбрасываем позицию !на начало!
+        cursor_ = store_.begin();
+
+        // зануляем индекс известных типов
+        header_index_.fill(peeled);
+
+        // мапа всегда содержит ключи
+        // зануляем только значения
+        for (auto& h : header_map_)
+            std::get<1>(h) = peeled;
+    }
 
     const_iterator begin() const noexcept
     {
@@ -120,11 +153,57 @@ public:
         return size() == 0;
     }
 
-    store_type storage() const;
+    store_type storage() const
+    {
+        store_type rc;
+        rc.insert(rc.end(), store_.cbegin(), const_iterator(cursor_));
+        return rc;
+    }
 
-    std::string dump_known() const;
+    std::string dump_known() const
+    {
+        std::string rc;
+        rc.reserve(320);
 
-    std::string dump() const;
+        for (auto& i: header_index_)
+        {
+            if (i != peeled)
+            {
+                if (!rc.empty())
+                    rc += '\n';
+
+                auto& h = store_[i];
+                rc += sv(std::get<0>(h));
+                rc += ':';
+                rc += sv(std::get<1>(h));
+            }
+        }
+
+        return rc;
+    }
+
+    std::string dump() const
+    {
+        std::string rc;
+        rc.reserve(320);
+
+        for (auto& h : *this)
+        {
+            if (!rc.empty())
+                rc += '\n';
+
+            rc += sv(std::get<0>(h));
+            rc += ':';
+            rc += sv(std::get<1>(h));
+        }
+
+        return rc;
+    }
 };
+
+using header_store = basic_header_store<std::string, std::string>;
+//using header_store =
+//    basic_header_store<basic_text<char, 64>, basic_text<char, 256>>;
+
 
 } // namespace stomptalk

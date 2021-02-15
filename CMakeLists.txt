@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 
-project(stomptalk VERSION 1.3.5 LANGUAGES CXX)
+project(stomptalk VERSION 1.3.6 LANGUAGES CXX)
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
@@ -45,7 +45,6 @@ set(source
     src/version.cpp
     src/stomplay.cpp
     src/parser_hook.cpp
-    src/header_store.cpp
     src/stomplay_hook.cpp
 )
 
