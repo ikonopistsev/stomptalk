@@ -88,8 +88,8 @@ struct basic_fnv1a<x86_64, 4>
         while (p < e)
         {
             hval ^= static_cast<std::size_t>(*p++);
-            hval += (hval << 1) + (hval << 4) + (hval << 5) +
-                (hval << 7) + (hval << 8) + (hval << 40);
+            hval += (hval << 1) + (hval << 4) +
+                (hval << 7) + (hval << 8) + (hval << 24);
         }
         return hval;
     }
