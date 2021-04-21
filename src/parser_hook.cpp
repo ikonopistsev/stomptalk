@@ -28,7 +28,7 @@ void parser_hook::on_hdr_key(std::string_view text) noexcept
 {
     using namespace header;
     using content_length = tag::content_length;
-// пока нам важен тоько размер контента
+// нам важен только размер контента
 // прверяем встречается ли хидер первый раз
 // http://stomp.github.io/stomp-specification-1.2.html#Repeated_Header_Entries
 // If a client or a server receives repeated frame header entries,

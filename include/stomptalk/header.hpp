@@ -308,6 +308,19 @@ constexpr static auto heart_beat(std::string_view val) noexcept
     return known<tag::heart_beat, std::string_view>(val);
 }
 
+
+// 0 means it cannot send heart-beats
+//
+// otherwise it is the smallest number of milliseconds
+// between heart-beats that it can guarantee
+static auto heart_beat(std::size_t cx, std::size_t cy)
+{
+    auto val = std::to_string(cx);
+    val += ',';
+    val += std::to_string(cy);
+    return known<tag::heart_beat, std::string>(std::move(val));
+}
+
 constexpr static auto session(std::string_view val) noexcept
 {
     return known<tag::session, std::string_view>(val);
