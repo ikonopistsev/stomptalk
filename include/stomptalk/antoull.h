@@ -25,6 +25,13 @@ extern "C" {
 // if result < 0 then parse error;
 int64_t stomptalk_antoull(const char *text, size_t len);
 
+// if fail - return 0
+size_t stomptalk_antoll(int64_t *res, const char *text, size_t len);
+
+// remove spaceses from both sides
+// change len and return begin of string
+const char* stomptalk_trim(const char *text, size_t *len);
+
 #ifdef __cplusplus
 }
 #endif

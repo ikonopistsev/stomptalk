@@ -135,3 +135,49 @@ int64_t stomptalk_antoull(const char *text, size_t len)
 {
     return static_cast<int64_t>(stomptalk::antoull(text, len));
 }
+
+size_t stomptalk_antoll(int64_t *res, const char *text, size_t len)
+{
+    assert(res);
+
+    if (text && len)
+    {
+        size_t minus = 0;
+
+        if (*text == '-')
+        {
+            minus = 1;
+            ++text;
+            --len;
+        }
+
+        auto num = static_cast<int64_t>(stomptalk::antoull(text, len));
+        if (num)
+        {
+            *res = minus ? -num : num;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+const char* stomptalk_trim(const char *text, size_t *len)
+{
+    size_t l = *len;
+    while (l && (*text == ' '))
+        ++text, --l;
+
+    if (l && text)
+    {
+        const char *last = text + l  - 1;
+        while ((text != last) && (*last == ' '))
+            --last, --l;
+
+        *len = l;
+        return text;
+    }
+
+    *len = 0;
+    return nullptr;
+}
