@@ -28,7 +28,7 @@ public:
     using known_index_type = std::array<index_type, header::num_id::count>;
 
 private:
-    constexpr static auto peeled = std::numeric_limits<index_type>::max();
+    constexpr static index_type peeled = std::numeric_limits<index_type>::max();
 
     store_type store_{};
     // в конструкторе указываем на конец списка

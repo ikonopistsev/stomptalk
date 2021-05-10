@@ -4,6 +4,12 @@
 #include <string>
 #include <chrono>
 
+#ifdef WIN32 // timeval
+#include <Winsock2.h>
+#else
+#include <sys/types.h>
+#endif
+
 namespace stomptalk {
 namespace method {
 

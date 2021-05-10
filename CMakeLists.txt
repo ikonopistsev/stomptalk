@@ -39,6 +39,10 @@ if (STOMPTALK_USE_MEMCMP)
     add_definitions("-DSTOMPTALK_USE_MEMCMP")
 endif()
 
+if (WIN32)
+    add_definitions(-DNOMINMAX -DWIN32_LEAN_AND_MEAN)
+endif()
+
 set(source
     src/tag.cpp
     src/parser.cpp
