@@ -439,7 +439,7 @@ std::size_t parser::run(parser_hook& hook,
 
 } // namespace stomptalk
 
-struct stomptalk_parser
+struct stomptalk_parser final
     : public stomptalk::hook_base
 {
 public:
@@ -496,14 +496,15 @@ private:
     stomptalk_cb on_frame_end_{};
     void* user_arg_{};
 
-    virtual void on_frame(stomptalk::parser_hook&, const char* ptr) noexcept
+    void on_frame(
+        stomptalk::parser_hook&, const char* ptr) noexcept override
     {
         if (on_frame_)
             on_frame_(this, ptr);
     }
 
-    virtual void on_method(stomptalk::parser_hook& hook,
-                           std::string_view method) noexcept
+    void on_method(stomptalk::parser_hook& hook,
+        std::string_view method) noexcept override
     {
         if (on_method_)
         {
@@ -512,8 +513,8 @@ private:
         }
     }
 
-    virtual void on_hdr_key(stomptalk::parser_hook& hook,
-                            std::string_view key) noexcept
+    void on_hdr_key(stomptalk::parser_hook& hook,
+        std::string_view key) noexcept override
     {
         if (on_hdr_key_)
         {
@@ -522,8 +523,8 @@ private:
         }
     }
 
-    virtual void on_hdr_val(stomptalk::parser_hook& hook,
-                            std::string_view val) noexcept
+    void on_hdr_val(stomptalk::parser_hook& hook,
+        std::string_view val) noexcept override
     {
         if (on_hdr_val_)
         {
@@ -532,8 +533,8 @@ private:
         }
     }
 
-    virtual void on_body(stomptalk::parser_hook& hook,
-                         const void* ptr, std::size_t size) noexcept
+    void on_body(stomptalk::parser_hook& hook,
+        const void* ptr, std::size_t size) noexcept override
     {
         if (on_body_)
         {
@@ -542,7 +543,8 @@ private:
         }
     }
 
-    virtual void on_frame_end(stomptalk::parser_hook&, const char* ptr) noexcept
+    void on_frame_end(
+        stomptalk::parser_hook&, const char* ptr) noexcept override
     {
         if (on_frame_end_)
             on_frame_end_(this, ptr);

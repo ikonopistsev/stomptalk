@@ -531,7 +531,7 @@ constexpr static auto timestamp(std::string_view val) noexcept
 }
 
 //typedef basic<tag::timestamp> timestamp;
-static inline auto timestamp(std::size_t val) noexcept
+static inline auto timestamp(std::uint64_t val) noexcept
 {
     return known<tag::timestamp, std::string>(std::to_string(val));
 }
@@ -541,12 +541,20 @@ static auto timestamp(std::chrono::duration<Rep, Period> timeout) noexcept
 {
     using namespace std::chrono;
     auto time = duration_cast<milliseconds>(timeout).count();
-    return timestamp(static_cast<std::size_t>(time));
+    return timestamp(static_cast<std::uint64_t>(time));
 }
 
 static inline auto time_since_epoch() noexcept
 {
     return timestamp(std::chrono::system_clock::now().time_since_epoch());
+}
+
+static inline auto time_since_epoch(timeval tv) noexcept
+{
+    auto t = static_cast<std::uint64_t>(tv.tv_sec) * 1000ull +
+        static_cast<std::uint64_t>(tv.tv_usec) % 1000ull;
+
+    return timestamp(t);
 }
 
 //typedef basic<tag::amqp_type> amqp_type;
