@@ -319,7 +319,7 @@ constexpr static auto heart_beat(std::string_view val) noexcept
 //
 // otherwise it is the smallest number of milliseconds
 // between heart-beats that it can guarantee
-static auto heart_beat(std::size_t cx, std::size_t cy)
+static auto inline heart_beat(std::size_t cx, std::size_t cy)
 {
     auto val = std::to_string(cx);
     val += ',';
