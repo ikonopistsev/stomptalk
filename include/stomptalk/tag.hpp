@@ -1117,7 +1117,6 @@ public:
 #ifndef NDEBUG
     static inline void check_hash_test() noexcept
     {
-        bool rc = true;
         generic h;
         for (std::size_t i = 1; i < num_id::unknown; ++i)
         {
