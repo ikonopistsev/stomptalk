@@ -369,7 +369,7 @@ enum type : std::uint64_t
     app_id                      = 1ull << num_id::app_id,
     cluster_id                  = 1ull << num_id::cluster_id,
     delivery_mode               = 1ull << num_id::delivery_mode,
-    last_mask_id                = original_routing_key
+    last_mask_id                = delivery_mode
 };
 
 }; // struct mask_id
