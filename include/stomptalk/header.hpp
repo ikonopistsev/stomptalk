@@ -4,7 +4,7 @@
 #include <string>
 #include <chrono>
 
-#ifdef WIN32 // timeval
+#ifdef _WIN32 // timeval
 #include <Winsock2.h>
 #else
 #include <sys/types.h>
