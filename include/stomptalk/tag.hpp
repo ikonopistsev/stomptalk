@@ -309,6 +309,7 @@ enum type : std::size_t
     app_id = st_header_app_id,
     cluster_id = st_header_cluster_id,
     delivery_mode = st_header_delivery_mode,
+    requeue = st_header_requeue,
     count = st_header_count,
     unknown = count,
     last_num_id = delivery_mode
@@ -369,6 +370,7 @@ enum type : std::uint64_t
     app_id                      = 1ull << num_id::app_id,
     cluster_id                  = 1ull << num_id::cluster_id,
     delivery_mode               = 1ull << num_id::delivery_mode,
+    requeue                     = 1ull << num_id::requeue,
     last_mask_id                = delivery_mode
 };
 
@@ -1023,6 +1025,16 @@ struct delivery_mode {
     constexpr static auto num = num_id::delivery_mode;
     constexpr static auto mask = mask_id::delivery_mode;
     constexpr static auto header = "\ndelivery-mode:"sv;
+    constexpr static auto header_size = header.size();
+    constexpr static auto text = header.substr(1, header_size - 2);
+    constexpr static auto text_size = text.size();
+    constexpr static auto text_hash = get_hash(text);
+};
+
+struct requeue {
+    constexpr static auto num = num_id::requeue;
+    constexpr static auto mask = mask_id::requeue;
+    constexpr static auto header = "\nrequeue:"sv;
     constexpr static auto header_size = header.size();
     constexpr static auto text = header.substr(1, header_size - 2);
     constexpr static auto text_size = text.size();

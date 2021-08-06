@@ -105,7 +105,7 @@ std::string_view generic::str() const noexcept
         content_encoding::text, priority::text, correlation_id::text,
         expiration::text, amqp_message_id::text, timestamp::text,
         amqp_type::text, user_id::text, app_id::text, cluster_id::text,
-        delivery_mode::text,
+        delivery_mode::text, requeue::text,
         "unknown"sv
     };
 
@@ -138,7 +138,7 @@ std::size_t generic::hash() const noexcept
         correlation_id::text_hash, expiration::text_hash,
         amqp_message_id::text_hash, timestamp::text_hash,
         amqp_type::text_hash, user_id::text_hash, app_id::text_hash,
-        cluster_id::text_hash, delivery_mode::text_hash
+        cluster_id::text_hash, delivery_mode::text_hash, requeue::text_hash
     };
 
     if (num_id_ > num_id::unknown)
@@ -293,7 +293,9 @@ size_t stomptalk_eval_header(const char *name, size_t name_size)
         switch (name[0])
         {
         case tag::receipt::text[0]:
-            rc = detect(tag::receipt(), name);
+            rc = (name[2] == 'q') ? 
+                detect(tag::requeue(), name) :
+                detect(tag::receipt(), name);
         break;
         case tag::session::text[0]:
             rc = detect(tag::session(), name);
