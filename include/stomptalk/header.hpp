@@ -373,7 +373,6 @@ constexpr static auto auto_delete(std::string_view val) noexcept
     return known<tag::auto_delete, std::string_view>(val);
 }
 
-
 constexpr static auto message_ttl(std::string_view val) noexcept
 {
     return known<tag::message_ttl, std::string_view>(val);
@@ -452,8 +451,7 @@ constexpr static auto persistent(std::string_view val) noexcept
 
 constexpr static auto persistent_on() noexcept
 {
-    using namespace std::literals;
-    return known<tag::persistent, std::string_view>("true"sv);
+    return known_ref<tag::persistent>(tag::persistent::header_enable());
 }
 
 constexpr static auto reply_to(std::string_view val) noexcept
@@ -584,11 +582,11 @@ constexpr static auto ack_client() noexcept {
 }
 
 constexpr static auto content_type_text_xml() noexcept {
-   return known_ref<tag::content_type>(tag::content_type::text_xml());
+   return known_ref<tag::content_type>(tag::content_type::header_text_xml());
 }
 
 constexpr static auto content_type_text_html() noexcept {
-   return known_ref<tag::content_type>(tag::content_type::text_html());
+   return known_ref<tag::content_type>(tag::content_type::header_text_html());
 }
 
 constexpr static auto content_type_text_plain() noexcept {
@@ -596,7 +594,7 @@ constexpr static auto content_type_text_plain() noexcept {
 }
 
 constexpr static auto content_type_xml() noexcept {
-   return known_ref<tag::content_type>(tag::content_type::xml());
+   return known_ref<tag::content_type>(tag::content_type::header_xml());
 }
 
 constexpr static auto content_type_json() noexcept {
@@ -604,7 +602,7 @@ constexpr static auto content_type_json() noexcept {
 }
 
 constexpr static auto content_type_octet() noexcept {
-   return known_ref<tag::content_type>(tag::content_type::octet());
+   return known_ref<tag::content_type>(tag::content_type::header_octet());
 }
 
 ////typedef basic<tag::timestamp> timestamp;

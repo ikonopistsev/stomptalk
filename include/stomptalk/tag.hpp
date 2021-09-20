@@ -428,11 +428,11 @@ struct content_type {
     constexpr static auto text_xml() noexcept {
         return header_text_xml().substr(header_size);
     }
-    constexpr static auto header_tex_html() noexcept {
+    constexpr static auto header_text_html() noexcept {
         return "\ncontent-type:text/html"sv;
     }
     constexpr static auto text_html() noexcept {
-        return header_tex_html().substr(header_size);
+        return header_text_html().substr(header_size);
     }
     constexpr static auto header_text_plain() noexcept {
         return "\ncontent-type:text/plain"sv;
