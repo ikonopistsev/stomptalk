@@ -12,8 +12,8 @@ namespace stomptalk {
 
 class parser
 {
-    typedef const char* pointer;
-    typedef pointer (parser::*state_fn_type)(parser_hook&, pointer, pointer);
+    using pointer = const char*;
+    using state_fn_type = pointer (parser::*)(parser_hook&, pointer, pointer);
 
 private:
     pointer start_state(parser_hook& hook,
