@@ -62,6 +62,7 @@ enum stomptalk_header
     st_header_app_id,
     st_header_cluster_id,
     st_header_delivery_mode,
+    st_header_requeue,
     st_header_count,
     st_header_unknown = st_header_count,
     st_header_last_num_id = st_header_delivery_mode

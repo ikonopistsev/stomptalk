@@ -314,7 +314,6 @@ constexpr static auto heart_beat(std::string_view val) noexcept
     return known<tag::heart_beat, std::string_view>(val);
 }
 
-
 // 0 means it cannot send heart-beats
 //
 // otherwise it is the smallest number of milliseconds
@@ -349,12 +348,11 @@ constexpr static auto receipt(std::string_view val) noexcept
 
 // The ERROR frame SHOULD contain a message header
 // with a short description of the error
-//typedef basic<tag::message> message;
 constexpr static auto message(std::string_view val) noexcept
 {
     return known<tag::message, std::string_view>(val);
 }
-//typedef basic<tag::prefetch_count> prefetch_count;
+
 constexpr static auto prefetch_count(std::string_view val) noexcept
 {
     return known<tag::prefetch_count, std::string_view>(val);
@@ -364,18 +362,17 @@ static inline auto prefetch_count(std::size_t val) noexcept
 {
     return known<tag::prefetch_count, std::string>(std::to_string(val));
 }
-//typedef basic<tag::durable> durable;
+
 constexpr static auto durable(std::string_view val) noexcept
 {
     return known<tag::durable, std::string_view>(val);
 }
-//typedef basic<tag::auto_delete> auto_delete;
+
 constexpr static auto auto_delete(std::string_view val) noexcept
 {
     return known<tag::auto_delete, std::string_view>(val);
 }
 
-//typedef basic<tag::message_ttl> message_ttl;
 constexpr static auto message_ttl(std::string_view val) noexcept
 {
     return known<tag::message_ttl, std::string_view>(val);
@@ -394,7 +391,6 @@ static auto message_ttl(std::chrono::duration<Rep, Period> timeout) noexcept
     return message_ttl(static_cast<std::size_t>(time));
 }
 
-//typedef basic<tag::expires> expires;
 constexpr static auto expires(std::string_view val) noexcept
 {
     return known<tag::expires, std::string_view>(val);
@@ -413,7 +409,6 @@ static auto expires(std::chrono::duration<Rep, Period> timeout) noexcept
     return expires(static_cast<std::size_t>(time));
 }
 
-//typedef basic<tag::max_length> max_length;
 constexpr static auto max_length(std::string_view val) noexcept
 {
     return known<tag::max_length, std::string_view>(val);
@@ -424,7 +419,6 @@ static inline auto max_length(std::size_t val) noexcept
     return known<tag::max_length, std::string>(std::to_string(val));
 }
 
-//typedef basic<tag::max_length_bytes> max_length_bytes;
 constexpr static auto max_length_bytes(std::string_view val) noexcept
 {
     return known<tag::max_length_bytes, std::string_view>(val);
@@ -435,91 +429,81 @@ static inline auto max_length_bytes(std::size_t val) noexcept
     return known<tag::max_length_bytes, std::string>(std::to_string(val));
 }
 
-//typedef basic<tag::dead_letter_exchange> dead_letter_exchange;
 constexpr static auto dead_letter_exchange(std::string_view val) noexcept
 {
     return known<tag::dead_letter_exchange, std::string_view>(val);
 }
 
-//typedef basic<tag::dead_letter_routing_key> dead_letter_routing_key;
 constexpr static auto dead_letter_routing_key(std::string_view val) noexcept
 {
     return known<tag::dead_letter_routing_key, std::string_view>(val);
 }
 
-//typedef basic<tag::max_priority> max_priority;
 constexpr static auto max_priority(std::string_view val) noexcept
 {
     return known<tag::max_priority, std::string_view>(val);
 }
 
-//typedef basic<tag::persistent> persistent;
 constexpr static auto persistent(std::string_view val) noexcept
 {
     return known<tag::persistent, std::string_view>(val);
 }
 
-//typedef basic<tag::reply_to> reply_to;
+constexpr static auto persistent_on() noexcept
+{
+    return known_ref<tag::persistent>(tag::persistent::header_enable());
+}
+
 constexpr static auto reply_to(std::string_view val) noexcept
 {
     return known<tag::reply_to, std::string_view>(val);
 }
 
-//typedef basic<tag::redelivered> redelivered;
 constexpr static auto redelivered(std::string_view val) noexcept
 {
     return known<tag::redelivered, std::string_view>(val);
 }
 
-//typedef basic<tag::original_exchange> original_exchange;
 constexpr static auto original_exchange(std::string_view val) noexcept
 {
     return known<tag::original_exchange, std::string_view>(val);
 }
 
-//typedef basic<tag::original_routing_key> original_routing_key;
 constexpr static auto original_routing_key(std::string_view val) noexcept
 {
     return known<tag::original_routing_key, std::string_view>(val);
 }
 
-//typedef basic<tag::queue_name> queue_name;
 constexpr static auto queue_name(std::string_view val) noexcept
 {
     return known<tag::queue_name, std::string_view>(val);
 }
 
-//typedef basic<tag::queue_type> queue_type;
 constexpr static auto queue_type(std::string_view val) noexcept
 {
     return known<tag::queue_type, std::string_view>(val);
 }
 
-//typedef basic<tag::content_encoding> content_encoding;
 constexpr static auto content_encoding(std::string_view val) noexcept
 {
     return known<tag::content_encoding, std::string_view>(val);
 }
 
-//typedef basic<tag::priority> priority;
 constexpr static auto priority(std::string_view val) noexcept
 {
     return known<tag::priority, std::string_view>(val);
 }
 
-//typedef basic<tag::correlation_id> correlation_id;
 constexpr static auto correlation_id(std::string_view val) noexcept
 {
     return known<tag::correlation_id, std::string_view>(val);
 }
 
-//typedef basic<tag::expiration> expiration;
 constexpr static auto expiration(std::string_view val) noexcept
 {
     return known<tag::expiration, std::string_view>(val);
 }
 
-//typedef basic<tag::amqp_message_id> amqp_message_id;
 constexpr static auto amqp_message_id(std::string_view val) noexcept
 {
     return known<tag::amqp_message_id, std::string_view>(val);
@@ -530,13 +514,11 @@ static inline auto amqp_message_id(std::size_t val) noexcept
     return known<tag::amqp_message_id, std::string>(std::to_string(val));
 }
 
-//typedef basic<tag::timestamp> timestamp;
 constexpr static auto timestamp(std::string_view val) noexcept
 {
     return known<tag::timestamp, std::string_view>(val);
 }
 
-//typedef basic<tag::timestamp> timestamp;
 static inline auto timestamp(std::uint64_t val) noexcept
 {
     return known<tag::timestamp, std::string>(std::to_string(val));
@@ -563,24 +545,21 @@ static inline auto time_since_epoch(timeval tv) noexcept
     return timestamp(t);
 }
 
-//typedef basic<tag::amqp_type> amqp_type;
 constexpr static auto amqp_type(std::string_view val) noexcept
 {
     return known<tag::amqp_type, std::string_view>(val);
 }
 
-//typedef basic<tag::user_id> user_id;
 constexpr static auto user_id(std::string_view val) noexcept
 {
     return known<tag::user_id, std::string_view>(val);
 }
 
-//typedef basic<tag::app_id> app_id;
 constexpr static auto app_id(std::string_view val) noexcept
 {
     return known<tag::app_id, std::string_view>(val);
 }
-//typedef basic<tag::cluster_id> cluster_id;
+
 constexpr static auto cluster_id(std::string_view val) noexcept
 {
     return known<tag::cluster_id, std::string_view>(val);
@@ -594,70 +573,42 @@ constexpr static auto version_v12() noexcept {
     return known_ref<tag::version>(tag::version::header_v12());
 }
 
-//template<class T>
-//using kr = known_ref<T, std::string_view>;
-
-//constexpr static auto durable_on() noexcept {
-//    return known_ref<tag::durable>(tag::enable());
-//}
-
-//constexpr static auto durable_off() noexcept {
-//    return kr<tag::durable>(tag::disable());
-//}
-
-//constexpr static auto auto_delete_on() noexcept {
-//    return kr<tag::auto_delete>(tag::enable());
-//}
-
-//constexpr static auto auto_delete_off() noexcept {
-//    return kr<tag::auto_delete>(tag::disable());
-//}
-
-constexpr static auto persistent_on() noexcept {
-    return persistent(tag::persistent::header_enable());
-}
-
-//constexpr static auto ver12() noexcept {
-//    return kr<tag::accept_version>(tag::accept_version::v12());
-//}
-
 constexpr static auto ack_client_individual() noexcept {
     return known_ref<tag::ack>(tag::ack::header_client_individual());
 }
 
-//constexpr static auto ack_client() noexcept {
-//    return kr<tag::ack>(tag::ack::client());
-//}
+constexpr static auto ack_client() noexcept {
+   return known_ref<tag::ack>(tag::ack::client());
+}
 
-//constexpr static auto content_type_text_xml() noexcept {
-//    return kr<tag::content_type>(tag::content_type::text_xml());
-//}
-//constexpr static auto content_type_text_html() noexcept {
-//    return kr<tag::content_type>(tag::content_type::text_html());
-//}
+constexpr static auto content_type_text_xml() noexcept {
+   return known_ref<tag::content_type>(tag::content_type::header_text_xml());
+}
+
+constexpr static auto content_type_text_html() noexcept {
+   return known_ref<tag::content_type>(tag::content_type::header_text_html());
+}
+
 constexpr static auto content_type_text_plain() noexcept {
     return known_ref<tag::content_type>(tag::content_type::header_text_plain());
 }
-//constexpr static auto content_type_xml() noexcept {
-//    return kr<tag::content_type>(tag::content_type::xml());
-//}
+
+constexpr static auto content_type_xml() noexcept {
+   return known_ref<tag::content_type>(tag::content_type::header_xml());
+}
+
 constexpr static auto content_type_json() noexcept {
     return known_ref<tag::content_type>(tag::content_type::header_json());
 }
-//constexpr static auto content_type_octet() noexcept {
-//    return kr<tag::content_type>(tag::content_type::octet());
-//}
+
+constexpr static auto content_type_octet() noexcept {
+   return known_ref<tag::content_type>(tag::content_type::header_octet());
+}
 
 ////typedef basic<tag::timestamp> timestamp;
 //constexpr static auto delivery_mode(std::string_view val) noexcept
 //{
 //    return known<tag::delivery_mode, std::string_view>(val);
-//}
-
-////typedef basic<tag::timestamp> timestamp;
-//static inline auto delivery_mode(std::size_t val) noexcept
-//{
-//    return known<tag::delivery_mode, std::string>(std::to_string(val));
 //}
 
 } // namespace header
