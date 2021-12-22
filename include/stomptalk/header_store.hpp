@@ -182,7 +182,7 @@ public:
         return rc;
     }
 
-    std::string dump() const
+    std::string dump(char ch = ';') const
     {
         std::string rc;
         rc.reserve(320);
@@ -190,7 +190,7 @@ public:
         for (auto& h : *this)
         {
             if (!rc.empty())
-                rc += '\n';
+                rc += ch;
 
             rc += sv(std::get<0>(h));
             rc += ':';
