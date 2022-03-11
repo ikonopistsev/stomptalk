@@ -8,1168 +8,731 @@
 #include <cstdint>
 
 namespace stomptalk {
-namespace method {
 
-struct num_id {
-
-enum type
-    : std::size_t
+template<class T, fnv1a::type H>
+struct static_hash
 {
-    none            = st_method_none,
-    ack             = st_method_ack,
-    nack            = st_method_nack,
-    send            = st_method_send,
-    abort           = st_method_abort,
-    begin           = st_method_begin,
-    error           = st_method_error,
-    stomp           = st_method_stomp,
-    commit          = st_method_commit,
-    connect         = st_method_connect,
-    message         = st_method_message,
-    receipt         = st_method_receipt,
-    subscribe       = st_method_subscribe,
-    connected       = st_method_connected,
-    disconnect      = st_method_disconnect,
-    unsubscribe     = st_method_unsubscribe,
-    unknown         = st_method_unknown
+    constexpr static auto value = fnv1a::calc_hash<decltype(T::text)>(T::text.begin(), T::text.end());
+	using enable_type = typename std::enable_if<value == H, std::nullptr_t>::type;
 };
 
-};
-
+namespace method {
 namespace tag {
 
 using namespace std::literals;
 
-struct ack {
-    constexpr static auto num = num_id::ack;
-    constexpr static auto text = "ACK"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct nack {
-    constexpr static auto num = num_id::nack;
-    constexpr static auto text = "NACK"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct send {
-    constexpr static auto num = num_id::send;
-    constexpr static auto text = "SEND"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
 struct abort {
-    constexpr static auto num = num_id::abort;
-    constexpr static auto text = "ABORT"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = 0;
+	constexpr static auto text = "ABORT"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<abort, st_method_abort>::value;
+};
+
+struct ack {
+	constexpr static auto num = abort::num + 1;
+	constexpr static auto text = "ACK"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<ack, st_method_ack>::value;
 };
 
 struct begin {
-    constexpr static auto num = num_id::begin;
-    constexpr static auto text = "BEGIN"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct error {
-    constexpr static auto num = num_id::error;
-    constexpr static auto text = "ERROR"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct stomp {
-    constexpr static auto num = num_id::stomp;
-    constexpr static auto text = "STOMP"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = ack::num + 1;
+	constexpr static auto text = "BEGIN"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<begin, st_method_begin>::value;
 };
 
 struct commit {
-    constexpr static auto num = num_id::commit;
-    constexpr static auto text = "COMMIT"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = begin::num + 1;
+	constexpr static auto text = "COMMIT"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<commit, st_method_commit>::value;
 };
 
 struct connect {
-    constexpr static auto num = num_id::connect;
-    constexpr static auto text = "CONNECT"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct message {
-    constexpr static auto num = num_id::message;
-    constexpr static auto text = "MESSAGE"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct receipt {
-    constexpr static auto num = num_id::receipt;
-    constexpr static auto text = "RECEIPT"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = commit::num + 1;
+	constexpr static auto text = "CONNECT"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<connect, st_method_connect>::value;
 };
 
 struct connected {
-    constexpr static auto num = num_id::connected;
-    constexpr static auto text = "CONNECTED"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct subscribe {
-    constexpr static auto num = num_id::subscribe;
-    constexpr static auto text = "SUBSCRIBE"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = connect::num + 1;
+	constexpr static auto text = "CONNECTED"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<connected, st_method_connected>::value;
 };
 
 struct disconnect {
-    constexpr static auto num = num_id::disconnect;
-    constexpr static auto text = "DISCONNECT"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = connected::num + 1;
+	constexpr static auto text = "DISCONNECT"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<disconnect, st_method_disconnect>::value;
+};
+
+struct error {
+	constexpr static auto num = disconnect::num + 1;
+	constexpr static auto text = "ERROR"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<error, st_method_error>::value;
+};
+
+struct message {
+	constexpr static auto num = error::num + 1;
+	constexpr static auto text = "MESSAGE"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<message, st_method_message>::value;
+};
+
+struct nack {
+	constexpr static auto num = message::num + 1;
+	constexpr static auto text = "NACK"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<nack, st_method_nack>::value;
+};
+
+struct receipt {
+	constexpr static auto num = nack::num + 1;
+	constexpr static auto text = "RECEIPT"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<receipt, st_method_receipt>::value;
+};
+
+struct send {
+	constexpr static auto num = receipt::num + 1;
+	constexpr static auto text = "SEND"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<send, st_method_send>::value;
+};
+
+struct stomp {
+	constexpr static auto num = send::num + 1;
+	constexpr static auto text = "STOMP"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<stomp, st_method_stomp>::value;
+};
+
+struct subscribe {
+	constexpr static auto num = stomp::num + 1;
+	constexpr static auto text = "SUBSCRIBE"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<subscribe, st_method_subscribe>::value;
 };
 
 struct unsubscribe {
-    constexpr static auto num = num_id::unsubscribe;
-    constexpr static auto text = "UNSUBSCRIBE"sv;
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = subscribe::num + 1;
+	constexpr static auto text = "UNSUBSCRIBE"sv;
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<unsubscribe, st_method_unsubscribe>::value;
 };
+
+constexpr static auto count = unsubscribe::num + 1;
 
 } // namespace tag
-
-struct hash_id {
-
-enum type
-    : std::size_t
-{
-    none = 0,
-    ack = tag::ack::text_hash,
-    nack = tag::nack::text_hash,
-    send = tag::send::text_hash,
-    abort = tag::abort::text_hash,
-    begin = tag::begin::text_hash,
-    error = tag::error::text_hash,
-    stomp = tag::stomp::text_hash,
-    commit = tag::commit::text_hash,
-    connect = tag::connect::text_hash,
-    message = tag::message::text_hash,
-    receipt = tag::receipt::text_hash,
-    subscribe = tag::subscribe::text_hash,
-    connected = tag::connected::text_hash,
-    disconnect = tag::disconnect::text_hash,
-    unsubscribe = tag::unsubscribe::text_hash,
-};
-
-};
-
-template <class T>
-std::size_t detect(T, const char *val) noexcept
-{
-    return eqstr<T::text_size>(T::text.data(), val) ?
-        std::size_t(T::num) : std::size_t(num_id::none);
-}
-
-template <class T>
-constexpr std::size_t detect(T, std::string_view val) noexcept
-{
-    return eqstr<T::text_size>(T::text.data(), val.data()) ?
-        std::size_t(T::num) : std::size_t(num_id::none);
-}
-
-class generic
-{
-public:
-    typedef std::size_t type;
-
-private:
-    type num_id_ = { num_id::none };
-
-public:
-    generic() = default;
-    generic(generic&&) = default;
-    generic& operator=(generic&&) = default;
-    generic(const generic&) = default;
-    generic& operator=(const generic&) = default;
-
-    virtual ~generic() = default;
-
-    explicit generic(type num_id) noexcept
-        : num_id_(num_id)
-    {   }
-
-    explicit generic(std::string_view val) noexcept
-        : num_id_(stomptalk_eval_method(val.data(), val.size()))
-    {   }
-
-    void eval(std::string_view method) noexcept;
-
-    virtual bool valid() const noexcept;
-
-    virtual std::string_view str() const noexcept;
-
-    void set(type num_id) noexcept
-    {
-        num_id_ = num_id;
-    }
-
-    void reset()
-    {
-        set(num_id::none);
-    }
-
-    generic& operator=(type num_id) noexcept
-    {
-        set(num_id);
-        return *this;
-    }
-
-    type num_id() const noexcept
-    {
-        return num_id_;
-    }
-
-    operator type() const noexcept
-    {
-        return num_id();
-    }
-};
-
 } // namespace method
 
 namespace header {
-
-struct num_id {
-
-enum type : std::size_t
-{
-    none = st_header_none,
-    content_length = st_header_content_length,
-    content_type = st_header_content_type,
-    accept_version = st_header_accept_version,
-    host = st_header_host,
-    version = st_header_version,
-    destination = st_header_destination,
-    id = st_header_id,
-    transaction = st_header_transaction,
-    message_id = st_header_message_id,
-    subscription = st_header_subscription,
-    receipt_id = st_header_receipt_id,
-    login = st_header_login,
-    passcode = st_header_passcode,
-    heart_beat = st_header_heart_beat,
-    session = st_header_session,
-    server = st_header_server,
-    ack = st_header_ack,
-    receipt = st_header_receipt,
-    message = st_header_message,
-    prefetch_count = st_header_prefetch_count,
-    durable = st_header_durable,
-    auto_delete = st_header_auto_delete,
-    message_ttl = st_header_message_ttl,
-    // https://www.rabbitmq.com/ttl.html#queue-ttl
-    expires = st_header_expires,
-    max_length = st_header_max_length,
-    max_length_bytes = st_header_max_length_bytes,
-    dead_letter_exchange = st_header_dead_letter_exchange,
-    dead_letter_routing_key = st_header_dead_letter_routing_key,
-    max_priority = st_header_max_priority,
-    persistent = st_header_persistent,
-    reply_to = st_header_reply_to,
-    redelivered = st_header_redelivered,
-    original_exchange = st_header_original_exchange,
-    original_routing_key = st_header_original_routing_key,
-    // https://www.rabbitmq.com/stomp.html#d.ugqn
-    queue_name = st_header_queue_name,
-    // https://www.rabbitmq.com/stomp.html#queue-parameters
-    queue_type = st_header_queue_type,
-    //https://www.rabbitmq.com/stomp.html#pear.ap
-    content_encoding = st_header_content_encoding,
-    priority = st_header_priority,
-    // Helps correlate requests with responses, see tutorial 6
-    correlation_id = st_header_correlation_id,
-     // https://www.rabbitmq.com/ttl.html
-    expiration = st_header_expiration,
-    // Arbitrary message ID
-    amqp_message_id = st_header_amqp_message_id,
-    // Application-provided timestamp
-    timestamp = st_header_timestamp,
-    // Application-specific message type, e.g. "orders.created"
-    amqp_type = st_header_amqp_type,
-    user_id = st_header_user_id,
-    app_id = st_header_app_id,
-    cluster_id = st_header_cluster_id,
-    delivery_mode = st_header_delivery_mode,
-    requeue = st_header_requeue,
-    count = st_header_count,
-    unknown = count,
-    last_num_id = delivery_mode
-};
-
-};
-
-struct mask_id {
-
-enum type : std::uint64_t
-{
-    none                        = 0,
-    content_length              = 1ull << num_id::none,
-    content_type                = 1ull << num_id::content_type,
-    accept_version              = 1ull << num_id::accept_version,
-    host                        = 1ull << num_id::host,
-    version                     = 1ull << num_id::version,
-    destination                 = 1ull << num_id::destination,
-    id                          = 1ull << num_id::id,
-    transaction                 = 1ull << num_id::transaction,
-    message_id                  = 1ull << num_id::message_id,
-    subscription                = 1ull << num_id::subscription,
-    receipt_id                  = 1ull << num_id::receipt_id,
-    login                       = 1ull << num_id::login,
-    passcode                    = 1ull << num_id::passcode,
-    heart_beat                  = 1ull << num_id::heart_beat,
-    session                     = 1ull << num_id::session,
-    server                      = 1ull << num_id::server,
-    ack                         = 1ull << num_id::ack,
-    receipt                     = 1ull << num_id::receipt,
-    message                     = 1ull << num_id::message,
-    prefetch_count              = 1ull << num_id::prefetch_count,
-    durable                     = 1ull << num_id::durable,
-    auto_delete                 = 1ull << num_id::auto_delete,
-    message_ttl                 = 1ull << num_id::message_ttl,
-    expires                     = 1ull << num_id::expires,
-    max_length                  = 1ull << num_id::max_length,
-    max_length_bytes            = 1ull << num_id::max_length_bytes,
-    dead_letter_exchange        = 1ull << num_id::dead_letter_exchange,
-    dead_letter_routing_key     = 1ull << num_id::dead_letter_routing_key,
-    max_priority                = 1ull << num_id::max_priority,
-    persistent                  = 1ull << num_id::persistent,
-    reply_to                    = 1ull << num_id::reply_to,
-    redelivered                 = 1ull << num_id::redelivered,
-    original_exchange           = 1ull << num_id::original_exchange,
-    original_routing_key        = 1ull << num_id::original_routing_key,
-    queue_name                  = 1ull << num_id::queue_name,
-    queue_type                  = 1ull << num_id::queue_type,
-    //https://www.rabbitmq.com/stomp.html#pear.ap
-    content_encoding            = 1ull << num_id::content_encoding,
-    priority                    = 1ull << num_id::priority,
-    correlation_id              = 1ull << num_id::correlation_id,
-    expiration                  = 1ull << num_id::expiration,
-    amqp_message_id             = 1ull << num_id::amqp_message_id,
-    timestamp                   = 1ull << num_id::timestamp,
-    amqp_type                   = 1ull << num_id::amqp_type,
-    user_id                     = 1ull << num_id::user_id,
-    app_id                      = 1ull << num_id::app_id,
-    cluster_id                  = 1ull << num_id::cluster_id,
-    delivery_mode               = 1ull << num_id::delivery_mode,
-    requeue                     = 1ull << num_id::requeue,
-    last_mask_id                = delivery_mode
-};
-
-}; // struct mask_id
-
 namespace tag {
 
 using namespace std::literals;
 
-struct content_length {
-    constexpr static auto num = num_id::content_length;
-    constexpr static auto mask = mask_id::content_length;
-    constexpr static auto header = "\ncontent-length:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-
-};
-
-struct content_type {
-    constexpr static auto num = num_id::content_type;
-    constexpr static auto mask = mask_id::content_type;
-    constexpr static auto header = "\ncontent-type:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-
-
-    struct content_type_id
-    {
-        enum type
-            : std::size_t
-        {
-            none    = 0,
-            octet   = 1,    // default type
-            html    = 2,
-            json    = 3,
-            xml     = 4,
-            text    = 5,
-            last_content_type_id = text
-            // mask_next    = last_mask_id << 1
-        };
-    };
-
-    // вообще должно быть
-    // тип/подтип;параметр=значение
-    // https://developer.mozilla.org/ru/docs/Web/HTTP/Basics_of_HTTP/MIME_types
-    // но мы упростим
-
-    constexpr static auto header_text_xml() noexcept {
-        return "\ncontent-type:text/xml"sv;
-    }
-    constexpr static auto text_xml() noexcept {
-        return header_text_xml().substr(header_size);
-    }
-    constexpr static auto header_text_html() noexcept {
-        return "\ncontent-type:text/html"sv;
-    }
-    constexpr static auto text_html() noexcept {
-        return header_text_html().substr(header_size);
-    }
-    constexpr static auto header_text_plain() noexcept {
-        return "\ncontent-type:text/plain"sv;
-    }
-    constexpr static auto text_plain() noexcept {
-        return header_text_plain().substr(header_size);
-    }
-    constexpr static auto header_xml() noexcept {
-        return "\ncontent-type:application/xml"sv;
-    }
-    constexpr static auto xml() noexcept {
-        return header_xml().substr(header_size);
-    }
-    constexpr static auto header_json() noexcept {
-        return "\ncontent-type:application/json"sv;
-    }
-    constexpr static auto json() noexcept {
-        return header_json().substr(header_size);
-    }
-    constexpr static auto header_octet() noexcept {
-        return "\ncontent-type:application/octet-stream"sv;
-    }
-    constexpr static auto octet() noexcept {
-        return header_octet().substr(header_size);
-    }
-
-    static content_type_id::type
-        eval_content_type(std::string_view val) noexcept;
-};
-
 struct accept_version {
-    constexpr static auto num = num_id::accept_version;
-    constexpr static auto mask = mask_id::accept_version;
-    constexpr static auto header = "\naccept-version:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = 0;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\naccept-version:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<accept_version, st_header_accept_version>::value;
 
-    constexpr static auto header_v12() noexcept {
-        return "\naccept-version:1.2"sv;
-    }
-    constexpr static auto v12() noexcept {
-        return header_v12().substr(header_size);
-    }
-};
-
-struct host {
-    constexpr static auto num = num_id::host;
-    constexpr static auto mask = mask_id::host;
-    constexpr static auto header = "\nhost:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct version {
-    constexpr static auto num = num_id::version;
-    constexpr static auto mask = mask_id::version;
-    constexpr static auto header = "\nversion:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-
-    constexpr static auto header_v12() noexcept {
-        return "\nversion:1.2"sv;
-    }
-    constexpr static auto v12() noexcept {
-        return header_v12().substr(header_size);
-    }
-};
-
-struct login {
-    constexpr static auto num = num_id::login;
-    constexpr static auto mask = mask_id::login;
-    constexpr static auto header = "\nlogin:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct server {
-    constexpr static auto num = num_id::server;
-    constexpr static auto mask = mask_id::server;
-    constexpr static auto header = "\nserver:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct passcode {
-    constexpr static auto num = num_id::passcode;
-    constexpr static auto mask = mask_id::passcode;
-    constexpr static auto header = "\npasscode:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct heart_beat {
-    constexpr static auto num = num_id::heart_beat;
-    constexpr static auto mask = mask_id::heart_beat;
-    constexpr static auto header = "\nheart-beat:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct session {
-    constexpr static auto num = num_id::session;
-    constexpr static auto mask = mask_id::session;
-    constexpr static auto header = "\nsession:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct destination {
-    constexpr static auto num = num_id::destination;
-    constexpr static auto mask = mask_id::destination;
-    constexpr static auto header = "\ndestination:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct transaction {
-    constexpr static auto num = num_id::transaction;
-    constexpr static auto mask = mask_id::transaction;
-    constexpr static auto header = "\ntransaction:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct message_id {
-    constexpr static auto num = num_id::message_id;
-    constexpr static auto mask = mask_id::message_id;
-    constexpr static auto header = "\nmessage-id:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct subscription {
-    constexpr static auto num = num_id::subscription;
-    constexpr static auto mask = mask_id::subscription;
-    constexpr static auto header = "\nsubscription:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto header_v12() noexcept {
+		return "\naccept-version:1.2"sv;
+	}
+	constexpr static auto v12() noexcept {
+		return header_v12().substr(header_size);
+	}
 };
 
 struct ack {
-    constexpr static auto num = num_id::ack;
-    constexpr static auto mask = mask_id::ack;
-    constexpr static auto header = "\nack:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = accept_version::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nack:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<ack, st_header_ack>::value;
 
-    constexpr static auto header_client() noexcept {
-        return "\nack:client"sv;
-    }
-    constexpr static auto client() noexcept {
-        return header_client().substr(header_size);
-    }
-    constexpr static auto header_client_individual() noexcept {
-        return "\nack:client-individual"sv;
-    }
-    constexpr static auto client_individual() noexcept {
-        return header_client_individual().substr(header_size);
-    }
-};
-
-struct id {
-    constexpr static auto num = num_id::id;
-    constexpr static auto mask = mask_id::id;
-    constexpr static auto header = "\nid:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct receipt {
-    constexpr static auto num = num_id::receipt;
-    constexpr static auto mask = mask_id::receipt;
-    constexpr static auto header = "\nreceipt:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-// The ERROR frame SHOULD contain a message header with a short description of the error
-struct message {
-    constexpr static auto num = num_id::message;
-    constexpr static auto mask = mask_id::message;
-    constexpr static auto header = "\nmessage:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct receipt_id {
-    constexpr static auto num = num_id::receipt_id;
-    constexpr static auto mask = mask_id::receipt_id;
-    constexpr static auto header = "\nreceipt-id:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct prefetch_count {
-    constexpr static auto num = num_id::prefetch_count;
-    constexpr static auto mask = mask_id::prefetch_count;
-    constexpr static auto header = "\nprefetch-count:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct durable {
-    constexpr static auto num = num_id::durable;
-    constexpr static auto mask = mask_id::durable;
-    constexpr static auto header = "\ndurable:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct auto_delete {
-    constexpr static auto num = num_id::auto_delete;
-    constexpr static auto mask = mask_id::auto_delete;
-    constexpr static auto header = "\nauto-delete:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-
-    constexpr static auto header_enable() noexcept {
-        return "\nauto-delete:true"sv;
-    }
-    constexpr static auto enable() noexcept {
-        return header_enable().substr(header_size);
-    }
-    constexpr static auto header_disable() noexcept {
-        return "\nauto-delete:false"sv;
-    }
-    constexpr static auto disable() noexcept {
-        return header_disable().substr(header_size);
-    }
-};
-
-struct persistent {
-    constexpr static auto num = num_id::persistent;
-    constexpr static auto mask = mask_id::persistent;
-    constexpr static auto header = "\npersistent:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-
-    constexpr static auto header_enable() noexcept {
-        return "\npersistent:true"sv;
-    }
-    constexpr static auto enable() noexcept {
-        return header_enable().substr(header_size);
-    }
-    constexpr static auto header_disable() noexcept {
-        return "\npersistent:false"sv;
-    }
-    constexpr static auto disable() noexcept {
-        return header_disable().substr(header_size);
-    }
-};
-
-struct message_ttl {
-    constexpr static auto num = num_id::message_ttl;
-    constexpr static auto mask = mask_id::message_ttl;
-    constexpr static auto header = "\nx-message-ttl:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct reply_to {
-    constexpr static auto num = num_id::reply_to;
-    constexpr static auto mask = mask_id::reply_to;
-    constexpr static auto header = "\nreply-to:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-// https://www.rabbitmq.com/ttl.html#queue-ttl
-struct expires {
-    constexpr static auto num = num_id::expires;
-    constexpr static auto mask = mask_id::expires;
-    constexpr static auto header = "\nx-expires:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct redelivered {
-    constexpr static auto num = num_id::redelivered;
-    constexpr static auto mask = mask_id::redelivered;
-    constexpr static auto header = "\nredelivered:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct max_length {
-    constexpr static auto num = num_id::max_length;
-    constexpr static auto mask = mask_id::max_length;
-    constexpr static auto header = "\nx-max-length:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct max_length_bytes {
-    constexpr static auto num = num_id::max_length_bytes;
-    constexpr static auto mask = mask_id::max_length_bytes;
-    constexpr static auto header = "\nx-max-length-bytes:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct max_priority {
-    constexpr static auto num = num_id::max_priority;
-    constexpr static auto mask = mask_id::max_priority;
-    constexpr static auto header = "\nx-max-priority:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct dead_letter_exchange {
-    constexpr static auto num = num_id::dead_letter_exchange;
-    constexpr static auto mask = mask_id::dead_letter_exchange;
-    constexpr static auto header = "\nx-dead-letter-exchange:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct dead_letter_routing_key {
-    constexpr static auto num = num_id::dead_letter_routing_key;
-    constexpr static auto mask = mask_id::dead_letter_routing_key;
-    constexpr static auto header = "\nx-dead-letter-routing-key:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct original_exchange {
-    constexpr static auto num = num_id::original_exchange;
-    constexpr static auto mask = mask_id::original_exchange;
-    constexpr static auto header = "\nx-original-exchange:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct original_routing_key {
-    constexpr static auto num = num_id::original_routing_key;
-    constexpr static auto mask = mask_id::original_routing_key;
-    constexpr static auto header = "\nx-original-routing-key:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-// https://www.rabbitmq.com/stomp.html#d.ugqn
-struct queue_name {
-    constexpr static auto num = num_id::queue_name;
-    constexpr static auto mask = mask_id::queue_name;
-    constexpr static auto header = "\nx-queue-name:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-// https://www.rabbitmq.com/stomp.html#queue-parameters
-struct queue_type {
-    constexpr static auto num = num_id::queue_type;
-    constexpr static auto mask = mask_id::queue_type;
-    constexpr static auto header = "\nx-queue-type:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct content_encoding {
-    constexpr static auto num = num_id::content_encoding;
-    constexpr static auto mask = mask_id::content_encoding;
-    constexpr static auto header = "\ncontent-encoding:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-
-    // https://developer.mozilla.org/ru/docs/Web/HTTP/%D0%97%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%B8/Content-Encoding
-    struct content_encoding_id
-    {
-        enum type
-            : std::size_t
-        {
-            none        = 0,
-// Indicates the identity function (i.e., no compression or modification).
-            identity    = 1,    // default type
-// Using the zlib structure (defined in RFC 1950) with the
-// deflate compression algorithm (defined in RFC 1951).
-            deflate     = 2,
-// A format using the Lempel-Ziv-Welch (LZW) algorithm.
-            compress    = 3,
-// A format using the Lempel-Ziv coding (LZ77), with a 32-bit CRC.
-            gzip        = 4,
-// A format using the Brotli algorithm.
-            br          = 5,
-            last_content_type_id = br
-        };
-    };
-
-    constexpr static auto header_identity() noexcept {
-        return "\ncontent-encoding:identity"sv;
-    }
-    constexpr static auto identity() noexcept {
-        return header_identity().substr(header_size);
-    }
-    constexpr static auto header_deflate() noexcept {
-        return "\ncontent-encoding:deflate"sv;
-    }
-    constexpr static auto deflate() noexcept {
-        return header_deflate().substr(header_size);
-    }
-    constexpr static auto header_compress() noexcept {
-        return "\ncontent-encoding:compress"sv;
-    }
-    constexpr static auto compress() noexcept {
-        return header_compress().substr(header_size);
-    }
-    constexpr static auto header_gzip() noexcept {
-        return "\ncontent-encoding:gzip"sv;
-    }
-    constexpr static auto gzip() noexcept {
-        return header_gzip().substr(header_size);
-    }
-    constexpr static auto header_xgzip() noexcept {
-        return "\ncontent-encoding:x-gzip"sv;
-    }
-    constexpr static auto xgzip() noexcept {
-        return header_xgzip().substr(header_size);
-    }
-    constexpr static auto header_br() noexcept {
-        return "\ncontent-encoding:br"sv;
-    }
-    constexpr static auto br() noexcept {
-        return header_br().substr(header_size);
-    }
-//    static content_type_id::type
-//        eval_content_encoding(std::string_view val) noexcept;
-};
-
-struct priority {
-    constexpr static auto num = num_id::priority;
-    constexpr static auto mask = mask_id::priority;
-    constexpr static auto header = "\npriority:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct correlation_id {
-    constexpr static auto num = num_id::correlation_id;
-    constexpr static auto mask = mask_id::correlation_id;
-    constexpr static auto header = "\ncorrelation-id:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct expiration {
-    constexpr static auto num = num_id::expiration;
-    constexpr static auto mask = mask_id::expiration;
-    constexpr static auto header = "\nexpiration:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto header_client() noexcept {
+		return "\nack:client"sv;
+	}
+	constexpr static auto client() noexcept {
+		return header_client().substr(header_size);
+	}
+	constexpr static auto header_client_individual() noexcept {
+		return "\nack:client-individual"sv;
+	}
+	constexpr static auto client_individual() noexcept {
+		return header_client_individual().substr(header_size);
+	}
 };
 
 struct amqp_message_id {
-    constexpr static auto num = num_id::amqp_message_id;
-    constexpr static auto mask = mask_id::amqp_message_id;
-    constexpr static auto header = "\namqp-message-id:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct timestamp {
-    constexpr static auto num = num_id::timestamp;
-    constexpr static auto mask = mask_id::timestamp;
-    constexpr static auto header = "\ntimestamp:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = ack::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\namqp-message-id:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<amqp_message_id, st_header_amqp_message_id>::value;
 };
 
 struct amqp_type {
-    constexpr static auto num = num_id::amqp_type;
-    constexpr static auto mask = mask_id::amqp_type;
-    constexpr static auto header = "\ntype:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
-};
-
-struct user_id {
-    constexpr static auto num = num_id::user_id;
-    constexpr static auto mask = mask_id::user_id;
-    constexpr static auto header = "\nuser-id:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = amqp_message_id::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\namqp_type:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<amqp_type, st_header_amqp_type>::value;
 };
 
 struct app_id {
-    constexpr static auto num = num_id::app_id;
-    constexpr static auto mask = mask_id::app_id;
-    constexpr static auto header = "\napp-id:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = amqp_type::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\napp-id:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<app_id, st_header_app_id>::value;
+};
+
+struct auto_delete {
+	constexpr static auto num = app_id::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nauto_delete:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<auto_delete, st_header_auto_delete>::value;
 };
 
 struct cluster_id {
-    constexpr static auto num = num_id::cluster_id;
-    constexpr static auto mask = mask_id::cluster_id;
-    constexpr static auto header = "\ncluster-id:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = auto_delete::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ncluster-id:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<cluster_id, st_header_cluster_id>::value;
+};
+
+struct content_encoding {
+	constexpr static auto num = cluster_id::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ncontent-encoding:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<content_encoding, st_header_content_encoding>::value;
+
+	constexpr static auto header_identity() noexcept {
+		return "\ncontent-encoding:identity"sv;
+	}
+	constexpr static auto identity() noexcept {
+		return header_identity().substr(header_size);
+	}
+	constexpr static auto header_deflate() noexcept {
+		return "\ncontent-encoding:deflate"sv;
+	}
+	constexpr static auto deflate() noexcept {
+		return header_deflate().substr(header_size);
+	}
+	constexpr static auto header_compress() noexcept {
+		return "\ncontent-encoding:compress"sv;
+	}
+	constexpr static auto compress() noexcept {
+		return header_compress().substr(header_size);
+	}
+	constexpr static auto header_gzip() noexcept {
+		return "\ncontent-encoding:gzip"sv;
+	}
+	constexpr static auto gzip() noexcept {
+		return header_gzip().substr(header_size);
+	}
+	constexpr static auto header_x_gzip() noexcept {
+		return "\ncontent-encoding:x-gzip"sv;
+	}
+	constexpr static auto x_gzip() noexcept {
+		return header_x_gzip().substr(header_size);
+	}
+	constexpr static auto header_br() noexcept {
+		return "\ncontent-encoding:br"sv;
+	}
+	constexpr static auto br() noexcept {
+		return header_br().substr(header_size);
+	}
+};
+
+struct content_length {
+	constexpr static auto num = content_encoding::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ncontent-length:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<content_length, st_header_content_length>::value;
+};
+
+struct content_type {
+	constexpr static auto num = content_length::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ncontent-type:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<content_type, st_header_content_type>::value;
+
+	constexpr static auto header_text_xml() noexcept {
+		return "\ncontent-type:text/xml"sv;
+	}
+	constexpr static auto text_xml() noexcept {
+		return header_text_xml().substr(header_size);
+	}
+	constexpr static auto header_text_html() noexcept {
+		return "\ncontent-type:text/html"sv;
+	}
+	constexpr static auto text_html() noexcept {
+		return header_text_html().substr(header_size);
+	}
+	constexpr static auto header_text_plain() noexcept {
+		return "\ncontent-type:text/plain"sv;
+	}
+	constexpr static auto text_plain() noexcept {
+		return header_text_plain().substr(header_size);
+	}
+	constexpr static auto header_application_xml() noexcept {
+		return "\ncontent-type:application/xml"sv;
+	}
+	constexpr static auto application_xml() noexcept {
+		return header_application_xml().substr(header_size);
+	}
+	constexpr static auto header_application_json() noexcept {
+		return "\ncontent-type:application/json"sv;
+	}
+	constexpr static auto application_json() noexcept {
+		return header_application_json().substr(header_size);
+	}
+	constexpr static auto header_application_octet_stream() noexcept {
+		return "\ncontent-type:application/octet-stream"sv;
+	}
+	constexpr static auto application_octet_stream() noexcept {
+		return header_application_octet_stream().substr(header_size);
+	}
+};
+
+struct correlation_id {
+	constexpr static auto num = content_type::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ncorrelation-id:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<correlation_id, st_header_correlation_id>::value;
 };
 
 struct delivery_mode {
-    constexpr static auto num = num_id::delivery_mode;
-    constexpr static auto mask = mask_id::delivery_mode;
-    constexpr static auto header = "\ndelivery-mode:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = correlation_id::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ndelivery-mode:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<delivery_mode, st_header_delivery_mode>::value;
+};
+
+struct destination {
+	constexpr static auto num = delivery_mode::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ndestination:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<destination, st_header_destination>::value;
+};
+
+struct durable {
+	constexpr static auto num = destination::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ndurable:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<durable, st_header_durable>::value;
+};
+
+struct expiration {
+	constexpr static auto num = durable::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nexpiration:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<expiration, st_header_expiration>::value;
+};
+
+struct expires {
+	constexpr static auto num = expiration::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nexpires:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<expires, st_header_expires>::value;
+};
+
+struct heart_beat {
+	constexpr static auto num = expires::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nheart-beat:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<heart_beat, st_header_heart_beat>::value;
+};
+
+struct host {
+	constexpr static auto num = heart_beat::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nhost:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<host, st_header_host>::value;
+};
+
+struct id {
+	constexpr static auto num = host::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nid:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<id, st_header_id>::value;
+};
+
+struct login {
+	constexpr static auto num = id::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nlogin:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<login, st_header_login>::value;
+};
+
+struct message {
+	constexpr static auto num = login::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nmessage:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<message, st_header_message>::value;
+};
+
+struct message_id {
+	constexpr static auto num = message::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nmessage-id:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<message_id, st_header_message_id>::value;
+};
+
+struct passcode {
+	constexpr static auto num = message_id::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\npasscode:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<passcode, st_header_passcode>::value;
+};
+
+struct persistent {
+	constexpr static auto num = passcode::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\npersistent:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<persistent, st_header_persistent>::value;
+
+	constexpr static auto header_enable() noexcept {
+		return "\npersistent:true"sv;
+	}
+	constexpr static auto enable() noexcept {
+		return header_enable().substr(header_size);
+	}
+	constexpr static auto header_disable() noexcept {
+		return "\npersistent:false"sv;
+	}
+	constexpr static auto disable() noexcept {
+		return header_disable().substr(header_size);
+	}
+};
+
+struct prefetch_count {
+	constexpr static auto num = persistent::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nprefetch-count:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<prefetch_count, st_header_prefetch_count>::value;
+};
+
+struct priority {
+	constexpr static auto num = prefetch_count::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\npriority:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<priority, st_header_priority>::value;
+};
+
+struct receipt {
+	constexpr static auto num = priority::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nreceipt:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<receipt, st_header_receipt>::value;
+};
+
+struct receipt_id {
+	constexpr static auto num = receipt::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nreceipt-id:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<receipt_id, st_header_receipt_id>::value;
+};
+
+struct redelivered {
+	constexpr static auto num = receipt_id::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nredelivered:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<redelivered, st_header_redelivered>::value;
+};
+
+struct reply_to {
+	constexpr static auto num = redelivered::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nreply-to:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<reply_to, st_header_reply_to>::value;
 };
 
 struct requeue {
-    constexpr static auto num = num_id::requeue;
-    constexpr static auto mask = mask_id::requeue;
-    constexpr static auto header = "\nrequeue:"sv;
-    constexpr static auto header_size = header.size();
-    constexpr static auto text = header.substr(1, header_size - 2);
-    constexpr static auto text_size = text.size();
-    constexpr static auto text_hash = get_hash(text);
+	constexpr static auto num = reply_to::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nrequeue:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<requeue, st_header_requeue>::value;
 };
+
+struct server {
+	constexpr static auto num = requeue::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nserver:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<server, st_header_server>::value;
+};
+
+struct session {
+	constexpr static auto num = server::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nsession:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<session, st_header_session>::value;
+};
+
+struct subscription {
+	constexpr static auto num = session::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nsubscription:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<subscription, st_header_subscription>::value;
+};
+
+struct timestamp {
+	constexpr static auto num = subscription::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ntimestamp:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<timestamp, st_header_timestamp>::value;
+};
+
+struct transaction {
+	constexpr static auto num = timestamp::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\ntransaction:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<transaction, st_header_transaction>::value;
+};
+
+struct user_id {
+	constexpr static auto num = transaction::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nuser-id:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<user_id, st_header_user_id>::value;
+};
+
+struct version {
+	constexpr static auto num = user_id::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nversion:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<version, st_header_version>::value;
+
+	constexpr static auto header_v12() noexcept {
+		return "\nversion:1.2"sv;
+	}
+	constexpr static auto v12() noexcept {
+		return header_v12().substr(header_size);
+	}
+};
+
+struct dead_letter_exchange {
+	constexpr static auto num = version::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-dead-letter-exchange:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<dead_letter_exchange, st_header_dead_letter_exchange>::value;
+};
+
+struct dead_letter_routing_key {
+	constexpr static auto num = dead_letter_exchange::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-dead-letter-routing-key:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<dead_letter_routing_key, st_header_dead_letter_routing_key>::value;
+};
+
+struct max_length {
+	constexpr static auto num = dead_letter_routing_key::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-max-length:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<max_length, st_header_max_length>::value;
+};
+
+struct max_length_bytes {
+	constexpr static auto num = max_length::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-max-length-bytes:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<max_length_bytes, st_header_max_length_bytes>::value;
+};
+
+struct max_priority {
+	constexpr static auto num = max_length_bytes::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-max-priority:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<max_priority, st_header_max_priority>::value;
+};
+
+struct message_ttl {
+	constexpr static auto num = max_priority::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-message-ttl:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<message_ttl, st_header_message_ttl>::value;
+};
+
+struct original_exchange {
+	constexpr static auto num = message_ttl::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-original-exchange:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<original_exchange, st_header_original_exchange>::value;
+};
+
+struct original_routing_key {
+	constexpr static auto num = original_exchange::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-original-routing-key:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<original_routing_key, st_header_original_routing_key>::value;
+};
+
+struct queue_name {
+	constexpr static auto num = original_routing_key::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-queue-name:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<queue_name, st_header_queue_name>::value;
+};
+
+struct queue_type {
+	constexpr static auto num = queue_name::num + 1;
+	constexpr static auto mask = 1ull << num;
+	constexpr static auto header = "\nx-queue-type:"sv;
+	constexpr static auto header_size = header.size();
+	constexpr static auto text = header.substr(1, header_size - 2);
+	constexpr static auto text_size = text.size();
+	constexpr static auto text_hash = static_hash<queue_type, st_header_queue_type>::value;
+};
+
+constexpr static auto count = queue_type::num + 1;
 
 } // namespace tag
 
-template <class T>
-std::size_t detect(T, const char *val) noexcept
-{
-    return eqstr<T::text_size>(T::text.data(), val) ?
-        std::size_t(T::num) : std::size_t(num_id::none);
-}
-
-template <class T>
-constexpr std::size_t detect(T, std::string_view val) noexcept
-{
-    return eqstr<T::text_size>(T::text.data(), val.data()) ?
-        std::size_t(T::num) : std::size_t(num_id::none);
-}
-
-class generic
-{
-public:
-    typedef std::size_t type;
-
-protected:
-    type num_id_ = { num_id::none };
-
-public:
-    generic() = default;
-    generic(generic&&) = default;
-    generic& operator=(generic&&) = default;
-    generic(const generic&) = default;
-    generic& operator=(const generic&) = default;
-
-    virtual ~generic() = default;
-
-    explicit generic(std::string_view hdr) noexcept
-        : num_id_(stomptalk_eval_header(hdr.data(), hdr.size()))
-    {   }
-
-    explicit generic(type num_id) noexcept
-        : num_id_(num_id)
-    {   }
-
-    void eval(std::string_view hdr) noexcept;
-
-    bool valid() const noexcept;
-
-    std::string_view str() const noexcept;
-
-    std::size_t hash() const noexcept;
-
-    void set(type num_id) noexcept
-    {
-        num_id_ = num_id;
-    }
-
-    void reset()
-    {
-        set(num_id::none);
-    }
-
-    bool is(type num_id) noexcept
-    {
-        return num_id_ == num_id;
-    }
-
-    generic& operator=(type num_id) noexcept
-    {
-        set(num_id);
-        return *this;
-    }
-
-    type num_id() const noexcept
-    {
-        return num_id_;
-    }
-
-    operator type() const noexcept
-    {
-        return num_id();
-    }
-
-    operator bool() const noexcept
-    {
-        return valid();
-    }
-
-#ifndef NDEBUG
-    static inline void check_hash_test() noexcept
-    {
-        generic h;
-        for (std::size_t i = 1; i < num_id::unknown; ++i)
-        {
-            h.set(i);
-            auto hdr = h.str();
-            auto ch = stomptalk::get_hash(hdr);
-            auto mh = h.hash();
-            //std::cout << h.str() << ' ' << ch << ' ' << mh << std::endl;
-            assert(ch != mh);
-
-            generic h2;
-            for (std::size_t j = 1; j < num_id::unknown; ++j)
-            {
-                if (i != j)
-                {
-                    h2.set(j);
-                    assert(h.hash() == h2.hash());
-                }
-            }
-        }
-
-        h.set(tag::delivery_mode::num);
-        assert((tag::delivery_mode::text_hash != h.hash()) ||
-            (tag::delivery_mode::text != h.str()));
-    }
-#endif
-};
-
 } // namespace header
 } // namespace stomptalk
-
-template<class C, class T>
-constexpr std::basic_ostream<C, T>& operator<<(
-    std::basic_ostream<C, T>& os, const stomptalk::method::generic& method)
-{
-    return os << method.str();
-}
-
-template<class C, class T>
-constexpr std::basic_ostream<C, T>& operator<<(
-    std::basic_ostream<C, T>& os, const stomptalk::header::generic& hdr)
-{
-    return os << hdr.str();
-}

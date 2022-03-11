@@ -8,10 +8,8 @@ void parser_hook::reset() noexcept
 {
     no_error();
     content_len_ = 0u;
-
-    using namespace header;
-    next_ = num_id::none;
-    mask_ = mask_id::none;
+    next_ = st_header_none;
+    mask_ = 0u;
 }
 
 void parser_hook::on_frame(const char *frame_start) noexcept
@@ -19,12 +17,12 @@ void parser_hook::on_frame(const char *frame_start) noexcept
     hook_.on_frame(*this, frame_start);
 }
 
-void parser_hook::on_method(std::string_view text) noexcept
+void parser_hook::on_method(std::uint64_t id, std::string_view text) noexcept
 {
-    hook_.on_method(*this, text);
+    hook_.on_method(*this, id, text);
 }
 
-void parser_hook::on_hdr_key(std::string_view text) noexcept
+void parser_hook::on_hdr_key(std::uint64_t id, std::string_view text) noexcept
 {
     using namespace header;
     using content_length = tag::content_length;
@@ -33,21 +31,21 @@ void parser_hook::on_hdr_key(std::string_view text) noexcept
 // http://stomp.github.io/stomp-specification-1.2.html#Repeated_Header_Entries
 // If a client or a server receives repeated frame header entries,
 // only the first header entry SHOULD be used as the value of header entry.
-    if ((!(mask_ & mask_id::content_length)) &&
-        (text.size() == content_length::text_size))
-        next_ = detect(content_length(), text);
+    // if ((!(mask_ & mask_id::content_length)) &&
+    //     (text.size() == content_length::text_size))
+    //     next_ = detect(content_length(), text);
 
-    hook_.on_hdr_key(*this, text);
+    hook_.on_hdr_key(*this, id, text);
 }
 
 void parser_hook::on_hdr_val(std::string_view text) noexcept
 {
-    using namespace header;
+    using namespace header::tag;
     // проверяем ожидали ли content_length
-    if (next_ == num_id::content_length)
+    if (next_ == content_length::num)
     {
         // выставляем маску найденого хидера
-        mask_ |= mask_id::content_length;
+        mask_ |= content_length::mask;
 
         // парсим размер
         auto content_len = stomptalk::antoull(text);
@@ -61,7 +59,7 @@ void parser_hook::on_hdr_val(std::string_view text) noexcept
 
         // пока ожидаем только один хидер
         // можно оставить внутри условия
-        next_ = num_id::none;
+        next_ = st_header_none;
     }
 
     hook_.on_hdr_val(*this, text);

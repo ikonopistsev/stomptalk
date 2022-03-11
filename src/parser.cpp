@@ -36,6 +36,10 @@ parser::pointer parser::start_state(parser_hook& hook,
 
         // сохраняем стек
         sbuf_.push(ch);
+        // инциализируем хэш
+        hval_ = fnv1a::salt;
+        // добавляем первый символ
+        hash_add(ch);
 
         // переходим к разбору метода
         state_fn_ = &parser::method_state;
@@ -63,6 +67,8 @@ parser::pointer parser::method_state(parser_hook& hook,
                 hook.too_big();
                 return curr;
             }
+            
+            hash_add(ch);
         }
         else
         {
@@ -70,7 +76,7 @@ parser::pointer parser::method_state(parser_hook& hook,
             {
                 // определяем метод
                 // вызываем каллбек
-                hook.on_method(sbuf_.pop());
+                hook.on_method(hval_, sbuf_.pop());
 
                 // переходим к поиску конца метода
                 state_fn_ = &parser::hdrline_done;
@@ -82,7 +88,7 @@ parser::pointer parser::method_state(parser_hook& hook,
             {
                 // определяем метод
                 // вызываем каллбек
-                hook.on_method(sbuf_.pop());
+                hook.on_method(hval_, sbuf_.pop());
 
                 // переходим к поиску конца метода
                 state_fn_ = &parser::hdrline_almost_done;
@@ -125,7 +131,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
             auto text = sbuf_.pop();
 
             // выполняем каллбек на хидер
-            hook.on_hdr_key(text);
+            hook.on_hdr_key(hval_, text);
 
             state_fn_ = &parser::hdrline_val;
 
@@ -141,6 +147,8 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
                     hook.too_big();
                     return curr;
                 }
+
+                hash_add(ch);
             }
             else
             {
@@ -269,6 +277,9 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
         hook.too_big();
         return curr;
     }
+
+    hval_ = fnv1a::salt;
+    hash_add(ch);
 
     state_fn_ = &parser::hdrline_hdr_key;
 
@@ -440,11 +451,8 @@ std::size_t parser::run(parser_hook& hook,
 } // namespace stomptalk
 
 struct stomptalk_parser final
-    : public stomptalk::hook_base
+    : stomptalk::hook_base
 {
-public:
-    stomptalk_parser() = default;
-
     std::size_t run(const char *begin, std::size_t len) noexcept
     {
         return parser_.run(hook_, begin, len);
@@ -474,7 +482,8 @@ public:
         else
         {
             on_frame_ = on_frame_end_ = nullptr;
-            on_method_ = on_hdr_key_ = on_hdr_val_ = on_body_ = nullptr;
+            on_method_ = on_hdr_key_ = nullptr;
+            on_hdr_val_ = on_body_ = nullptr;
         }
 
         user_arg_ = arg;
@@ -489,8 +498,8 @@ private:
     stomptalk::parser parser_{};
     stomptalk::parser_hook hook_{*this};
     stomptalk_cb on_frame_{};
-    stomptalk_data_cb on_method_{};
-    stomptalk_data_cb on_hdr_key_{};
+    stomptalk_id_cb on_method_{};
+    stomptalk_id_cb on_hdr_key_{};
     stomptalk_data_cb on_hdr_val_{};
     stomptalk_data_cb on_body_{};
     stomptalk_cb on_frame_end_{};
@@ -503,22 +512,22 @@ private:
             on_frame_(this, ptr);
     }
 
-    void on_method(stomptalk::parser_hook& hook,
+    void on_method(stomptalk::parser_hook& hook, std::uint64_t id,
         std::string_view method) noexcept override
     {
         if (on_method_)
         {
-            if (on_method_(this, method.data(), method.size()))
+            if (on_method_(this, id, method.data(), method.size()))
                 hook.generic_error();
         }
     }
 
-    void on_hdr_key(stomptalk::parser_hook& hook,
+    void on_hdr_key(stomptalk::parser_hook& hook, std::uint64_t id,
         std::string_view key) noexcept override
     {
         if (on_hdr_key_)
         {
-            if (on_hdr_key_(this, key.data(), key.size()))
+            if (on_hdr_key_(this, id, key.data(), key.size()))
                 hook.generic_error();
         }
     }

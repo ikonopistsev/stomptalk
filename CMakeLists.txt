@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 
-project(stomptalk VERSION 1.4.1 LANGUAGES CXX)
+project(stomptalk VERSION 1.5.0 LANGUAGES CXX)
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
@@ -47,9 +47,9 @@ set(source
     src/tag.cpp
     src/parser.cpp
     src/version.cpp
-    src/stomplay.cpp
+    #src/stomplay.cpp
     src/parser_hook.cpp
-    src/stomplay_hook.cpp
+    #src/stomplay_hook.cpp
 )
 
 set(pub_header
@@ -61,7 +61,7 @@ set(pub_header
     include/stomptalk/hook_base.hpp
     include/stomptalk/parser_hook.hpp
     include/stomptalk/stackbuf.hpp
-    include/stomptalk/stomplay.hpp
+    #include/stomptalk/stomplay.hpp
     include/stomptalk/tag.hpp
     include/stomptalk/basic_text.hpp
     include/stomptalk/frame_base.hpp
@@ -70,7 +70,7 @@ set(pub_header
     include/stomptalk/parser.hpp
     include/stomptalk/parser.h
     include/stomptalk/method.h
-    include/stomptalk/stomplay_hook.hpp
+    #include/stomptalk/stomplay_hook.hpp
     include/stomptalk/sv.hpp
     include/stomptalk/version.hpp
 )

@@ -28,8 +28,8 @@ protected:
     hook_base& hook_;
     std::uint64_t content_len_{};
     error::type error_{error::none};
-    std::size_t next_{};
-    std::size_t mask_{};
+    std::uint64_t next_{ st_header_none };
+    std::uint64_t mask_{ };
 
 public:
     parser_hook(hook_base& hook)
@@ -62,9 +62,9 @@ public:
 
     void on_frame(const char *frame_start) noexcept;
 
-    void on_method(std::string_view text) noexcept;
+    void on_method(std::uint64_t, std::string_view text) noexcept;
 
-    void on_hdr_key(std::string_view text) noexcept;
+    void on_hdr_key(std::uint64_t, std::string_view text) noexcept;
 
     void on_hdr_val(std::string_view text) noexcept;
 
