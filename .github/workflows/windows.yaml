@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [windows-2019]
         include:
-          - os: windows-latest
+          - os: windows-2019
             triplet: x64-windows
             vcpkgCommitId: '8a9a97315aefb3f8bc5d81bf66ca0025938b9c91'
             vcpkgPackages: 'sqlite3'
