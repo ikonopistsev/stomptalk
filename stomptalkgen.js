@@ -87,7 +87,7 @@ const method = m.sort();
 // generate method.h
 let path = "include/stomptalk/method.h"
 let s = stconstgen("method", method);
-s = includegen(s, ["<stdint.h>"]);
+s = includegen(s, ["stomptalk/type.h"]);
 s = guardgen(s, "method");
 fs.writeFileSync(path, s);
 
@@ -200,7 +200,7 @@ const header = h.sort();
 // generate header.h
 path = "include/stomptalk/header.h"
 s = stconstgen("header", header);
-s = includegen(s, ["<stdint.h>"]);
+s = includegen(s, ["stomptalk/type.h"]);
 s = guardgen(s, "header");
 fs.writeFileSync(path, s);
 
