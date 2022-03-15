@@ -1,6 +1,7 @@
 #pragma once
 
-#include "stomptalk/tag.hpp"
+#include "stomptalk/tag/header.hpp"
+#include "stomptalk/tag/method.hpp"
 #include <string>
 #include <chrono>
 

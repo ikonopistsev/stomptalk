@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stomptalk/hook_base.hpp"
+#include "stomptalk/header.h"
 
 namespace stomptalk {
 
@@ -28,7 +29,7 @@ protected:
     hook_base& hook_;
     std::uint64_t content_len_{};
     error::type error_{error::none};
-    std::uint64_t next_{ st_header_none };
+    std::uint64_t next_{st_header_none};
     std::uint64_t mask_{ };
 
 public:

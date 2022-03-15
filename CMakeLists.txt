@@ -44,25 +44,22 @@ if (WIN32)
 endif()
 
 set(source
-    src/tag.cpp
     src/parser.cpp
     src/version.cpp
-    #src/stomplay.cpp
     src/parser_hook.cpp
-    #src/stomplay_hook.cpp
 )
 
 set(pub_header
     include/stomptalk/antoull.h
     include/stomptalk/antoull.hpp
     include/stomptalk/fnv1a.hpp
+    include/stomptalk/tag/header.hpp
+    include/stomptalk/tag/method.hpp
     include/stomptalk/header.hpp
     include/stomptalk/header.h
     include/stomptalk/hook_base.hpp
     include/stomptalk/parser_hook.hpp
     include/stomptalk/stackbuf.hpp
-    #include/stomptalk/stomplay.hpp
-    include/stomptalk/tag.hpp
     include/stomptalk/basic_text.hpp
     include/stomptalk/frame_base.hpp
     include/stomptalk/header_store.hpp
@@ -70,8 +67,6 @@ set(pub_header
     include/stomptalk/parser.hpp
     include/stomptalk/parser.h
     include/stomptalk/method.h
-    #include/stomptalk/stomplay_hook.hpp
-    include/stomptalk/sv.hpp
     include/stomptalk/version.hpp
 )
 

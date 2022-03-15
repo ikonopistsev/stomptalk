@@ -30,16 +30,15 @@ parser::pointer parser::start_state(parser_hook& hook,
         }
 
         sbuf_.reset();
+        hval_.reset();
         hook.reset();
         // передаем позицию в буфере
         hook.on_frame(curr - 1);
 
         // сохраняем стек
         sbuf_.push(ch);
-        // инциализируем хэш
-        hval_ = fnv1a::salt;
-        // добавляем первый символ
-        hash_add(ch);
+        // инкрементируем хэш
+        hval_.push(ch);
 
         // переходим к разбору метода
         state_fn_ = &parser::method_state;
@@ -68,7 +67,7 @@ parser::pointer parser::method_state(parser_hook& hook,
                 return curr;
             }
             
-            hash_add(ch);
+            hval_.push(ch);
         }
         else
         {
@@ -76,7 +75,7 @@ parser::pointer parser::method_state(parser_hook& hook,
             {
                 // определяем метод
                 // вызываем каллбек
-                hook.on_method(hval_, sbuf_.pop());
+                hook.on_method(hval_.pop(), sbuf_.pop());
 
                 // переходим к поиску конца метода
                 state_fn_ = &parser::hdrline_done;
@@ -88,7 +87,7 @@ parser::pointer parser::method_state(parser_hook& hook,
             {
                 // определяем метод
                 // вызываем каллбек
-                hook.on_method(hval_, sbuf_.pop());
+                hook.on_method(hval_.pop(), sbuf_.pop());
 
                 // переходим к поиску конца метода
                 state_fn_ = &parser::hdrline_almost_done;
@@ -131,7 +130,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
             auto text = sbuf_.pop();
 
             // выполняем каллбек на хидер
-            hook.on_hdr_key(hval_, text);
+            hook.on_hdr_key(hval_.pop(), text);
 
             state_fn_ = &parser::hdrline_val;
 
@@ -148,13 +147,14 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
                     return curr;
                 }
 
-                hash_add(ch);
+                hval_.push(ch);
             }
             else
             {
                 if (ch == '\n')
                 {
                     sbuf_.pop();
+                    hval_.reset();
 
                     state_fn_ = &parser::hdrline_done;
 
@@ -164,6 +164,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
                 else if (ch == '\r')
                 {
                     sbuf_.pop();
+                    hval_.reset();
 
                     state_fn_ = &parser::hdrline_almost_done;
 
@@ -278,8 +279,7 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
         return curr;
     }
 
-    hval_ = fnv1a::salt;
-    hash_add(ch);
+    hval_.push(ch);
 
     state_fn_ = &parser::hdrline_hdr_key;
 

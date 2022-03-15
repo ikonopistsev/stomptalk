@@ -1,6 +1,5 @@
 #pragma once
 
-#include "stomptalk/tag.hpp"
 #include <string_view>
 #include <cassert>
 #include <cstdint>

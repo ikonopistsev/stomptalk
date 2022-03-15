@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 namespace stomptalk {
 
@@ -18,9 +19,14 @@ struct fnv1a
 
     constexpr static auto calc(char ch, type hval = salt) noexcept
     {
+
         hval ^= static_cast<type>(ch);
+#if defined(NO_FNV_GCC_OPTIMIZATION)
+        hval *= 0x100000001b3ULL;
+#else
         hval += (hval << 1) + (hval << 4) + (hval << 5) +
             (hval << 7) + (hval << 8) + (hval << 40);
+#endif
         return hval;
     }
 
@@ -30,23 +36,13 @@ struct fnv1a
         while (*ptr != '\0')
         {            
             hval ^= static_cast<std::size_t>(*ptr++);
+#if defined(NO_FNV_GCC_OPTIMIZATION)
+            hval *= 0x100000001b3ULL;
+#else
             hval += (hval << 1) + (hval << 4) + (hval << 5) +
                 (hval << 7) + (hval << 8) + (hval << 40);
+#endif
         }
-        return hval;
-    }
-
-    auto operator()(std::size_t& len, const char *ptr) const noexcept
-    {
-        auto hval = salt;
-        const char *p = ptr;
-        while (*p != '\0')
-        {
-            hval ^= static_cast<type>(*p++);
-            hval += (hval << 1) + (hval << 4) + (hval << 5) +
-                (hval << 7) + (hval << 8) + (hval << 40);
-        }
-        len = static_cast<std::size_t>(p - ptr);
         return hval;
     }
 
@@ -56,8 +52,12 @@ struct fnv1a
         while (p < e)
         {
             hval ^= static_cast<type>(*p++);
+#if defined(NO_FNV_GCC_OPTIMIZATION)
+            hval *= 0x100000001b3ULL;
+#else
             hval += (hval << 1) + (hval << 4) + (hval << 5) +
                 (hval << 7) + (hval << 8) + (hval << 40);
+#endif
         }
         return hval;
     }
@@ -76,11 +76,22 @@ struct fnv1a
         while (p < e)
         {
             hval ^= static_cast<type>(*p++);
+#if defined(NO_FNV_GCC_OPTIMIZATION)
+            hval *= 0x100000001b3ULL;
+#else
             hval += (hval << 1) + (hval << 4) + (hval << 5) +
                 (hval << 7) + (hval << 8) + (hval << 40);
+#endif
         }
         return hval;
     }
+};
+
+template<class T, fnv1a::type H>
+struct static_hash
+{
+    constexpr static auto value = fnv1a::calc_hash<decltype(T::text)>(T::text.begin(), T::text.end());
+    using enable_type = typename std::enable_if<value == H, std::nullptr_t>::type;
 };
 
 } // namespace stomptalk

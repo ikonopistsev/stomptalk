@@ -2,6 +2,7 @@
 
 #include "stomptalk/parser_hook.hpp"
 #include "stomptalk/stackbuf.hpp"
+#include "stomptalk/hashval.hpp"
 #include <iterator>
 
 namespace stomptalk {
@@ -51,12 +52,8 @@ private:
 
     state_fn_type state_fn_{&parser::start_state};
     stackbuf<char, STOMPTALK_PARSER_STACK_SIZE> sbuf_{};
-    fnv1a::type hval_{};
+    hashval<char> hval_{};
 
-    void hash_add(char ch) noexcept
-    {
-        hval_ = fnv1a::calc(ch, hval_);
-    }
 public:
     parser() = default;
 

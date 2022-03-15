@@ -2,7 +2,6 @@
 
 #include "stomptalk/fnv1a.hpp"
 #include "stomptalk/header.hpp"
-#include "stomptalk/sv.hpp"
 #include <array>
 #include <limits>
 #include <vector>
