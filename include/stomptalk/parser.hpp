@@ -2,6 +2,7 @@
 
 #include "stomptalk/parser_hook.hpp"
 #include "stomptalk/stackbuf.hpp"
+#include "stomptalk/hashval.hpp"
 #include <iterator>
 
 namespace stomptalk {
@@ -51,6 +52,7 @@ private:
 
     state_fn_type state_fn_{&parser::start_state};
     stackbuf<char, STOMPTALK_PARSER_STACK_SIZE> sbuf_{};
+    hashval<char> hval_{};
 
 public:
     parser() = default;

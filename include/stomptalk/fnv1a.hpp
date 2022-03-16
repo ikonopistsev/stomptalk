@@ -7,124 +7,42 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 namespace stomptalk {
 
-template<bool>
-struct basic_fnv1a_result;
-
-template<>
-struct basic_fnv1a_result<true>
-{
-    using x32 = std::size_t;
-    using x64 = std::size_t;
-};
-
-template<>
-struct basic_fnv1a_result<false>
-{
-    using x32 = std::size_t;
-    using x64 = std::uint64_t;
-};
-
-template<bool, int>
-struct basic_fnv1a;
-
-template<bool x86_64>
-struct basic_fnv1a<x86_64, 4>
-{
-    using hash_type = typename basic_fnv1a_result<x86_64>::x32;
-    constexpr static auto salt = hash_type{ 0x811c9dc5 };
-
-    constexpr auto operator()(const char *ptr) const noexcept
-    {
-        auto hval = salt;
-        while (*ptr != '\0')
-        {
-            hval ^= static_cast<std::size_t>(*ptr++);
-            hval += (hval << 1) + (hval << 4) +
-                (hval << 7) + (hval << 8) + (hval << 24);
-        }
-        return hval;
-    }
-
-    auto operator()(std::size_t& len, const char *ptr) const noexcept
-    {
-        auto hval = salt;
-        const char *p = ptr;
-        while (*p != '\0')
-        {
-            hval ^= static_cast<std::size_t>(*p++);
-            hval += (hval << 1) + (hval << 4) +
-                (hval << 7) + (hval << 8) + (hval << 24);
-        }
-        len = static_cast<std::size_t>(p - ptr);
-        return hval;
-    }
-
-    constexpr auto operator()(const char* p, const char* e) const noexcept
-    {
-        auto hval = salt;
-        while (p < e)
-        {
-            hval ^= static_cast<std::size_t>(*p++);
-            hval += (hval << 1) + (hval << 4) +
-                (hval << 7) + (hval << 8) + (hval << 24);
-        }
-        return hval;
-    }
-
-    constexpr auto operator()(const char *ptr, std::size_t len) const noexcept
-    {
-        auto p = static_cast<const char*>(ptr);
-        return this->operator()(p, p + len);
-    }
-
-    template<class T>
-    constexpr static auto calc_hash(typename T::const_iterator p,
-        typename T::const_iterator e) noexcept
-    {
-        auto hval = salt;
-        while (p < e)
-        {
-            hval ^= static_cast<std::size_t>(*p++);
-            hval += (hval << 1) + (hval << 4) +
-                (hval << 7) + (hval << 8) + (hval << 24);
-        }
-        return hval;
-    }
-};
-
 // x86_64
-template<bool x86_64>
-struct basic_fnv1a<x86_64, 8>
+struct fnv1a
 {
-    using hash_type = typename basic_fnv1a_result<x86_64>::x64;
-    constexpr static auto salt = hash_type{ 0xcbf29ce484222325ull };
+    using type = std::uint64_t;
+    constexpr static auto salt = type{ 0xcbf29ce484222325ull };
+
+    constexpr static auto calc(char ch, type hval = salt) noexcept
+    {
+
+        hval ^= static_cast<type>(ch);
+#if defined(NO_FNV_GCC_OPTIMIZATION)
+        hval *= 0x100000001b3ULL;
+#else
+        hval += (hval << 1) + (hval << 4) + (hval << 5) +
+            (hval << 7) + (hval << 8) + (hval << 40);
+#endif
+        return hval;
+    }
 
     constexpr auto operator()(const char *ptr) const noexcept
     {
         auto hval = salt;
         while (*ptr != '\0')
-        {
+        {            
             hval ^= static_cast<std::size_t>(*ptr++);
+#if defined(NO_FNV_GCC_OPTIMIZATION)
+            hval *= 0x100000001b3ULL;
+#else
             hval += (hval << 1) + (hval << 4) + (hval << 5) +
                 (hval << 7) + (hval << 8) + (hval << 40);
+#endif
         }
-        return hval;
-    }
-
-    auto operator()(std::size_t& len, const char *ptr) const noexcept
-    {
-        auto hval = salt;
-        const char *p = ptr;
-        while (*p != '\0')
-        {
-            hval ^= static_cast<std::size_t>(*p++);
-            hval += (hval << 1) + (hval << 4) + (hval << 5) +
-                (hval << 7) + (hval << 8) + (hval << 40);
-        }
-        len = static_cast<std::size_t>(p - ptr);
         return hval;
     }
 
@@ -133,9 +51,13 @@ struct basic_fnv1a<x86_64, 8>
         auto hval = salt;
         while (p < e)
         {
-            hval ^= static_cast<std::size_t>(*p++);
+            hval ^= static_cast<type>(*p++);
+#if defined(NO_FNV_GCC_OPTIMIZATION)
+            hval *= 0x100000001b3ULL;
+#else
             hval += (hval << 1) + (hval << 4) + (hval << 5) +
                 (hval << 7) + (hval << 8) + (hval << 40);
+#endif
         }
         return hval;
     }
@@ -153,21 +75,23 @@ struct basic_fnv1a<x86_64, 8>
         auto hval = salt;
         while (p < e)
         {
-            hval ^= static_cast<std::size_t>(*p++);
+            hval ^= static_cast<type>(*p++);
+#if defined(NO_FNV_GCC_OPTIMIZATION)
+            hval *= 0x100000001b3ULL;
+#else
             hval += (hval << 1) + (hval << 4) + (hval << 5) +
                 (hval << 7) + (hval << 8) + (hval << 40);
+#endif
         }
         return hval;
     }
 };
 
-using fnv1a = basic_fnv1a<sizeof(std::size_t) == sizeof(std::uint64_t),
-    sizeof(std::size_t)>;
-
-template<class T>
-constexpr static auto get_hash(const T& text) noexcept
+template<class T, fnv1a::type H>
+struct static_hash
 {
-    return fnv1a::calc_hash<T>(text.begin(), text.end());
-}
+    constexpr static auto value = fnv1a::calc_hash<decltype(T::text)>(T::text.begin(), T::text.end());
+    using enable_type = typename std::enable_if<value == H, std::nullptr_t>::type;
+};
 
 } // namespace stomptalk

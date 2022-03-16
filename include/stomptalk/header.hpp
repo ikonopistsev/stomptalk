@@ -1,6 +1,7 @@
 #pragma once
 
-#include "stomptalk/tag.hpp"
+#include "stomptalk/tag/header.hpp"
+#include "stomptalk/tag/method.hpp"
 #include <string>
 #include <chrono>
 
@@ -594,15 +595,15 @@ constexpr static auto content_type_text_plain() noexcept {
 }
 
 constexpr static auto content_type_xml() noexcept {
-   return known_ref<tag::content_type>(tag::content_type::header_xml());
+   return known_ref<tag::content_type>(tag::content_type::header_application_xml());
 }
 
 constexpr static auto content_type_json() noexcept {
-    return known_ref<tag::content_type>(tag::content_type::header_json());
+    return known_ref<tag::content_type>(tag::content_type::header_application_json());
 }
 
 constexpr static auto content_type_octet() noexcept {
-   return known_ref<tag::content_type>(tag::content_type::header_octet());
+   return known_ref<tag::content_type>(tag::content_type::header_application_octet_stream());
 }
 
 ////typedef basic<tag::timestamp> timestamp;

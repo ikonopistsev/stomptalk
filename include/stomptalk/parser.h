@@ -15,18 +15,21 @@ typedef struct stomptalk_parser_hook stomptalk_parser_hook;
 typedef int (*stomptalk_data_cb) (stomptalk_parser*,
     const char *at, size_t length);
 
+typedef int (*stomptalk_id_cb) (stomptalk_parser*, uint64_t id,
+    const char *at, size_t length);
+
 // result != 0 -> error
 typedef int (*stomptalk_cb) (stomptalk_parser*, const char* at);
 
 struct stomptalk_parser;
 
 struct stomptalk_parser_hook {
-    stomptalk_cb      on_frame;
-    stomptalk_data_cb on_method;
-    stomptalk_data_cb on_hdr_key;
-    stomptalk_data_cb on_hdr_val;
-    stomptalk_data_cb on_body;
-    stomptalk_cb      on_frame_end;
+    stomptalk_cb        on_frame;
+    stomptalk_id_cb     on_method;
+    stomptalk_id_cb     on_hdr_key;
+    stomptalk_data_cb   on_hdr_val;
+    stomptalk_data_cb   on_body;
+    stomptalk_cb        on_frame_end;
 };
 
 stomptalk_parser* stomptalk_parser_new();

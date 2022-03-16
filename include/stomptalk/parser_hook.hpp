@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stomptalk/hook_base.hpp"
+#include "stomptalk/header.h"
 
 namespace stomptalk {
 
@@ -26,10 +27,12 @@ public:
 
 protected:
     hook_base& hook_;
-    std::uint64_t content_len_{};
+    std::uint64_t content_left_{};
+    // header 'content-length' data
+    std::uint64_t total_length_{};
     error::type error_{error::none};
-    std::size_t next_{};
-    std::size_t mask_{};
+    std::uint64_t header_id_{};
+    std::uint64_t mask_{};
 
 public:
     parser_hook(hook_base& hook)
@@ -50,21 +53,26 @@ public:
 
     void set(error::type) = delete;
 
-    void set(std::uint64_t content_length) noexcept
+    void set(std::uint64_t content_left) noexcept
     {
-        content_len_ = content_length;
+        content_left_ = content_left;
     }
 
     std::uint64_t content_length() const noexcept
     {
-        return content_len_;
+        return total_length_;
+    }
+
+    std::uint64_t content_left() const noexcept
+    {
+        return content_left_;
     }
 
     void on_frame(const char *frame_start) noexcept;
 
-    void on_method(std::string_view text) noexcept;
+    void on_method(std::uint64_t method_id, std::string_view text) noexcept;
 
-    void on_hdr_key(std::string_view text) noexcept;
+    void on_hdr_key(std::uint64_t header_id, std::string_view text) noexcept;
 
     void on_hdr_val(std::string_view text) noexcept;
 
