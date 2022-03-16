@@ -61,13 +61,6 @@ size_t rc = stomptalk_parser_execute(parser, data, data_size);
 // cleanup
 stomptalk_parser_free(parser);
 
-// some useful methods
-// detect method
-size_t rc = stomptalk_eval_method(at, length)
-
-// detect header
-size_t rc = stomptalk_eval_header(at, length);
-
 // convert text with unsigned number
 // it return negative value if error
 int64_t rc = stomptalk_antoull(at, length);
