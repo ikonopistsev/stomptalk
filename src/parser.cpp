@@ -323,7 +323,7 @@ parser::pointer parser::done(parser_hook& hook,
     }
     else
     {
-        if (hook.content_length() > 0)
+        if (hook.content_left() > 0)
         {
             // выбираем как будем читать боди
             state_fn_ = &parser::body_read;
@@ -365,7 +365,7 @@ parser::pointer parser::body_read(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
     auto to_read = static_cast<std::size_t>(std::distance(curr, end));
-    auto content_length = hook.content_length();
+    auto content_length = hook.content_left();
 
     to_read = static_cast<std::size_t>(
         (std::min)(static_cast<std::uint64_t>(to_read), content_length));
