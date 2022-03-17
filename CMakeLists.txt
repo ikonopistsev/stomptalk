@@ -28,8 +28,6 @@ set(pub_header
     include/stomptalk/antoull.h
     include/stomptalk/antoull.hpp
     include/stomptalk/fnv1a.hpp
-    include/stomptalk/tag/header.hpp
-    include/stomptalk/tag/method.hpp
     include/stomptalk/header.hpp
     include/stomptalk/hook_base.hpp
     include/stomptalk/parser_hook.hpp
@@ -39,6 +37,11 @@ set(pub_header
     include/stomptalk/header_store.hpp
     include/stomptalk/parser.hpp
     include/stomptalk/version.hpp
+)
+
+set(pub_tag_header
+    include/stomptalk/tag/header.hpp
+    include/stomptalk/tag/method.hpp
 )
 
 if (STOMPTALK_LIBRARY_STATIC)
@@ -54,4 +57,5 @@ if (STOMPTALK_LIBRARY_INSTALL)
     include(GNUInstallDirs)
     install(TARGETS stomptalk LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(FILES ${pub_header} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/stomptalk)
+    install(FILES ${pub_tag_header} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/stomptalk/tag)
 endif()
