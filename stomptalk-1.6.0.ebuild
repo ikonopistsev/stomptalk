@@ -3,32 +3,30 @@
 
 EAPI=7
 
-inherit cmake git-r3
+inherit cmake
 
 DESCRIPTION="stomp protocol parser"
 HOMEPAGE="https://github.com/ikonopistsev/stomptalk"
-#SRC_URI="https://github.com/ikonopistsev/stomptalk/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-EGIT_REPO_URI="https://github.com/ikonopistsev/stomptalk"
+SRC_URI="https://github.com/ikonopistsev/stomptalk/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="Apache License 2.0"
 
 SLOT="0/${PV}"
 
-KEYWORDS=""
-IUSE="static-libs memeq"
+KEYWORDS="~amd64 ~x86"
+IUSE="static-libs"
 
 DOCS=(
     README.md
 )
 
-S=${WORKDIR}/${P/_/-}
-
 src_configure() {
     local -a mycmakeargs=(
+	-DCMAKE_BUILD_TYPE=Release
 	-DSTOMPTALK_LIBRARY_STATIC=$(usex static-libs 'ON' 'OFF')
-	-DSTOMPTALK_USE_MEMEQ=$(usex memeq 'ON' 'OFF')
 	-DSTOMPTALK_LIBRARY_INSTALL=ON
     )
 
     cmake_src_configure
 }
+
