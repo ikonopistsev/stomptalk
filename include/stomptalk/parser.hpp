@@ -14,7 +14,7 @@ namespace stomptalk {
 class parser
 {
     using pointer = const char*;
-    using state_fn_type = pointer (parser::*)(parser_hook&, pointer, pointer);
+    using state_type = pointer (parser::*)(parser_hook&, pointer, pointer);
 
 private:
     pointer start_state(parser_hook& hook,
@@ -50,7 +50,7 @@ private:
     pointer frame_end(parser_hook& hook,
         pointer curr, pointer end) noexcept;
 
-    state_fn_type state_fn_{&parser::start_state};
+    state_type state_{&parser::start_state};
     stackbuf<char, STOMPTALK_PARSER_STACK_SIZE> sbuf_{};
     hashval<char> hval_{};
 

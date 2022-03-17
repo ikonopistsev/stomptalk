@@ -41,7 +41,7 @@ parser::pointer parser::start_state(parser_hook& hook,
         hval_.push(ch);
 
         // переходим к разбору метода
-        state_fn_ = &parser::method_state;
+        state_ = &parser::method_state;
 
         if (curr < end)
             return method_state(hook, curr, end);
@@ -78,7 +78,7 @@ parser::pointer parser::method_state(parser_hook& hook,
                 hook.on_method(hval_.pop(), sbuf_.pop());
 
                 // переходим к поиску конца метода
-                state_fn_ = &parser::hdrline_done;
+                state_ = &parser::hdrline_done;
 
                 return (curr < end) ?
                     hdrline_done(hook, curr, end) : curr;
@@ -90,7 +90,7 @@ parser::pointer parser::method_state(parser_hook& hook,
                 hook.on_method(hval_.pop(), sbuf_.pop());
 
                 // переходим к поиску конца метода
-                state_fn_ = &parser::hdrline_almost_done;
+                state_ = &parser::hdrline_almost_done;
 
                 return (curr < end) ?
                     hdrline_almost_done(hook, curr, end) : curr;
@@ -132,7 +132,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
             // выполняем каллбек на хидер
             hook.on_hdr_key(hval_.pop(), text);
 
-            state_fn_ = &parser::hdrline_val;
+            state_ = &parser::hdrline_val;
 
             return (curr < end) ?
                 hdrline_val(hook, curr, end) : curr;
@@ -156,7 +156,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
                     sbuf_.pop();
                     hval_.reset();
 
-                    state_fn_ = &parser::hdrline_done;
+                    state_ = &parser::hdrline_done;
 
                     return (curr < end) ?
                         hdrline_done(hook, curr, end) : curr;
@@ -166,7 +166,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
                     sbuf_.pop();
                     hval_.reset();
 
-                    state_fn_ = &parser::hdrline_almost_done;
+                    state_ = &parser::hdrline_almost_done;
 
                     return (curr < end) ?
                         hdrline_almost_done(hook, curr, end) : curr;
@@ -213,7 +213,7 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
                 hook.on_hdr_val(text);
 
                 // переходим к поиску конца метода
-                state_fn_ = &parser::hdrline_almost_done;
+                state_ = &parser::hdrline_almost_done;
 
                 return (curr < end) ?
                     hdrline_almost_done(hook, curr, end) : curr;
@@ -226,7 +226,7 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
                 hook.on_hdr_val(text);
 
                 // переходим к поиску конца метода
-                state_fn_ = &parser::hdrline_done;
+                state_ = &parser::hdrline_done;
 
                 return (curr < end) ?
                     hdrline_done(hook, curr, end) : curr;
@@ -252,7 +252,7 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
     if (ch == '\r')
     {
         // переходим к поиску конца метода
-        state_fn_ = &parser::almost_done;
+        state_ = &parser::almost_done;
 
         return (curr < end) ?
             almost_done(hook, curr, end) : curr;
@@ -260,7 +260,7 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
     else if (ch == '\n')
     {
         // переходим к поиску конца метода
-        state_fn_ = &parser::done;
+        state_ = &parser::done;
 
         return (curr < end) ?
             done(hook, curr, end) : curr;
@@ -281,7 +281,7 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
 
     hval_.push(ch);
 
-    state_fn_ = &parser::hdrline_hdr_key;
+    state_ = &parser::hdrline_hdr_key;
 
     return (curr < end) ?
         hdrline_hdr_key(hook, curr, end) : curr;
@@ -299,7 +299,7 @@ parser::pointer parser::hdrline_almost_done(parser_hook& hook,
     }
 
     // переходим к поиску конца метода
-    state_fn_ = &parser::hdrline_done;
+    state_ = &parser::hdrline_done;
 
     return (curr < end) ?
         hdrline_done(hook, curr, end) : curr;
@@ -313,7 +313,7 @@ parser::pointer parser::done(parser_hook& hook,
     // конец фрейма
     if (ch == '\0')
     {
-        state_fn_ = &parser::start_state;
+        state_ = &parser::start_state;
 
         // закончили
         hook.on_frame_end(curr);
@@ -326,7 +326,7 @@ parser::pointer parser::done(parser_hook& hook,
         if (hook.content_left() > 0)
         {
             // выбираем как будем читать боди
-            state_fn_ = &parser::body_read;
+            state_ = &parser::body_read;
 
             if (curr < end)
                 return body_read(hook, curr, end);
@@ -334,7 +334,7 @@ parser::pointer parser::done(parser_hook& hook,
         else
         {
             // выбираем как будем читать боди
-            state_fn_ = &parser::body_read_no_length;
+            state_ = &parser::body_read_no_length;
 
             if (curr < end)
                 return body_read_no_length(hook, curr, end);
@@ -355,7 +355,7 @@ parser::pointer parser::almost_done(parser_hook& hook,
     }
 
     // переходим к поиску конца метода
-    state_fn_ = &parser::done;
+    state_ = &parser::done;
 
     return (curr < end) ?
         done(hook, curr, end) : curr;
@@ -382,7 +382,7 @@ parser::pointer parser::body_read(parser_hook& hook,
 
     if (content_length == 0)
     {
-        state_fn_ = &parser::frame_end;
+        state_ = &parser::frame_end;
 
         if (curr < end)
             return frame_end(hook, curr, end);
@@ -400,7 +400,7 @@ parser::pointer parser::body_read_no_length(parser_hook& hook,
         if (*curr++ == '\0')
         {
             // если достигли конца переходим к новому фрейму
-            state_fn_ = &parser::frame_end;
+            state_ = &parser::frame_end;
             // вернемся назад чтобы обработать каллбек
             --curr;
             break;
@@ -423,7 +423,7 @@ parser::pointer parser::frame_end(parser_hook& hook,
     parser::pointer curr, parser::pointer) noexcept
 {
 
-    state_fn_ = &parser::start_state;
+    state_ = &parser::start_state;
 
     if (*curr++ != '\0')
         hook.inval_frame();
@@ -443,7 +443,7 @@ std::size_t parser::run(parser_hook& hook,
     const char* end = begin + len;
 
     while ((curr < end) && hook.ok())
-        curr = (this->*state_fn_)(hook, curr, end);
+        curr = (this->*state_)(hook, curr, end);
 
     return static_cast<std::size_t>(std::distance(begin, curr));
 }
