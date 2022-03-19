@@ -1,7 +1,6 @@
 #include "stomptalk/parser_hook.hpp"
 #include "stomptalk/antoull.hpp"
 #include "stomptalk/antoull.h"
-#include "stomptalk/tag/header.hpp"
 
 namespace stomptalk {
 
@@ -11,7 +10,6 @@ void parser_hook::reset() noexcept
     content_left_ = 0u;
     total_length_ = 0u;
     header_id_ = 0u;
-    mask_ = 0u;
 }
 
 void parser_hook::on_frame(const char *frame_start) noexcept
@@ -26,13 +24,12 @@ void parser_hook::on_method(std::uint64_t method_id, std::string_view text) noex
 
 void parser_hook::on_hdr_key(std::uint64_t header_id, std::string_view text) noexcept
 {
-    using content_length = header::tag::content_length;
 // нам важен только размер контента
 // прверяем встречается ли хидер первый раз
 // http://stomp.github.io/stomp-specification-1.2.html#Repeated_Header_Entries
 // If a client or a server receives repeated frame header entries,
 // only the first header entry SHOULD be used as the value of header entry.
-    if ((content_length::text_hash == header_id) && (!(mask_ & content_length::mask)))
+    if ((st_header_content_length == header_id) && !total_length_)
         header_id_ = header_id;
 
     hook_.on_hdr_key(*this, header_id, text);
@@ -40,13 +37,9 @@ void parser_hook::on_hdr_key(std::uint64_t header_id, std::string_view text) noe
 
 void parser_hook::on_hdr_val(std::string_view text) noexcept
 {
-    using content_length = header::tag::content_length;
     // проверяем ожидали ли content_length
-    if (header_id_ == content_length::text_hash)
+    if (st_header_content_length == header_id_)
     {
-        // выставляем маску найденого хидера
-        mask_ |= content_length::mask;
-
         // парсим размер
         auto content_len = stomptalk::antoull(text);
         if (content_len > 0ll)

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.6.1 LANGUAGES CXX)
+project(stomptalk VERSION 1.7.0 LANGUAGES CXX)
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
@@ -16,7 +16,6 @@ endif()
 
 set(source
     src/parser.cpp
-    src/version.cpp
     src/parser_hook.cpp
 )
 
@@ -28,20 +27,12 @@ set(pub_header
     include/stomptalk/antoull.h
     include/stomptalk/antoull.hpp
     include/stomptalk/fnv1a.hpp
-    include/stomptalk/header.hpp
     include/stomptalk/hook_base.hpp
     include/stomptalk/parser_hook.hpp
     include/stomptalk/stackbuf.hpp
     include/stomptalk/hashval.hpp
-    include/stomptalk/frame_base.hpp
-    include/stomptalk/header_store.hpp
     include/stomptalk/parser.hpp
     include/stomptalk/version.hpp
-)
-
-set(pub_tag_header
-    include/stomptalk/tag/header.hpp
-    include/stomptalk/tag/method.hpp
 )
 
 if (STOMPTALK_LIBRARY_STATIC)
@@ -57,5 +48,4 @@ if (STOMPTALK_LIBRARY_INSTALL)
     include(GNUInstallDirs)
     install(TARGETS stomptalk LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(FILES ${pub_header} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/stomptalk)
-    install(FILES ${pub_tag_header} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/stomptalk/tag)
 endif()

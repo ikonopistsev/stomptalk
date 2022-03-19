@@ -32,7 +32,6 @@ protected:
     std::uint64_t total_length_{};
     error::type error_{error::none};
     std::uint64_t header_id_{};
-    std::uint64_t mask_{};
 
 public:
     parser_hook(hook_base& hook)
