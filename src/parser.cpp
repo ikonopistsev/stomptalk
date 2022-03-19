@@ -1,5 +1,4 @@
 #include "stomptalk/parser.hpp"
-#include "stomptalk/header.hpp"
 #include "stomptalk/parser_hook.hpp"
 #include "stomptalk/parser.h"
 #include <cstring>
