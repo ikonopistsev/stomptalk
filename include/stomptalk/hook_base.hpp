@@ -1,8 +1,7 @@
 #pragma once
 
-#include <cassert>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 
 namespace stomptalk {
 

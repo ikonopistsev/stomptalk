@@ -3,6 +3,7 @@
 #include <limits>
 #include <string>
 #include <cstdint>
+#include <cassert>
 #include <type_traits>
 
 namespace stomptalk {
