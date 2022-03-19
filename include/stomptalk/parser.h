@@ -23,6 +23,17 @@ typedef int (*stomptalk_cb) (stomptalk_parser*, const char* at);
 
 struct stomptalk_parser;
 
+enum stomptalk_error {
+    stomptalk_error_none = 0,
+    stomptalk_error_too_big,
+    stomptalk_error_inval_reqline,
+    stomptalk_error_inval_method,
+    stomptalk_error_inval_frame,
+    stomptalk_error_inval_content_size,
+    stomptalk_error_next_frame,
+    stomptalk_error_generic
+};
+
 struct stomptalk_parser_hook {
     stomptalk_cb        on_frame;
     stomptalk_id_cb     on_method;
@@ -51,6 +62,10 @@ const char* stomptalk_method_str(size_t method);
 uint64_t stomptalk_get_content_length(stomptalk_parser *parser);
 
 size_t stomptalk_get_error(stomptalk_parser *parser);
+
+const char* stomptalk_get_error_str(size_t error);
+
+const char* stomptalk_version();
 
 #ifdef __cplusplus
 }

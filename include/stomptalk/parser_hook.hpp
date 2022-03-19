@@ -1,56 +1,49 @@
 #pragma once
 
 #include "stomptalk/hook_base.hpp"
-#include "stomptalk/header.h"
+#include "stomptalk/antoull.hpp"
+#include "stomptalk/parser.h"
 
 namespace stomptalk {
 
 class parser;
 class parser_hook
 {
-public:
-    struct error
-    {
-        enum type
-            : std::size_t
-        {
-            none = 0,
-            too_big,
-            inval_reqline,
-            inval_method,
-            inval_frame,
-            inval_content_size,
-            next_frame,
-            generic
-        };
-    };
-
 protected:
     hook_base& hook_;
     std::uint64_t content_left_{};
     // header 'content-length' data
     std::uint64_t total_length_{};
-    error::type error_{error::none};
     std::uint64_t header_id_{};
+    stomptalk_error error_{stomptalk_error_none};
 
 public:
-    parser_hook(hook_base& hook)
-        : hook_(hook)
+    parser_hook(hook_base& hook) noexcept
+        : hook_{hook}
     {   }
 
-    void reset() noexcept;
+    void reset() noexcept
+    {
+        content_left_ = 0u;
+        total_length_ = 0u;
+        header_id_ = 0u;
+        error_ = stomptalk_error_none;
+    }
 
     bool ok() const noexcept
     {
-        return error() == error::none;
+        return error() == stomptalk_error_none;
     }
 
-    error::type error() const noexcept
+    stomptalk_error error() const noexcept
     {
         return error_;
     }
 
-    void set(error::type) = delete;
+    void set(stomptalk_error error) noexcept
+    {
+        error_ = error;
+    }
 
     void set(std::uint64_t content_left) noexcept
     {
@@ -67,36 +60,77 @@ public:
         return content_left_;
     }
 
-    void on_frame(const char *frame_start) noexcept;
+    void on_frame(const char *frame_start) noexcept
+    {
+        hook_.on_frame(*this, frame_start);
+    }
+    
+    void on_method(std::uint64_t method_id, const char *at, std::size_t len) noexcept
+    {
+        hook_.on_method(*this, method_id, at, len);
+    }
 
-    void on_method(std::uint64_t method_id, std::string_view text) noexcept;
+    template<class P>
+    void on_method(std::uint64_t method_id, P p) noexcept
+    {
+        on_method(method_id, p.first, p.second);
+    }
 
-    void on_hdr_key(std::uint64_t header_id, std::string_view text) noexcept;
+    void on_hdr_key(std::uint64_t header_id, const char *at, std::size_t len) noexcept
+    {
+    // нам важен только размер контента
+    // прверяем встречается ли хидер первый раз
+    // http://stomp.github.io/stomp-specification-1.2.html#Repeated_Header_Entries
+    // If a client or a server receives repeated frame header entries,
+    // only the first header entry SHOULD be used as the value of header entry.
+        if ((st_header_content_length == header_id) && !total_length_)
+            header_id_ = header_id;
 
-    void on_hdr_val(std::string_view text) noexcept;
+        hook_.on_hdr_key(*this, header_id, at, len);
+    }
 
-    void on_body(const void* ptr, std::size_t size) noexcept;
+    template<class P>
+    void on_hdr_key(std::uint64_t header_id, P p) noexcept
+    {
+        on_hdr_key(header_id, p.first, p.second);
+    }
 
-    void on_frame_end(const char *frame_end) noexcept;
+    void on_hdr_val(const char *at, std::size_t len) noexcept
+    {
+        // проверяем ожидали ли content_length
+        if (st_header_content_length == header_id_)
+        {
+            // парсим размер
+            auto content_len = stomptalk::antoull(at, len);
+            if (content_len > 0ll)
+                total_length_ = content_left_ = static_cast<std::uint64_t>(content_len);
+            else
+            {
+                set(stomptalk_error_inval_content_size);
+                return;
+            }
 
-    // errors
-    void no_error() noexcept;
+            header_id_ = 0u;
+        }
 
-    void too_big() noexcept;
+        hook_.on_hdr_val(*this, at, len);
+    }
 
-    void inval_reqline() noexcept;
+    template<class P>
+    void on_hdr_val(P p) noexcept
+    {
+        on_hdr_val(p.first, p.second);
+    }
 
-    void inval_method() noexcept;
+    void on_body(const void* ptr, std::size_t size) noexcept
+    {
+        hook_.on_body(*this, ptr, size);
+    }
 
-    void inval_frame() noexcept;
-
-    void inval_content_size() noexcept;
-
-    void next_frame() noexcept;
-
-    void generic_error() noexcept;
-
-    std::string_view error_str() const noexcept;
+    void on_frame_end(const char *frame_end) noexcept
+    {
+        hook_.on_frame_end(*this, frame_end);
+    }
 };
 
 } // stomptalk

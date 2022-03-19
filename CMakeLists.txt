@@ -5,7 +5,7 @@ project(stomptalk VERSION 1.7.0 LANGUAGES CXX)
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
 
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions("-DSTOMPTALK_VERSION=${PROJECT_VERSION}")
@@ -16,7 +16,7 @@ endif()
 
 set(source
     src/parser.cpp
-    src/parser_hook.cpp
+    src/stomptalk.cpp
 )
 
 set(pub_header

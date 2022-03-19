@@ -4,7 +4,6 @@
 #include <string>
 #include <cstdint>
 #include <type_traits>
-#include <string_view>
 
 namespace stomptalk {
 namespace detail {
@@ -78,12 +77,6 @@ static inline
 std::int64_t antoull(const char *ptr, std::size_t n) noexcept
 {
     return detail::antoull(ptr, n);
-}
-
-static inline
-std::int64_t antoull(std::string_view text) noexcept
-{
-    return detail::antoull(text.data(), text.size());
 }
 
 } // namespace stomptalk
