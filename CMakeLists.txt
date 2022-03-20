@@ -32,7 +32,6 @@ set(pub_header
     include/stomptalk/stackbuf.hpp
     include/stomptalk/hashval.hpp
     include/stomptalk/parser.hpp
-    include/stomptalk/version.hpp
 )
 
 if (STOMPTALK_LIBRARY_STATIC)

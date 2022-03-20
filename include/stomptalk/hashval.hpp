@@ -11,7 +11,7 @@ template<>
 struct hashval<char>
 {
     using type = fnv1a::type;
-    type value_{ fnv1a::salt };
+    type value_{fnv1a::salt};
 
     void reset(type salt = fnv1a::salt) noexcept
     {
