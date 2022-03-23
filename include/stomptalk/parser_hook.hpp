@@ -13,7 +13,7 @@ protected:
     hook_base& hook_;
     std::uint64_t content_left_{};
     // header 'content-length' data
-    std::uint64_t total_length_{};
+    std::uint64_t content_length_{};
     std::uint64_t header_id_{};
     stomptalk_error error_{stomptalk_error_none};
 
@@ -25,24 +25,9 @@ public:
     void reset() noexcept
     {
         content_left_ = 0u;
-        total_length_ = 0u;
+        content_length_ = 0u;
         header_id_ = 0u;
         error_ = stomptalk_error_none;
-    }
-
-    bool ok() const noexcept
-    {
-        return error() == stomptalk_error_none;
-    }
-
-    stomptalk_error error() const noexcept
-    {
-        return error_;
-    }
-
-    void set(stomptalk_error error) noexcept
-    {
-        error_ = error;
     }
 
     void set(std::uint64_t content_left) noexcept
@@ -52,12 +37,32 @@ public:
 
     std::uint64_t content_length() const noexcept
     {
-        return total_length_;
+        return content_length_;
+    }
+
+    void set(stomptalk_error error) noexcept
+    {
+        error_ = error;
     }
 
     std::uint64_t content_left() const noexcept
     {
         return content_left_;
+    }
+
+    std::uint64_t header_id() const noexcept
+    {
+        return header_id_;
+    }
+
+    stomptalk_error error() const noexcept
+    {
+        return error_;
+    }
+
+    bool ok() const noexcept
+    {
+        return error() == stomptalk_error_none;
     }
 
     void on_frame(const char *frame_start) noexcept
@@ -83,7 +88,7 @@ public:
     // http://stomp.github.io/stomp-specification-1.2.html#Repeated_Header_Entries
     // If a client or a server receives repeated frame header entries,
     // only the first header entry SHOULD be used as the value of header entry.
-        if ((st_header_content_length == header_id) && !total_length_)
+        if ((st_header_content_length == header_id) && !content_length_)
             header_id_ = header_id;
 
         hook_.on_hdr_key(*this, header_id, at, len);
@@ -103,7 +108,7 @@ public:
             // парсим размер
             auto content_len = stomptalk::antoull(at, len);
             if (content_len > 0ll)
-                total_length_ = content_left_ = static_cast<std::uint64_t>(content_len);
+                content_length_ = content_left_ = static_cast<std::uint64_t>(content_len);
             else
             {
                 set(stomptalk_error_inval_content_size);
