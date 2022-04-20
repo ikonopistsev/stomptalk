@@ -1,6 +1,4 @@
 #include "stomptalk/parser.hpp"
-#include "stomptalk/parser_hook.hpp"
-#include "stomptalk/parser.h"
 #include <cstring>
 #include <cassert>
 #include <algorithm>
@@ -24,7 +22,7 @@ parser::pointer parser::start_state(parser_hook& hook,
 
         if (!ch_isupper(ch))
         {
-            hook.inval_reqline();
+            hook.set(stomptalk_error_inval_reqline);
             return curr;
         }
 
@@ -62,7 +60,7 @@ parser::pointer parser::method_state(parser_hook& hook,
         {
             if (!sbuf_.push(ch))
             {
-                hook.too_big();
+                hook.set(stomptalk_error_too_big);
                 return curr;
             }
             
@@ -96,7 +94,7 @@ parser::pointer parser::method_state(parser_hook& hook,
             }
             else
             {
-                hook.inval_method();
+                hook.set(stomptalk_error_inval_method);
                 return curr;
             }
         }
@@ -125,11 +123,8 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
 
         if (ch == ':')
         {
-            // сохраняем параметры стека
-            auto text = sbuf_.pop();
-
             // выполняем каллбек на хидер
-            hook.on_hdr_key(hval_.pop(), text);
+            hook.on_hdr_key(hval_.pop(), sbuf_.pop());
 
             state_ = &parser::hdrline_val;
 
@@ -142,7 +137,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
             {
                 if (!sbuf_.push(ch))
                 {
-                    hook.too_big();
+                    hook.set(stomptalk_error_too_big);
                     return curr;
                 }
 
@@ -172,7 +167,7 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
                 }
                 else
                 {
-                    hook.inval_frame();
+                    hook.set(stomptalk_error_inval_frame);
                     return curr;
                 }
             }
@@ -198,7 +193,7 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
         {
             if (!sbuf_.push(ch))
             {
-                hook.too_big();
+                hook.set(stomptalk_error_too_big);
                 return curr;
             }
         }
@@ -207,9 +202,7 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
             if (ch == '\r')
             {
                 // сохраняем параметры стека
-                auto text = sbuf_.pop();
-
-                hook.on_hdr_val(text);
+                hook.on_hdr_val(sbuf_.pop());
 
                 // переходим к поиску конца метода
                 state_ = &parser::hdrline_almost_done;
@@ -220,9 +213,7 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
             else if (ch == '\n')
             {
                 // сохраняем параметры стека
-                auto text = sbuf_.pop();
-
-                hook.on_hdr_val(text);
+                hook.on_hdr_val(sbuf_.pop());
 
                 // переходим к поиску конца метода
                 state_ = &parser::hdrline_done;
@@ -232,7 +223,7 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
             }
             else
             {
-                hook.inval_frame();
+                hook.set(stomptalk_error_inval_frame);
                 return curr;
             }
         }
@@ -268,13 +259,13 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
     // иначе это следующий хидер
     if (!ch_isprint_nospace(ch))
     {
-        hook.inval_reqline();
+        hook.set(stomptalk_error_inval_reqline);
         return curr;
     }
 
     if (!sbuf_.push(ch))
     {
-        hook.too_big();
+        hook.set(stomptalk_error_too_big);
         return curr;
     }
 
@@ -293,7 +284,7 @@ parser::pointer parser::hdrline_almost_done(parser_hook& hook,
 {
     if (*curr++ != '\n')
     {
-        hook.inval_reqline();
+        hook.set(stomptalk_error_inval_reqline);
         return curr;
     }
 
@@ -349,7 +340,7 @@ parser::pointer parser::almost_done(parser_hook& hook,
 {
     if (*curr++ != '\n')
     {
-        hook.inval_reqline();
+        hook.set(stomptalk_error_inval_reqline);
         return curr;
     }
 
@@ -425,7 +416,7 @@ parser::pointer parser::frame_end(parser_hook& hook,
     state_ = &parser::start_state;
 
     if (*curr++ != '\0')
-        hook.inval_frame();
+        hook.set(stomptalk_error_inval_frame);
 
     // закончили
     hook.on_frame_end(curr - 1);
@@ -436,7 +427,7 @@ parser::pointer parser::frame_end(parser_hook& hook,
 std::size_t parser::run(parser_hook& hook,
     const char *begin, std::size_t len) noexcept
 {
-    hook.no_error();
+    hook.set(stomptalk_error_none);
 
     const char* curr = begin;
     const char* end = begin + len;
@@ -448,166 +439,3 @@ std::size_t parser::run(parser_hook& hook,
 }
 
 } // namespace stomptalk
-
-struct stomptalk_parser final
-    : stomptalk::hook_base
-{
-    std::size_t run(const char *begin, std::size_t len) noexcept
-    {
-        return parser_.run(hook_, begin, len);
-    }
-
-    std::uint64_t content_length() const noexcept
-    {
-        return hook_.content_length();
-    }
-
-    std::size_t get_error() const noexcept
-    {
-        return hook_.error();
-    }
-
-    void set(const stomptalk_parser_hook *user, void *arg) noexcept
-    {
-        if (user)
-        {
-            on_frame_ = user->on_frame;
-            on_method_ = user->on_method;
-            on_hdr_key_ = user->on_hdr_key;
-            on_hdr_val_ = user->on_hdr_val;
-            on_body_ = user->on_body;
-            on_frame_end_ = user->on_frame_end;
-        }
-        else
-        {
-            on_frame_ = on_frame_end_ = nullptr;
-            on_method_ = on_hdr_key_ = nullptr;
-            on_hdr_val_ = on_body_ = nullptr;
-        }
-
-        user_arg_ = arg;
-    }
-
-    void* user_arg() const noexcept
-    {
-        return user_arg_;
-    }
-
-private:
-    stomptalk::parser parser_{};
-    stomptalk::parser_hook hook_{*this};
-    stomptalk_cb on_frame_{};
-    stomptalk_id_cb on_method_{};
-    stomptalk_id_cb on_hdr_key_{};
-    stomptalk_data_cb on_hdr_val_{};
-    stomptalk_data_cb on_body_{};
-    stomptalk_cb on_frame_end_{};
-    void* user_arg_{};
-
-    void on_frame(
-        stomptalk::parser_hook&, const char* ptr) noexcept override
-    {
-        if (on_frame_)
-            on_frame_(this, ptr);
-    }
-
-    void on_method(stomptalk::parser_hook& hook, std::uint64_t id,
-        std::string_view method) noexcept override
-    {
-        if (on_method_)
-        {
-            if (on_method_(this, id, method.data(), method.size()))
-                hook.generic_error();
-        }
-    }
-
-    void on_hdr_key(stomptalk::parser_hook& hook, std::uint64_t id,
-        std::string_view key) noexcept override
-    {
-        if (on_hdr_key_)
-        {
-            if (on_hdr_key_(this, id, key.data(), key.size()))
-                hook.generic_error();
-        }
-    }
-
-    void on_hdr_val(stomptalk::parser_hook& hook,
-        std::string_view val) noexcept override
-    {
-        if (on_hdr_val_)
-        {
-            if (on_hdr_val_(this, val.data(), val.size()))
-                 hook.generic_error();
-        }
-    }
-
-    void on_body(stomptalk::parser_hook& hook,
-        const void* ptr, std::size_t size) noexcept override
-    {
-        if (on_body_)
-        {
-            if (on_body_(this, static_cast<const char*>(ptr), size))
-                 hook.generic_error();
-        }
-    }
-
-    void on_frame_end(
-        stomptalk::parser_hook&, const char* ptr) noexcept override
-    {
-        if (on_frame_end_)
-            on_frame_end_(this, ptr);
-    }
-};
-
-stomptalk_parser* stomptalk_parser_new()
-{
-    return new (std::nothrow) stomptalk_parser();
-}
-
-void stomptalk_parser_free(stomptalk_parser *parser)
-{
-    delete parser;
-}
-
-size_t stomptalk_parser_execute(stomptalk_parser *parser,
-                                const char *data, size_t len)
-{
-    assert(data);
-    assert(parser);
-
-    return static_cast<size_t>(parser->run(data, len));
-}
-
-void stomptalk_set_hook(stomptalk_parser *parser,
-                        const stomptalk_parser_hook *hook, void *arg)
-{
-    assert(parser);
-
-    parser->set(hook, arg);
-}
-
-void *stomptalk_get_hook_arg(stomptalk_parser *parser)
-{
-    assert(parser);
-
-    return parser->user_arg();
-}
-
-uint64_t stomptalk_get_content_length(stomptalk_parser *parser)
-{
-    assert(parser);
-
-    return parser->content_length();
-}
-
-size_t stomptalk_get_error(stomptalk_parser *parser)
-{
-    assert(parser);
-
-    return parser->get_error();
-}
-
-const char* stomptalk_get_error_str(size_t error)
-{
-    return "";
-}

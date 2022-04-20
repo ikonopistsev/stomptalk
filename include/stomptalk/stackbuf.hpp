@@ -1,7 +1,7 @@
 #pragma once
 
+#include <utility>
 #include <iterator>
-#include <string_view>
 
 namespace stomptalk {
 
@@ -9,14 +9,14 @@ template<class T, std::size_t Size>
 class stackbuf
 {
     T buf_[Size];
-    T* curr_{ buf_ };
+    T* curr_{buf_};
 
 public:
     stackbuf() = default;
 
-    std::basic_string_view<T> pop() noexcept
+    auto pop() noexcept
     {
-        std::basic_string_view<T> rc(buf_,
+        auto rc = std::make_pair(buf_,
             std::distance(buf_, curr_));
 
         curr_ = buf_;

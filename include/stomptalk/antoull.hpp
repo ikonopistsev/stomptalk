@@ -3,8 +3,8 @@
 #include <limits>
 #include <string>
 #include <cstdint>
+#include <cassert>
 #include <type_traits>
-#include <string_view>
 
 namespace stomptalk {
 namespace detail {
@@ -39,11 +39,16 @@ struct antout<T, 1>
 
 }
 
+} // namespace detail
+
+// return UNSIGNED result as SIGNED value;
+// if result < 0 then parse error;
 static inline
 std::int64_t antoull(const char *ptr, std::size_t n) noexcept
 {
     assert(ptr);
 
+    using namespace detail;
     switch (n)
     {
     case 0x12: return antout<std::int64_t, 0x12>::conv(ptr);
@@ -67,23 +72,8 @@ std::int64_t antoull(const char *ptr, std::size_t n) noexcept
     default:;
     }
 
+    // parse error
     return std::numeric_limits<std::int64_t>::min();
-}
-
-} // namespace detail
-
-// return UNSIGNED result as SIGNED value;
-// if result < 0 then parse error;
-static inline
-std::int64_t antoull(const char *ptr, std::size_t n) noexcept
-{
-    return detail::antoull(ptr, n);
-}
-
-static inline
-std::int64_t antoull(std::string_view text) noexcept
-{
-    return detail::antoull(text.data(), text.size());
 }
 
 } // namespace stomptalk
