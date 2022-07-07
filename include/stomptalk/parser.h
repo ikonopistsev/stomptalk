@@ -57,7 +57,7 @@ void stomptalk_set_hook(stomptalk_parser *parser,
 void *stomptalk_get_hook_arg(stomptalk_parser *parser);
 
 // Returns a string version of the stomp method.
-const char* stomptalk_method_str(size_t method);
+const char* stomptalk_method_str(uint64_t method);
 
 uint64_t stomptalk_get_content_length(stomptalk_parser *parser);
 

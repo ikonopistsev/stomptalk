@@ -212,6 +212,30 @@ const char* stomptalk_trim(const char *text, size_t *len)
     return nullptr;
 }
 
+const char* stomptalk_method_str(uint64_t method)
+{
+    switch (method)
+    {
+    case st_method_none: return "none";
+    case st_method_abort: return "ABORT";
+    case st_method_ack: return "ACK";
+    case st_method_begin: return "BEGIN";
+    case st_method_commit: return "COMMIT";
+    case st_method_connect: return "CONNECT";
+    case st_method_connected: return "CONNECTED";
+    case st_method_disconnect: return "DISCONNECT";
+    case st_method_error: return "ERROR";
+    case st_method_message: return "MESSAGE";
+    case st_method_nack: return "NACK";
+    case st_method_receipt: return "RECEIPT";
+    case st_method_send: return "SEND";
+    case st_method_stomp: return "STOMP";
+    case st_method_subscribe: return "SUBSCRIBE";
+    case st_method_unsubscribe: return "UNSUBSCRIBE";
+    default: ;
+    }
+    return "unknown";
+}
 
 const char* stomptalk_get_error_str(size_t error)
 {
