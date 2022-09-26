@@ -43,28 +43,38 @@ struct stomptalk_parser_hook {
     stomptalk_cb        on_frame_end;
 };
 
+STOMPTALK_EXPORT
 stomptalk_parser* stomptalk_parser_new();
 
+STOMPTALK_EXPORT
 void stomptalk_parser_free(stomptalk_parser *parser);
 
 // Executes the parser. Returns number of parsed bytes.
+STOMPTALK_EXPORT
 size_t stomptalk_parser_execute(stomptalk_parser *parser,
                                 const char *data, size_t len);
 
+STOMPTALK_EXPORT
 void stomptalk_set_hook(stomptalk_parser *parser,
                         const stomptalk_parser_hook *hook, void *arg);
 
+STOMPTALK_EXPORT
 void *stomptalk_get_hook_arg(stomptalk_parser *parser);
 
 // Returns a string version of the stomp method.
+STOMPTALK_EXPORT
 const char* stomptalk_method_str(uint64_t method);
 
+STOMPTALK_EXPORT
 uint64_t stomptalk_get_content_length(stomptalk_parser *parser);
 
+STOMPTALK_EXPORT
 size_t stomptalk_get_error(stomptalk_parser *parser);
 
+STOMPTALK_EXPORT
 const char* stomptalk_get_error_str(size_t error);
 
+STOMPTALK_EXPORT
 const char* stomptalk_version();
 
 #ifdef __cplusplus

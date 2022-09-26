@@ -11,7 +11,7 @@ namespace stomptalk {
 #define STOMPTALK_PARSER_STACK_SIZE 4096
 #endif
 
-class parser
+class STOMPTALK_EXPORT parser
 {
     using pointer = const char*;
     using state_type = pointer (parser::*)(parser_hook&, pointer, pointer);
