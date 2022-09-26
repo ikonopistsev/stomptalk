@@ -36,7 +36,7 @@ set(pub_header
 
 if (STOMPTALK_LIBRARY_STATIC)
     add_library(stomptalk STATIC ${source})
-    target_compile_definitions(stomptalk PRIVATE STOMPTALK_STATIC)
+    target_compile_definitions(stomptalk PUBLIC STOMPTALK_STATIC)
 else()
     add_library(stomptalk SHARED ${source})
     if (WIN32)
