@@ -15,11 +15,15 @@ typedef unsigned __int64 uint64_t;
 #endif
 
 #ifdef _WIN32
+#ifdef STOMPTALK_STATIC
+#  define STOMPTALK_EXPORT
+#else
 #ifdef STOMPTALK_MAKEDLL
 #  define STOMPTALK_EXPORT __declspec(dllexport)
 #else
 #  define STOMPTALK_EXPORT __declspec(dllimport)
 #endif
+#endif // STOMPTALK_STATIC
 #endif // _WIN32
 
 #endif // stomptalk_type_h

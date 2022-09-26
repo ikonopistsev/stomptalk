@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.7.2 LANGUAGES CXX)
+project(stomptalk VERSION 1.7.3 LANGUAGES CXX)
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
@@ -36,6 +36,9 @@ set(pub_header
 
 if (STOMPTALK_LIBRARY_STATIC)
     add_library(stomptalk STATIC ${source})
+    if (WIN32)
+        target_compile_definitions(stomptalk PRIVATE STOMPTALK_STATIC)
+    endif()    
 else()
     add_library(stomptalk SHARED ${source})
     if (WIN32)
