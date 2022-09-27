@@ -12,13 +12,16 @@ extern "C" {
 // does not working with negative numbers
 // return UNSIGNED result as SIGNED value;
 // if result < 0 then parse error;
+STOMPTALK_EXPORT
 int64_t stomptalk_antoull(const char *text, size_t len);
 
 // if fail - return 0
+STOMPTALK_EXPORT
 size_t stomptalk_antoll(int64_t *res, const char *text, size_t len);
 
 // remove spaceses from both sides
 // change len and return begin of string
+STOMPTALK_EXPORT
 const char* stomptalk_trim(const char *text, size_t *len);
 
 #ifdef __cplusplus
