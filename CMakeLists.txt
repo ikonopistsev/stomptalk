@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.7.4 LANGUAGES CXX)
+project(stomptalk VERSION 1.7.5 LANGUAGES CXX)
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
@@ -44,6 +44,11 @@ else()
     endif()
     set_target_properties(stomptalk PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
 endif()
+
+set_target_properties(stomptalk
+    PROPERTIES POSITION_INDEPENDENT_CODE
+    ON
+)
 
 target_include_directories(stomptalk PUBLIC include/)
 
