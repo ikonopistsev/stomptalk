@@ -135,7 +135,15 @@ parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
         {
             if (ch_isprint_nospace(ch))
             {
-                if (!sbuf_.push(ch))
+                // проверяем экранирование
+                if (ch == '\\')
+                {
+                    state_ = &parser::hdrline_hdr_key_escape;
+
+                    return (curr < end) ?
+                        hdrline_hdr_key_escape(hook, curr, end) : curr;
+                } 
+                else if (!sbuf_.push(ch))
                 {
                     hook.set(stomptalk_error_too_big);
                     return curr;
@@ -191,7 +199,15 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
 
         if (ch_isprint(ch))
         {
-            if (!sbuf_.push(ch))
+            // проверяем экранирование
+            if (ch == '\\')
+            {
+                state_ = &parser::hdrline_val_escape;
+
+                return (curr < end) ?
+                    hdrline_val_escape(hook, curr, end) : curr;
+            } 
+            else if (!sbuf_.push(ch))
             {
                 hook.set(stomptalk_error_too_big);
                 return curr;
@@ -231,6 +247,104 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
     } while (curr < end);
 
     return curr;
+}
+
+parser::pointer parser::hdrline_hdr_key_escape(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
+{
+    auto ch = *curr++;
+    // среди экранованных символов могут встречаться следующие
+    // \r (octet 92 and 114) translates to carriage return (octet 13)
+    // \n (octet 92 and 110) translates to line feed (octet 10)
+    // \c (octet 92 and 99) translates to : (octet 58)
+    // \\ (octet 92 and 92) translates to \ (octet 92)
+    // Undefined escape sequences such as \t (octet 92 and 116) MUST be treated as a fatal protocol error. 
+    // Conversely when encoding frame headers, the reverse transformation MUST be applied.
+    // 
+    // \ (char 92) мы уже пропарсили
+    // определяем какой символ был экранирован
+
+    switch (ch)
+    {
+    case 'r':
+        ch = '\r';
+        break;
+    case 'n':
+        ch = '\n';
+        break;
+    case 'c':
+        ch = ':';
+        break;
+    case '\\':
+        ch = '\\';
+        break;
+    default:
+        // все другие приводят к ошибке
+        hook.set(stomptalk_error_inval_frame);
+        return curr;
+    }
+
+    if (!sbuf_.push(ch))
+    {
+        hook.set(stomptalk_error_too_big);
+        return curr;
+    }
+    
+    hval_.push(ch);
+
+    state_ = &parser::hdrline_hdr_key;
+
+    return (curr < end) ?
+        hdrline_hdr_key(hook, curr, end) : curr;
+}
+
+parser::pointer parser::hdrline_val_escape(parser_hook& hook,
+    parser::pointer curr, parser::pointer end) noexcept
+{
+    auto ch = *curr++;
+    // среди экранованных символов могут встречаться следующие
+    // \r (octet 92 and 114) translates to carriage return (octet 13)
+    // \n (octet 92 and 110) translates to line feed (octet 10)
+    // \c (octet 92 and 99) translates to : (octet 58)
+    // \\ (octet 92 and 92) translates to \ (octet 92)
+    // Undefined escape sequences such as \t (octet 92 and 116) MUST be treated as a fatal protocol error. 
+    // Conversely when encoding frame headers, the reverse transformation MUST be applied.
+    // 
+    // \ (char 92) мы уже пропарсили
+    // определяем какой символ был экранирован
+
+    switch (ch)
+    {
+    case 'r':
+        ch = '\r';
+        break;
+    case 'n':
+        ch = '\n';
+        break;
+    case 'c':
+        ch = ':';
+        break;
+    case '\\':
+        ch = '\\';
+        break;
+    default:
+        // все другие приводят к ошибке
+        hook.set(stomptalk_error_inval_frame);
+        return curr;
+    }
+
+    if (!sbuf_.push(ch))
+    {
+        hook.set(stomptalk_error_too_big);
+        return curr;
+    }
+    
+    hval_.push(ch);
+
+    state_ = &parser::hdrline_val;
+
+    return (curr < end) ?
+        hdrline_val(hook, curr, end) : curr;
 }
 
 parser::pointer parser::hdrline_done(parser_hook& hook,
