@@ -8,7 +8,7 @@ namespace stomptalk {
 template<class T, std::size_t Size>
 class stackbuf
 {
-    static_assert(Size > 0);
+    static_assert(Size > 0, "Buffer size must be positive");
 
     T buf_[Size];
     T* curr_{buf_};
