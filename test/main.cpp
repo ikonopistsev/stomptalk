@@ -9,6 +9,7 @@
 // Windows implementation of gettimeofday
 // Note: struct timeval is already defined in winsock2.h
 int gettimeofday(struct timeval* tv, void* tz) {
+    (void)tz;  // Suppress unused parameter warning
     FILETIME ft;
     unsigned __int64 tmpres = 0;
 
