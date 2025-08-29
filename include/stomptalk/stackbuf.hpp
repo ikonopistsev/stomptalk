@@ -31,7 +31,7 @@ public:
     bool push(T ch) noexcept
     {
         auto b = buf_;
-        auto e = b + Size * sizeof(T);
+        auto e = b + Size;
         auto c = curr_;
 
         if (c < e)
