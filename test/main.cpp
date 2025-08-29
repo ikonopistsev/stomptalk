@@ -109,6 +109,7 @@ class hook
 
 int main()
 {
+    constexpr auto iter = 1000u;
     const char data_flow[] =
         "CONNECTED\r\n"
         "version:1.2\r\n"
@@ -207,18 +208,17 @@ int main()
 #ifdef NDEBUG
             data = data_flow;
 #endif
-            count += 10;
-            if (!(count % 100000000))
+            count += 1;  // Count each parsing iteration as 1 request
+            if (!(count % 10000))
             {
                 gettimeofday(&tv, nullptr);
                 auto ms = evutil_tv_to_msec(tv) - st;
-                double pps = (count / 1000000.0) / (ms / 1000.0);
+                double requests_per_sec = (count * 1000.0) / ms;  // requests per second
 
-                std::cout << time(nullptr) << ' ' << count / 1000000 << "M " << ms << ' '
-                          << std::fixed << std::setprecision(2) << std::setfill('0')
-                          << pps << "M r/s" << std::endl;
+                std::cout << "Processed: " << count << " requests in " << ms << "ms, "
+                          << std::fixed << std::setprecision(2) << (requests_per_sec / 1000000.0) << "M req/s" << std::endl;
 
-                if (count == 200000000)
+                if (count >= 50000)  // Stop after 50K iterations
                     break;
             }
         }
