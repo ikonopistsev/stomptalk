@@ -203,17 +203,17 @@ int main()
 #ifdef NDEBUG
             data = data_flow;
 #endif
-            count += 1;  // Count each parsing iteration as 1 request
-            if (!(count % 10000))
+            count += 10;  // Each iteration parses ~10 STOMP messages
+            if (!(count % 100000))  // Report every 100K messages (every 10K iterations)
             {
                 gettimeofday(&tv, nullptr);
                 auto ms = evutil_tv_to_msec(tv) - st;
                 double requests_per_sec = (count * 1000.0) / ms;  // requests per second
 
-                std::cout << "Processed: " << count << " requests in " << ms << "ms, "
-                          << std::fixed << std::setprecision(2) << (requests_per_sec / 1000000.0) << "M req/s" << std::endl;
+                std::cout << "Processed: " << count << " messages in " << ms << "ms, "
+                          << std::fixed << std::setprecision(2) << (requests_per_sec / 1000000.0) << "M msg/s" << std::endl;
 
-                if (count >= 50000)  // Stop after 50K iterations
+                if (count >= 500000)  // Stop after 500K messages (50K iterations)
                     break;
             }
         }
