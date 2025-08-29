@@ -57,6 +57,7 @@ if (STOMPTALK_BUILD_TESTS)
     enable_testing()
     add_executable(stomptalk_test test/main.cpp)
     target_link_libraries(stomptalk_test PRIVATE stomptalk)
+    add_test(NAME stomptalk_test COMMAND stomptalk_test)
 endif()
 
 if (STOMPTALK_LIBRARY_INSTALL)
