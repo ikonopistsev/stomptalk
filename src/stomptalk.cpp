@@ -165,7 +165,7 @@ int64_t stomptalk_antoull(const char *text, size_t len)
 {
     return static_cast<int64_t>(stomptalk::antoull(text, len));
 }
-
+// convert string to int64_t
 size_t stomptalk_antoll(int64_t *res, const char *text, size_t len)
 {
     assert(res);
@@ -174,6 +174,7 @@ size_t stomptalk_antoll(int64_t *res, const char *text, size_t len)
     {
         size_t minus = 0;
 
+        // negative number
         if (*text == '-')
         {
             minus = 1;
@@ -192,18 +193,26 @@ size_t stomptalk_antoll(int64_t *res, const char *text, size_t len)
     return 0;
 }
 
+// trim text
+// remove spaceses from both sides
+// change len and return begin of string
 const char* stomptalk_trim(const char *text, size_t *len)
 {
+    assert(len);
+
     size_t l = *len;
-    while (l && (*text == ' '))
+    // skip spaceses
+    while (l && (' ' == *text))
         ++text, --l;
 
     if (l && text)
     {
+        // last char
         const char *last = text + l  - 1;
-        while ((text != last) && (*last == ' '))
+        while ((text != last) && (' ' == *last))
             --last, --l;
 
+        // new len
         *len = l;
         return text;
     }

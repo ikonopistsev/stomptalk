@@ -30,6 +30,12 @@ private:
     pointer hdrline_val(parser_hook& hook,
         pointer curr, pointer end) noexcept;
 
+    pointer hdrline_hdr_key_escape(parser_hook& hook,
+        pointer curr, pointer end) noexcept;
+
+    pointer hdrline_val_escape(parser_hook& hook,
+        pointer curr, pointer end) noexcept;
+
     pointer hdrline_done(parser_hook& hook,
         pointer curr, pointer end) noexcept;
 

@@ -50,6 +50,7 @@ STOMPTALK_EXPORT
 void stomptalk_parser_free(stomptalk_parser *parser);
 
 // Executes the parser. Returns number of parsed bytes.
+// if return value != len the error occurred.
 STOMPTALK_EXPORT
 size_t stomptalk_parser_execute(stomptalk_parser *parser,
                                 const char *data, size_t len);
