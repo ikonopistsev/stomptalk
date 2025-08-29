@@ -22,6 +22,9 @@ struct hook_base
     virtual void on_body(parser_hook&, const void*, std::size_t) noexcept = 0;
  
     virtual void on_frame_end(parser_hook&, const char *frame_end) noexcept = 0;
+
+protected:
+    ~hook_base() = default;
 };
 
 } // namespace stomptalk
