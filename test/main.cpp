@@ -7,15 +7,10 @@
 #include <winsock2.h>
 
 // Windows implementation of gettimeofday
-struct timeval {
-    long tv_sec;
-    long tv_usec;
-};
-
+// Note: struct timeval is already defined in winsock2.h
 int gettimeofday(struct timeval* tv, void* tz) {
     FILETIME ft;
     unsigned __int64 tmpres = 0;
-    static int tzflag = 0;
 
     if (tv) {
         GetSystemTimeAsFileTime(&ft);
@@ -109,7 +104,6 @@ class hook
 
 int main()
 {
-    constexpr auto iter = 1000u;
     const char data_flow[] =
         "CONNECTED\r\n"
         "version:1.2\r\n"
