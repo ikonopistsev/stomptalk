@@ -1,7 +1,44 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+
+#ifdef _WIN32
+#include <windows.h>
+#include <winsock2.h>
+
+// Windows implementation of gettimeofday
+struct timeval {
+    long tv_sec;
+    long tv_usec;
+};
+
+int gettimeofday(struct timeval* tv, void* tz) {
+    FILETIME ft;
+    unsigned __int64 tmpres = 0;
+    static int tzflag = 0;
+
+    if (tv) {
+        GetSystemTimeAsFileTime(&ft);
+
+        tmpres |= ft.dwHighDateTime;
+        tmpres <<= 32;
+        tmpres |= ft.dwLowDateTime;
+
+        // Convert to microseconds
+        tmpres /= 10;
+        // Convert from 1601 to 1970 epoch
+        tmpres -= 11644473600000000ULL;
+
+        tv->tv_sec = (long)(tmpres / 1000000UL);
+        tv->tv_usec = (long)(tmpres % 1000000UL);
+    }
+
+    return 0;
+}
+#else
 #include <sys/time.h>
+#endif
+
 #include "stomptalk/parser.hpp"
 
 static std::string header_key;
@@ -186,8 +223,6 @@ int main()
             }
         }
     }
-
-    //frame_free(f);
 
     return 0;
 }
