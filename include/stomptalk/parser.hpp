@@ -13,6 +13,7 @@ namespace stomptalk {
 
 class STOMPTALK_EXPORT parser
 {
+public:
     using pointer = const char*;
     using state_type = pointer (parser::*)(parser_hook&, pointer, pointer);
 
@@ -53,6 +54,26 @@ private:
     state_type state_{&parser::start_state};
     stackbuf<char, STOMPTALK_PARSER_STACK_SIZE> sbuf_{};
     hashval<char> hval_{};
+    bool escape_{false};
+
+    auto push(parser_hook& hook, char c) noexcept 
+    {
+        if (!sbuf_.push(c)) 
+        { 
+            hook.set(stomptalk_error_too_big); 
+            return false; 
+        }
+        hval_.push(c);
+        return true;
+    }
+
+    auto tailcall(parser_hook& hook, state_type next, 
+        pointer curr, pointer end) noexcept 
+    {
+        state_ = next;
+        return (curr < end) ? 
+            (this->*next)(hook, curr, end) : curr;
+    }       
 
 public:
     parser() = default;

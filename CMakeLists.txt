@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.7.5 LANGUAGES CXX)
+project(stomptalk VERSION 1.8.0 LANGUAGES CXX)
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
+option(STOMPTALK_BUILD_TESTS "Build tests" OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -51,6 +52,12 @@ set_target_properties(stomptalk
 )
 
 target_include_directories(stomptalk PUBLIC include/)
+
+if (STOMPTALK_BUILD_TESTS)
+    enable_testing()
+    add_executable(stomptalk_test test/main.cpp)
+    target_link_libraries(stomptalk_test PRIVATE stomptalk)
+endif()
 
 if (STOMPTALK_LIBRARY_INSTALL)
     include(GNUInstallDirs)

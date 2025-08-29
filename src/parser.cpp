@@ -5,10 +5,15 @@
 
 namespace stomptalk {
 
-static inline bool ch_isupper(char ch) noexcept
-{
-    return ('A' <= ch) && (ch <= 'Z');
-    //return 0 == std::isupper(ch);
+
+static inline bool ch_isupper(unsigned char ch) noexcept { 
+    return ch >= 'A' && ch <= 'Z';
+}
+static inline bool ch_isprint(unsigned char ch) noexcept { 
+    return ch >= 32 && ch <= 126; 
+}
+static inline bool ch_isprint_nospace(unsigned char ch) noexcept { 
+    return ch > 32 && ch <= 126; 
 }
 
 parser::pointer parser::start_state(parser_hook& hook,
@@ -29,6 +34,7 @@ parser::pointer parser::start_state(parser_hook& hook,
         sbuf_.reset();
         hval_.reset();
         hook.reset();
+        escape_ = false;
         // передаем позицию в буфере
         hook.on_frame(curr - 1);
 
@@ -38,13 +44,7 @@ parser::pointer parser::start_state(parser_hook& hook,
         hval_.push(ch);
 
         // переходим к разбору метода
-        state_ = &parser::method_state;
-
-        if (curr < end)
-            return method_state(hook, curr, end);
-
-        return curr;
-
+        return tailcall(hook, &parser::method_state, curr, end);
     } while (curr < end);
 
     return curr;
@@ -58,13 +58,9 @@ parser::pointer parser::method_state(parser_hook& hook,
 
         if (ch_isupper(ch))
         {
-            if (!sbuf_.push(ch))
-            {
-                hook.set(stomptalk_error_too_big);
-                return curr;
+            if (!push(hook, ch)) { 
+                return curr; 
             }
-            
-            hval_.push(ch);
         }
         else
         {
@@ -75,10 +71,7 @@ parser::pointer parser::method_state(parser_hook& hook,
                 hook.on_method(hval_.pop(), sbuf_.pop());
 
                 // переходим к поиску конца метода
-                state_ = &parser::hdrline_done;
-
-                return (curr < end) ?
-                    hdrline_done(hook, curr, end) : curr;
+                return tailcall(hook, &parser::hdrline_done, curr, end);
             }
             else if (ch == '\r')
             {
@@ -87,10 +80,7 @@ parser::pointer parser::method_state(parser_hook& hook,
                 hook.on_method(hval_.pop(), sbuf_.pop());
 
                 // переходим к поиску конца метода
-                state_ = &parser::hdrline_almost_done;
-
-                return (curr < end) ?
-                    hdrline_almost_done(hook, curr, end) : curr;
+                return tailcall(hook, &parser::hdrline_almost_done, curr, end);
             }
             else
             {
@@ -104,134 +94,132 @@ parser::pointer parser::method_state(parser_hook& hook,
     return curr;
 }
 
-//static inline bool ch_isprint(char ch) noexcept
-//{
-//    return (ch >= 32) && (ch <= 126);
-//}
-
-static inline bool ch_isprint_nospace(char ch) noexcept
-{
-    return (ch > 32) && (ch <= 126);
-}
-
 parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
-    do
-    {
-        auto ch = *curr++;
+    do {
+        unsigned char ch = static_cast<unsigned char>(*curr++);
 
-        if (ch == ':')
+        // 1) Продолжение escape-последовательности?
+        if (escape_) 
         {
-            // выполняем каллбек на хидер
-            hook.on_hdr_key(hval_.pop(), sbuf_.pop());
-
-            state_ = &parser::hdrline_val;
-
-            return (curr < end) ?
-                hdrline_val(hook, curr, end) : curr;
-        }
-        else
-        {
-            if (ch_isprint_nospace(ch))
-            {
-                if (!sbuf_.push(ch))
-                {
-                    hook.set(stomptalk_error_too_big);
+            switch (ch) {
+                case 'n': ch = '\n'; break;
+                case 'r': ch = '\r'; break;
+                case 'c': ch = ':';  break;
+                case '\\': ch = '\\'; break;
+                default:
+                    hook.set(stomptalk_error_inval_frame);
                     return curr;
-                }
-
-                hval_.push(ch);
             }
-            else
-            {
-                if (ch == '\n')
+            // записали раскодированный символ в ключ + хэш
+            if (!push(hook, ch)) { 
+                return curr; 
+            }
+
+            escape_ = false;
+            continue; // берём следующий байт
+        }
+
+        // 2) Не в escape-режиме: специальные символы
+        switch (ch) 
+        {
+            case '\\':
+                escape_ = true;
+                continue; // ждём следующий байт (сам бэкслеш не пишем)
+
+            case ':':
+                // конец ключа → в значение
+                hook.on_hdr_key(hval_.pop(), sbuf_.pop());
+                escape_ = false;  // на всякий случай
+                return tailcall(hook, &parser::hdrline_val, curr, end);
+
+            case '\n':
+                // пустая строка → конец заголовков
+                sbuf_.reset();
+                hval_.reset();
+                escape_ = false;
+                return tailcall(hook, &parser::hdrline_done, curr, end);
+            case '\r':
+                sbuf_.reset();
+                hval_.reset();
+                escape_ = false;
+                return tailcall(hook, &parser::hdrline_almost_done, curr, end);
+
+            default:
+                // 3) Обычный символ ключа
+                if (ch_isprint_nospace(ch)) 
                 {
-                    sbuf_.pop();
-                    hval_.reset();
-
-                    state_ = &parser::hdrline_done;
-
-                    return (curr < end) ?
-                        hdrline_done(hook, curr, end) : curr;
-                }
-                else if (ch == '\r')
-                {
-                    sbuf_.pop();
-                    hval_.reset();
-
-                    state_ = &parser::hdrline_almost_done;
-
-                    return (curr < end) ?
-                        hdrline_almost_done(hook, curr, end) : curr;
-                }
-                else
+                    if (!push(hook, ch)) { 
+                        return curr; 
+                    }
+                } 
+                else 
                 {
                     hook.set(stomptalk_error_inval_frame);
                     return curr;
                 }
-            }
         }
-
     } while (curr < end);
 
     return curr;
-}
-
-static inline bool ch_isprint(char ch) noexcept
-{
-    return (ch >= 32) && (ch <= 126);
 }
 
 parser::pointer parser::hdrline_val(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
     do {
-        auto ch = *curr++;
+        unsigned char ch = static_cast<unsigned char>(*curr++);
 
-        if (ch_isprint(ch))
+        if (escape_) 
         {
-            if (!sbuf_.push(ch))
+            switch (ch) 
             {
+                case 'n': ch = '\n'; break;
+                case 'r': ch = '\r'; break;
+                case 'c': ch = ':';  break;
+                case '\\': ch = '\\'; break;
+                default:
+                    hook.set(stomptalk_error_inval_frame);
+                    return curr;
+            }
+            if (!sbuf_.push(static_cast<char>(ch))) {
                 hook.set(stomptalk_error_too_big);
                 return curr;
             }
+            escape_ = false;
+            continue;
         }
-        else
+
+        if (ch_isprint(ch)) 
         {
-            if (ch == '\r')
-            {
-                // сохраняем параметры стека
-                hook.on_hdr_val(sbuf_.pop());
-
-                // переходим к поиску конца метода
-                state_ = &parser::hdrline_almost_done;
-
-                return (curr < end) ?
-                    hdrline_almost_done(hook, curr, end) : curr;
+            if (ch == '\\') {
+                escape_ = true;
+                continue;
             }
-            else if (ch == '\n')
-            {
-                // сохраняем параметры стека
-                hook.on_hdr_val(sbuf_.pop());
-
-                // переходим к поиску конца метода
-                state_ = &parser::hdrline_done;
-
-                return (curr < end) ?
-                    hdrline_done(hook, curr, end) : curr;
+            if (!sbuf_.push(static_cast<char>(ch))) {
+                hook.set(stomptalk_error_too_big);
+                return curr;
             }
-            else
-            {
+        } else {
+            if (ch == '\r') {
+                hook.on_hdr_val(sbuf_.pop());
+                escape_ = false;
+                return tailcall(hook, &parser::hdrline_almost_done, curr, end);
+            } else if (ch == '\n') {
+                hook.on_hdr_val(sbuf_.pop());
+                escape_ = false;
+                return tailcall(hook, &parser::hdrline_done, curr, end);
+            } else {
                 hook.set(stomptalk_error_inval_frame);
                 return curr;
             }
         }
-
     } while (curr < end);
 
     return curr;
 }
+
 
 parser::pointer parser::hdrline_done(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
@@ -242,18 +230,12 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
     if (ch == '\r')
     {
         // переходим к поиску конца метода
-        state_ = &parser::almost_done;
-
-        return (curr < end) ?
-            almost_done(hook, curr, end) : curr;
+        return tailcall(hook, &parser::almost_done, curr, end);
     }
     else if (ch == '\n')
     {
         // переходим к поиску конца метода
-        state_ = &parser::done;
-
-        return (curr < end) ?
-            done(hook, curr, end) : curr;
+        return tailcall(hook, &parser::done, curr, end);
     }
 
     // иначе это следующий хидер
@@ -270,13 +252,8 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
     }
 
     hval_.push(ch);
-
-    state_ = &parser::hdrline_hdr_key;
-
-    return (curr < end) ?
-        hdrline_hdr_key(hook, curr, end) : curr;
-
-//    return curr;
+    escape_ = false;  
+    return tailcall(hook, &parser::hdrline_hdr_key, curr, end);
 }
 
 parser::pointer parser::hdrline_almost_done(parser_hook& hook,
@@ -289,49 +266,21 @@ parser::pointer parser::hdrline_almost_done(parser_hook& hook,
     }
 
     // переходим к поиску конца метода
-    state_ = &parser::hdrline_done;
-
-    return (curr < end) ?
-        hdrline_done(hook, curr, end) : curr;
+    return tailcall(hook, &parser::hdrline_done, curr, end);
 }
 
 parser::pointer parser::done(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
-    auto ch = *curr;
-
-    // конец фрейма
-    if (ch == '\0')
+    if (*curr == '\0') 
     {
-        state_ = &parser::start_state;
-
-        // закончили
         hook.on_frame_end(curr);
-
-        // сдвигаем курсор
-        ++curr;
+        return tailcall(hook, &parser::start_state, ++curr, end);
     }
-    else
-    {
-        if (hook.content_left() > 0)
-        {
-            // выбираем как будем читать боди
-            state_ = &parser::body_read;
-
-            if (curr < end)
-                return body_read(hook, curr, end);
-        }
-        else
-        {
-            // выбираем как будем читать боди
-            state_ = &parser::body_read_no_length;
-
-            if (curr < end)
-                return body_read_no_length(hook, curr, end);
-        }
-    }
-
-    return curr;
+    // выбираем как будем читать боди
+    return tailcall(hook, 
+        (hook.content_left() > 0) ? &parser::body_read : 
+            &parser::body_read_no_length, curr, end);
 }
 
 
@@ -345,39 +294,31 @@ parser::pointer parser::almost_done(parser_hook& hook,
     }
 
     // переходим к поиску конца метода
-    state_ = &parser::done;
-
-    return (curr < end) ?
-        done(hook, curr, end) : curr;
+    return tailcall(hook, &parser::done, curr, end);
 }
 
 parser::pointer parser::body_read(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
-    auto to_read = static_cast<std::size_t>(std::distance(curr, end));
-    auto content_length = hook.content_left();
-
-    to_read = static_cast<std::size_t>(
-        (std::min)(static_cast<std::uint64_t>(to_read), content_length));
+    auto avail = static_cast<std::size_t>(end - curr);
+    auto left = hook.content_left();
+    auto to_read = static_cast<std::size_t>(
+        (std::min)(static_cast<std::uint64_t>(avail), left)
+    );
 
     if (to_read > 0)
     {
-        content_length -= to_read;
-        hook.set(content_length);
-
+        left -= to_read;
+        hook.set(left);
         hook.on_body(curr, to_read);
     }
 
     curr += to_read;
 
-    if (content_length == 0)
-    {
-        state_ = &parser::frame_end;
+    if (left == 0)
+        return tailcall(hook, &parser::frame_end, curr, end);
 
-        if (curr < end)
-            return frame_end(hook, curr, end);
-    }
-
+    // данных больше нет
     return curr;
 }
 
@@ -398,7 +339,7 @@ parser::pointer parser::body_read_no_length(parser_hook& hook,
     } while (curr < end);
 
     // считаем количество данных боди
-    auto to_read = static_cast<std::size_t>(std::distance(beg, curr));
+    auto to_read = static_cast<std::size_t>(curr - beg);
 
     if (to_read > 0)
     {
@@ -435,7 +376,7 @@ std::size_t parser::run(parser_hook& hook,
     while ((curr < end) && hook.ok())
         curr = (this->*state_)(hook, curr, end);
 
-    return static_cast<std::size_t>(std::distance(begin, curr));
+    return static_cast<std::size_t>(curr - begin);
 }
 
 } // namespace stomptalk

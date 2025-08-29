@@ -8,20 +8,19 @@ namespace stomptalk {
 template<class T, std::size_t Size>
 class stackbuf
 {
+    static_assert(Size > 0);
+
     T buf_[Size];
     T* curr_{buf_};
 
 public:
     stackbuf() = default;
 
-    auto pop() noexcept
+    [[nodiscard]] std::pair<T*, std::size_t> pop() noexcept
     {
-        auto rc = std::make_pair(buf_,
-            std::distance(buf_, curr_));
-
+        auto len = static_cast<std::size_t>(curr_ - buf_);
         curr_ = buf_;
-
-        return rc;
+        return { buf_, len };
     }
 
     void reset() noexcept
@@ -32,7 +31,7 @@ public:
     bool push(T ch) noexcept
     {
         auto b = buf_;
-        auto e = b + sizeof(buf_);
+        auto e = b + Size * sizeof(T);
         auto c = curr_;
 
         if (c < e)
