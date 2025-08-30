@@ -325,29 +325,25 @@ parser::pointer parser::body_read(parser_hook& hook,
 parser::pointer parser::body_read_no_length(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
-    const char *beg = curr;
+    auto beg = curr;
+    auto avail = static_cast<std::size_t>(end - curr);
+    auto nul = static_cast<parser::pointer>(
+        std::memchr(curr, '\0', avail)
+    );
 
-    do {
-        if (*curr++ == '\0')
-        {
-            // если достигли конца переходим к новому фрейму
-            state_ = &parser::frame_end;
-            // вернемся назад чтобы обработать каллбек
-            --curr;
-            break;
+    if (nul) {
+        auto to_read = static_cast<std::size_t>(nul - beg);
+        if (to_read > 0) {
+            hook.on_body(beg, to_read);
         }
-    } while (curr < end);
-
-    // считаем количество данных боди
-    auto to_read = static_cast<std::size_t>(curr - beg);
-
-    if (to_read > 0)
-    {
-        // сообщаем о боди
-        hook.on_body(beg, to_read);
+        return tailcall(hook, &parser::frame_end, nul, end);
     }
 
-    return curr;
+    if (avail > 0) {
+        hook.on_body(beg, avail);
+    }
+
+    return end;
 }
 
 parser::pointer parser::frame_end(parser_hook& hook,
