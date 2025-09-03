@@ -448,7 +448,16 @@ void test_frames_with_lf_delimiters() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data) + 1; // include null terminator
+    // Вычисляем размер вручную, так как strlen остановится на первом \0
+    auto connect_part = "CONNECT\n"
+                        "accept-version:1.2\n"
+                        "host:localhost\n"
+                        "\n\0";
+    auto send_part = "SEND\n"
+                     "destination:/queue/test\n"
+                     "content-type:text/plain\n"
+                     "\n\0";
+    auto size = strlen(connect_part) + 1 + strlen(send_part) + 1;
     auto parsed = parser.run(hook, data, size);
     
     // Парсер должен поглотить все переданные данные
@@ -577,7 +586,22 @@ void test_heartbeat_between_frames() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data) + 1; // include null terminator
+    // Вычисляем размер вручную для корректной обработки множественных \0
+    auto connect_part = "CONNECT\r\n"
+                        "host:localhost\r\n" 
+                        "accept-version:1.2\r\n"
+                        "\r\n\0";
+    auto heartbeat_part = "\n\n\n";
+    auto send_part = "SEND\r\n"
+                     "destination:/queue/test\r\n"
+                     "\r\n\0";
+    auto heartbeat2_part = "\n";
+    auto disconnect_part = "DISCONNECT\r\n"
+                          "\r\n\0";
+    
+    auto size = strlen(connect_part) + 1 + strlen(heartbeat_part) + 
+                strlen(send_part) + 1 + strlen(heartbeat2_part) + 
+                strlen(disconnect_part) + 1;
     auto parsed = parser.run(hook, data, size);
     
     // Парсер должен поглотить все переданные данные
@@ -625,7 +649,21 @@ void test_mixed_whitespace_between_frames() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data) + 1; // include null terminator
+    // Вычисляем размер вручную для корректной обработки множественных \0
+    auto connect_part = "CONNECT\n"
+                        "host:test.com\n"
+                        "\n\0";
+    auto whitespace_part = "\r\n\r\n\0\0\n";
+    auto send_part = "SEND\r\n"
+                     "destination:/topic/news\r\n"
+                     "\r\n\0";
+    auto whitespace2_part = "\n\r\n\0";
+    auto disconnect_part = "DISCONNECT\n"
+                          "\n\0";
+    
+    auto size = strlen(connect_part) + 1 + strlen(whitespace_part) + 
+                strlen(send_part) + 1 + strlen(whitespace2_part) + 
+                strlen(disconnect_part) + 1;
     auto parsed = parser.run(hook, data, size);
     
     // Парсер должен поглотить все переданные данные
@@ -678,7 +716,30 @@ void test_header_id_validation() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data) + 1; // include null terminator
+    // Вычисляем размер вручную для корректной обработки множественных \0
+    auto connect_part = "CONNECT\r\n"
+                        "accept-version:1.2\r\n"
+                        "host:stomp.example.com\r\n"
+                        "login:testuser\r\n"
+                        "passcode:secret123\r\n"
+                        "heart-beat:10000,10000\r\n"
+                        "\r\n\0";
+    auto send_part = "SEND\r\n"
+                     "destination:/queue/test\r\n"
+                     "content-type:application/json\r\n"
+                     "content-length:25\r\n"
+                     "receipt:send-001\r\n"
+                     "transaction:tx-123\r\n"
+                     "\r\n"
+                     "{\"message\":\"hello world\"}\0";
+    auto message_part = "MESSAGE\r\n"
+                        "subscription:sub-1\r\n"
+                        "message-id:msg-456\r\n"
+                        "destination:/topic/updates\r\n"
+                        "timestamp:1693737600000\r\n"
+                        "\r\n\0";
+    
+    auto size = strlen(connect_part) + 1 + strlen(send_part) + 1 + strlen(message_part) + 1;
     auto parsed = parser.run(hook, data, size);
     
     // Парсер должен поглотить все переданные данные
@@ -733,7 +794,18 @@ void test_multiple_frames() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data) + 1; // include null terminator
+    // Вычисляем размер вручную для корректной обработки множественных \0
+    auto connect_part = "CONNECT\r\n"
+                        "host:localhost\r\n"
+                        "accept-version:1.2\r\n"
+                        "\r\n\0";
+    auto send_part = "SEND\r\n"
+                     "destination:/queue/test\r\n"
+                     "\r\n\0";
+    auto disconnect_part = "DISCONNECT\r\n"
+                          "\r\n\0";
+    
+    auto size = strlen(connect_part) + 1 + strlen(send_part) + 1 + strlen(disconnect_part) + 1;
     auto parsed = parser.run(hook, data, size);
     
     // Парсер должен поглотить все переданные данные
