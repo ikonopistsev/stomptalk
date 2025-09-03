@@ -133,9 +133,11 @@ void test_connect_frame() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
     
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_connect);
@@ -173,9 +175,11 @@ void test_connected_frame() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_connected);
@@ -210,9 +214,11 @@ void test_send_frame() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_send);
@@ -249,9 +255,11 @@ void test_subscribe_frame() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_subscribe);
@@ -289,9 +297,11 @@ void test_message_frame() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_message);
@@ -329,9 +339,11 @@ void test_ack_frame() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_ack);
@@ -363,9 +375,11 @@ void test_disconnect_frame() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_disconnect);
@@ -384,7 +398,7 @@ void test_error_frame() {
     const char* data = 
         "ERROR\r\n"
         "message:Invalid destination\r\n"
-        "content-length:20\r\n"
+        "content-length:21\r\n"
         "\r\n"
         "Destination not found\0";
 
@@ -398,9 +412,11 @@ void test_error_frame() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_error);
@@ -437,6 +453,7 @@ void test_frames_with_lf_delimiters() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 2);
     
@@ -479,9 +496,11 @@ void test_message_without_content_length() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_message);
@@ -519,9 +538,11 @@ void test_receipt_frame() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
+    (void)frame;
     
     assert(frame.completed);
     assert(frame.method_id == st_method_receipt);
@@ -561,6 +582,7 @@ void test_heartbeat_between_frames() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 3);
     
@@ -608,6 +630,7 @@ void test_mixed_whitespace_between_frames() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 3);
     
@@ -660,6 +683,7 @@ void test_header_id_validation() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 3);
     
@@ -714,6 +738,7 @@ void test_multiple_frames() {
     
     // Парсер должен поглотить все переданные данные
     assert(parsed == size);
+    (void)parsed;
 
     assert(frames.size() == 3);
     
