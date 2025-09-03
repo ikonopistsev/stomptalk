@@ -2,19 +2,9 @@
 #include <cstring>
 #include <cassert>
 #include <algorithm>
+#include <emmintrin.h>
 
 namespace stomptalk {
-
-
-static inline bool ch_isupper(unsigned char ch) noexcept { 
-    return ch >= 'A' && ch <= 'Z';
-}
-static inline bool ch_isprint(unsigned char ch) noexcept { 
-    return ch >= 32 && ch <= 126; 
-}
-static inline bool ch_isprint_nospace(unsigned char ch) noexcept { 
-    return ch > 32 && ch <= 126; 
-}
 
 parser::pointer parser::start_state(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
@@ -220,7 +210,6 @@ parser::pointer parser::hdrline_val(parser_hook& hook,
     return curr;
 }
 
-
 parser::pointer parser::hdrline_done(parser_hook& hook,
     parser::pointer curr, parser::pointer end) noexcept
 {
@@ -245,13 +234,9 @@ parser::pointer parser::hdrline_done(parser_hook& hook,
         return curr;
     }
 
-    if (!sbuf_.push(ch))
-    {
-        hook.set(stomptalk_error_too_big);
+    if (!push(hook, ch))
         return curr;
-    }
 
-    hval_.push(ch);
     escape_ = false;  
     return tailcall(hook, &parser::hdrline_hdr_key, curr, end);
 }

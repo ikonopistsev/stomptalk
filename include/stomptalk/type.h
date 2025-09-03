@@ -28,4 +28,12 @@ typedef unsigned __int64 uint64_t;
 #endif // _WIN32
 #endif // STOMPTALK_STATIC
 
+#if defined(_MSC_VER)
+  #define STOMPTALK_FORCE_INLINE __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+  #define STOMPTALK_FORCE_INLINE inline __attribute__((always_inline))
+#else
+  #define STOMPTALK_FORCE_INLINE inline
+#endif
+
 #endif // stomptalk_type_h

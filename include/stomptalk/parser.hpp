@@ -11,6 +11,21 @@ namespace stomptalk {
 #define STOMPTALK_PARSER_STACK_SIZE 4096
 #endif
 
+STOMPTALK_FORCE_INLINE
+static bool ch_isprint(unsigned char ch) noexcept { 
+    return ch >= 32 && ch <= 126; 
+}
+
+STOMPTALK_FORCE_INLINE
+static bool ch_isprint_nospace(unsigned char ch) noexcept { 
+    return ch > 32 && ch <= 126; 
+}
+
+STOMPTALK_FORCE_INLINE
+static bool ch_isupper(unsigned char ch) noexcept { 
+    return ch >= 'A' && ch <= 'Z';
+}
+
 class STOMPTALK_EXPORT parser
 {
 public:
@@ -28,12 +43,6 @@ private:
         pointer curr, pointer end) noexcept;
 
     pointer hdrline_val(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer hdrline_hdr_key_escape(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer hdrline_val_escape(parser_hook& hook,
         pointer curr, pointer end) noexcept;
 
     pointer hdrline_done(parser_hook& hook,
@@ -62,17 +71,20 @@ private:
     hashval<char> hval_{};
     bool escape_{false};
 
+    STOMPTALK_FORCE_INLINE
     auto push(parser_hook& hook, char c) noexcept 
     {
-        if (!sbuf_.push(c)) 
-        { 
-            hook.set(stomptalk_error_too_big); 
-            return false; 
+        if (sbuf_.push(c)) 
+        {
+            hval_.push(c);
+            return true;
         }
-        hval_.push(c);
-        return true;
+
+        hook.set(stomptalk_error_too_big); 
+        return false;
     }
 
+    STOMPTALK_FORCE_INLINE
     auto tailcall(parser_hook& hook, state_type next, 
         pointer curr, pointer end) noexcept 
     {
