@@ -1,0 +1,74 @@
+Start testing: Sep 03 22:00 EEST
+----------------------------------------------------------
+1/2 Testing: stomptalk_test
+1/2 Test: stomptalk_test
+Command: "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux/stomptalk_test"
+Directory: /home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux
+"stomptalk_test" start time: Sep 03 22:00 EEST
+Output:
+----------------------------------------------------------
+Processed: 100000 messages in 13ms, 7.69M msg/s
+Processed: 200000 messages in 24ms, 8.33M msg/s
+Processed: 300000 messages in 34ms, 8.82M msg/s
+Processed: 400000 messages in 47ms, 8.51M msg/s
+Processed: 500000 messages in 57ms, 8.77M msg/s
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"stomptalk_test" end time: Sep 03 22:00 EEST
+"stomptalk_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: stomptalk_unit_test
+2/2 Test: stomptalk_unit_test
+Command: "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux/stomptalk_unit_test"
+Directory: /home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux
+"stomptalk_unit_test" start time: Sep 03 22:00 EEST
+Output:
+----------------------------------------------------------
+Running STOMP parser unit tests...
+
+Testing CONNECT frame...
+  Data size: 92, parsed: 92
+  Frames count: 1
+✓ CONNECT frame test passed
+Testing CONNECTED frame...
+✓ CONNECTED frame test passed
+Testing SEND frame...
+✓ SEND frame test passed
+Testing SUBSCRIBE frame...
+✓ SUBSCRIBE frame test passed
+Testing MESSAGE frame...
+✓ MESSAGE frame test passed
+Testing ACK frame...
+✓ ACK frame test passed
+Testing DISCONNECT frame...
+✓ DISCONNECT frame test passed
+Testing ERROR frame...
+✓ ERROR frame test passed
+Testing frames with LF delimiters...
+✓ LF delimiters test passed
+Testing MESSAGE without content-length...
+✓ MESSAGE without content-length test passed
+Testing RECEIPT frame...
+✓ RECEIPT frame test passed
+Testing heartbeat (ping) between frames...
+✓ Heartbeat between frames test passed
+Testing mixed whitespace between frames...
+✓ Mixed whitespace test passed
+Testing header ID validation...
+✓ Header ID validation test passed
+Testing multiple frames...
+✓ Multiple frames test passed
+
+🎉 All tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"stomptalk_unit_test" end time: Sep 03 22:00 EEST
+"stomptalk_unit_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 03 22:00 EEST

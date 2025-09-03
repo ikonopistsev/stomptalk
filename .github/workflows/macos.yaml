@@ -13,9 +13,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Setup build environment
         run: |
-          brew install cmake ninja
+          # Проверяем наличие CMake и Ninja
+          echo "Checking build tools..."
+          
+          if command -v cmake &> /dev/null; then
+            echo "✅ CMake found: $(cmake --version | head -1)"
+          else
+            echo "❌ CMake not found, installing..."
+            brew install cmake
+          fi
+          
+          if command -v ninja &> /dev/null; then
+            echo "✅ Ninja found: $(ninja --version)"
+          else
+            echo "❌ Ninja not found, installing..."
+            brew install ninja
+          fi
+          
+          echo "✅ C++ compiler: $(c++ --version | head -1)"
 
       - name: Configure CMake
         run: |

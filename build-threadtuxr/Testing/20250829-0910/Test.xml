@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20250829-0910-Experimental"
+	Name="(empty)"
+	Generator="ctest-4.1.0"
+	CompilerName=""
+	CompilerVersion=""
+	OSName="Linux"
+	Hostname="threadtux"
+	OSRelease="6.12.41"
+	OSVersion="#1 SMP PREEMPT_DYNAMIC Mon Aug 18 12:30:35 EEST 2025"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="AuthenticAMD"
+	VendorID="Advanced Micro Devices"
+	FamilyID="25"
+	ModelID="97"
+	ModelName="AMD Ryzen 9 7900X3D 12-Core Processor"
+	ProcessorCacheSize="1024"
+	NumberOfLogicalCPU="24"
+	NumberOfPhysicalCPU="12"
+	TotalVirtualMemory="65535"
+	TotalPhysicalMemory="63503"
+	LogicalProcessorsPerPhysical="2"
+	ProcessorClockFrequency="4521.46"
+	>
+	<Testing>
+		<StartDateTime>Aug 29 12:56 EEST</StartDateTime>
+		<StartTestTime>1756461407</StartTestTime>
+		<TestList/>
+		<EndDateTime>Aug 29 12:56 EEST</EndDateTime>
+		<EndTestTime>1756461407</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

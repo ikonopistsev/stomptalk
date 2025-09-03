@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux",
+  "command": "/usr/lib/llvm/20/bin/clang++ -DSTOMPTALK_STATIC -DSTOMPTALK_VERSION=1.8.0 -I/home/meil/devel/linux/stomptalk-meta/stomptalk/include -O3 -DNDEBUG -std=gnu++14 -fPIC -o CMakeFiles/stomptalk.dir/src/parser.cpp.o -c /home/meil/devel/linux/stomptalk-meta/stomptalk/src/parser.cpp",
+  "file": "/home/meil/devel/linux/stomptalk-meta/stomptalk/src/parser.cpp",
+  "output": "CMakeFiles/stomptalk.dir/src/parser.cpp.o"
+},
+{
+  "directory": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux",
+  "command": "/usr/lib/llvm/20/bin/clang++ -DSTOMPTALK_STATIC -DSTOMPTALK_VERSION=1.8.0 -I/home/meil/devel/linux/stomptalk-meta/stomptalk/include -O3 -DNDEBUG -std=gnu++14 -fPIC -o CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o -c /home/meil/devel/linux/stomptalk-meta/stomptalk/src/stomptalk.cpp",
+  "file": "/home/meil/devel/linux/stomptalk-meta/stomptalk/src/stomptalk.cpp",
+  "output": "CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+},
+{
+  "directory": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux",
+  "command": "/usr/lib/llvm/20/bin/clang++ -DSTOMPTALK_STATIC -DSTOMPTALK_VERSION=1.8.0 -I/home/meil/devel/linux/stomptalk-meta/stomptalk/include -O3 -DNDEBUG -std=gnu++14 -flto=thin -march=native -fno-plt -fno-semantic-interposition -o CMakeFiles/stomptalk_test.dir/test/main.cpp.o -c /home/meil/devel/linux/stomptalk-meta/stomptalk/test/main.cpp",
+  "file": "/home/meil/devel/linux/stomptalk-meta/stomptalk/test/main.cpp",
+  "output": "CMakeFiles/stomptalk_test.dir/test/main.cpp.o"
+},
+{
+  "directory": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux",
+  "command": "/usr/lib/llvm/20/bin/clang++ -DSTOMPTALK_STATIC -DSTOMPTALK_VERSION=1.8.0 -I/home/meil/devel/linux/stomptalk-meta/stomptalk/include -O3 -DNDEBUG -std=gnu++14 -flto=thin -march=native -fno-plt -fno-semantic-interposition -o CMakeFiles/stomptalk_unit_test.dir/test/unit_test.cpp.o -c /home/meil/devel/linux/stomptalk-meta/stomptalk/test/unit_test.cpp",
+  "file": "/home/meil/devel/linux/stomptalk-meta/stomptalk/test/unit_test.cpp",
+  "output": "CMakeFiles/stomptalk_unit_test.dir/test/unit_test.cpp.o"
+},
+{
+  "directory": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux",
+  "command": "/usr/lib/llvm/20/bin/clang -DSTOMPTALK_STATIC -DSTOMPTALK_VERSION=1.8.0 -I/home/meil/devel/linux/stomptalk-meta/stomptalk/include -O3 -DNDEBUG -std=gnu99 -flto=thin -march=native -fno-plt -fno-semantic-interposition -o CMakeFiles/purestomp.dir/test/purestomp.c.o -c /home/meil/devel/linux/stomptalk-meta/stomptalk/test/purestomp.c",
+  "file": "/home/meil/devel/linux/stomptalk-meta/stomptalk/test/purestomp.c",
+  "output": "CMakeFiles/purestomp.dir/test/purestomp.c.o"
+}
+]

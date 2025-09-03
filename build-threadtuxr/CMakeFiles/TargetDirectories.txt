@@ -1,0 +1,5 @@
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CMakeFiles/stomptalk.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CMakeFiles/stomptalk_test.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CMakeFiles/test.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CMakeFiles/edit_cache.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CMakeFiles/rebuild_cache.dir

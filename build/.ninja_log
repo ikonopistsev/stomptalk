@@ -1,0 +1,6 @@
+# ninja log v5
+0	9	0	clean	a31eedcededa8236
+0	76	1649102959000000000	build.ninja	a5ec54f2d12d2836
+1	120	1649070182000000000	CMakeFiles/stomptalk.dir/src/parser_hook.cpp.o	eaf9c82e62ccb4e5
+1	189	1649070182000000000	CMakeFiles/stomptalk.dir/src/parser.cpp.o	a74dfc8e6e3dc5b7
+189	204	1649070182000000000	libstomptalk.a	fffc9b0b0c94677

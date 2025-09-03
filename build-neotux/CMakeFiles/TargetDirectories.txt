@@ -1,0 +1,7 @@
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux/CMakeFiles/stomptalk.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux/CMakeFiles/stomptalk_test.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux/CMakeFiles/stomptalk_unit_test.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux/CMakeFiles/purestomp.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux/CMakeFiles/test.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux/CMakeFiles/edit_cache.dir
+/home/meil/devel/linux/stomptalk-meta/stomptalk/build-neotux/CMakeFiles/rebuild_cache.dir

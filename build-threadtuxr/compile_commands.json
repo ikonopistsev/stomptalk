@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr",
+  "command": "/usr/bin/g++ -DSTOMPTALK_STATIC -DSTOMPTALK_VERSION=1.8.0 -I/home/meil/devel/linux/stomptalk-meta/stomptalk/include -O3 -DNDEBUG -std=gnu++14 -fPIC -o CMakeFiles/stomptalk.dir/src/parser.cpp.o -c /home/meil/devel/linux/stomptalk-meta/stomptalk/src/parser.cpp",
+  "file": "/home/meil/devel/linux/stomptalk-meta/stomptalk/src/parser.cpp",
+  "output": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CMakeFiles/stomptalk.dir/src/parser.cpp.o"
+},
+{
+  "directory": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr",
+  "command": "/usr/bin/g++ -DSTOMPTALK_STATIC -DSTOMPTALK_VERSION=1.8.0 -I/home/meil/devel/linux/stomptalk-meta/stomptalk/include -O3 -DNDEBUG -std=gnu++14 -fPIC -o CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o -c /home/meil/devel/linux/stomptalk-meta/stomptalk/src/stomptalk.cpp",
+  "file": "/home/meil/devel/linux/stomptalk-meta/stomptalk/src/stomptalk.cpp",
+  "output": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+},
+{
+  "directory": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr",
+  "command": "/usr/bin/g++ -DSTOMPTALK_STATIC -DSTOMPTALK_VERSION=1.8.0 -I/home/meil/devel/linux/stomptalk-meta/stomptalk/include -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/stomptalk_test.dir/test/main.cpp.o -c /home/meil/devel/linux/stomptalk-meta/stomptalk/test/main.cpp",
+  "file": "/home/meil/devel/linux/stomptalk-meta/stomptalk/test/main.cpp",
+  "output": "/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CMakeFiles/stomptalk_test.dir/test/main.cpp.o"
+}
+]

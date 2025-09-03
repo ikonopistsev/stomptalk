@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -DNDEBUG  -shared -Wl,-soname,libstomptalk.so.1 -o libstomptalk.so.0.0.2 CMakeFiles/stomptalk.dir/src/parser.cpp.o CMakeFiles/stomptalk.dir/src/parser_hook.cpp.o 

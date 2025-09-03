@@ -127,9 +127,13 @@ void test_connect_frame() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
-
+    // Включаем нулевой символ в размер данных
+    auto size = strlen(data) + 1;
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
+    
     assert(frames.size() == 1);
     const auto& frame = frames[0];
     
@@ -164,8 +168,11 @@ void test_connected_frame() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
@@ -198,7 +205,10 @@ void test_send_frame() {
     stomptalk::parser parser;
 
     auto size = strlen(data) + 11; // include body length
-    parser.run(hook, data, size);
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
@@ -233,8 +243,11 @@ void test_subscribe_frame() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
@@ -271,7 +284,10 @@ void test_message_frame() {
     stomptalk::parser parser;
 
     auto size = strlen(data) + 13; // include body
-    parser.run(hook, data, size);
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
@@ -307,8 +323,11 @@ void test_ack_frame() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
@@ -338,8 +357,11 @@ void test_disconnect_frame() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
@@ -371,7 +393,10 @@ void test_error_frame() {
     stomptalk::parser parser;
 
     auto size = strlen(data) + 20; // include body
-    parser.run(hook, data, size);
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
@@ -406,8 +431,11 @@ void test_frames_with_lf_delimiters() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 2);
     
@@ -446,7 +474,10 @@ void test_message_without_content_length() {
     stomptalk::parser parser;
 
     auto size = strlen(data) + strlen("{\"event\":\"update\",\"data\":42}");
-    parser.run(hook, data, size);
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
@@ -482,8 +513,11 @@ void test_receipt_frame() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 1);
     const auto& frame = frames[0];
@@ -521,8 +555,11 @@ void test_heartbeat_between_frames() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 3);
     
@@ -565,8 +602,11 @@ void test_mixed_whitespace_between_frames() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 3);
     
@@ -615,7 +655,10 @@ void test_header_id_validation() {
     stomptalk::parser parser;
 
     auto size = strlen(data) + 25; // include JSON body
-    parser.run(hook, data, size);
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 3);
     
@@ -665,8 +708,11 @@ void test_multiple_frames() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data);
-    parser.run(hook, data, size);
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
 
     assert(frames.size() == 3);
     

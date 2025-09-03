@@ -1,0 +1,20 @@
+# ninja log v7
+1	57	1756461345000000000	build.ninja	4779bebda8afa220
+1	57	1756461345000000000	/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/cmake_install.cmake	4779bebda8afa220
+2	353	1756461087663439307	CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o	49c4c34764bbcb89
+2	309	1756461087663439307	CMakeFiles/stomptalk.dir/src/parser.cpp.o	2d612feb86fa5be4
+353	392	1756461088015442627	libstomptalk.a	e4fc41dca800c1f2
+1	57	1756461345000000000	/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CTestTestfile.cmake	4779bebda8afa220
+8	240	1756461087671439382	CMakeFiles/stomptalk_test.dir/test/main.cpp.o	a48aad479f78f5b
+392	432	1756461088055443003	stomptalk_test	83ccbb7e6f6222f6
+1	49	1756461345193870699	build.ninja	4779bebda8afa220
+1	49	1756461345193870699	/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/cmake_install.cmake	4779bebda8afa220
+1	49	1756461345193870699	/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/CTestTestfile.cmake	4779bebda8afa220
+8	249	1756461345249871228	CMakeFiles/stomptalk_test.dir/test/main.cpp.o	a48aad479f78f5b
+2	307	1756461345241871153	CMakeFiles/stomptalk.dir/src/parser.cpp.o	2d612feb86fa5be4
+2	347	1756461345241871153	CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o	49c4c34764bbcb89
+347	383	1756461345589874442	libstomptalk.a	e4fc41dca800c1f2
+383	425	1756461345625874783	stomptalk_test	83ccbb7e6f6222f6
+2	292	1756461391594309375	CMakeFiles/stomptalk.dir/src/parser.cpp.o	2d612feb86fa5be4
+292	333	1756461391886312137	libstomptalk.a	e4fc41dca800c1f2
+333	373	1756461391926312514	stomptalk_test	83ccbb7e6f6222f6

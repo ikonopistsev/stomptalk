@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/stomptalk/memeq.hpp
+cstdint
+-
+
+../include/stomptalk/method.hpp
+stomptalk/strref.hpp
+../include/stomptalk/stomptalk/strref.hpp
+cstdint
+-
+
+../include/stomptalk/parser_hook.hpp
+stomptalk/method.hpp
+../include/stomptalk/stomptalk/method.hpp
+cstdint
+-
+
+../include/stomptalk/strref.hpp
+stomptalk/memeq.hpp
+../include/stomptalk/stomptalk/memeq.hpp
+string
+-
+ostream
+-
+
+/home/meil/devel/stomptalk-meta/stomptalk/src/parser_hook.cpp
+stomptalk/parser_hook.hpp
+/home/meil/devel/stomptalk-meta/stomptalk/src/stomptalk/parser_hook.hpp
+iterator
+-
+cassert
+-
+iostream
+-
+

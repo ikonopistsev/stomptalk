@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/meil/devel/linux/stomptalk-meta/stomptalk/build-threadtuxr/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
