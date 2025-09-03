@@ -653,16 +653,16 @@ void test_mixed_whitespace_between_frames() {
     auto connect_part = "CONNECT\n"
                         "host:test.com\n"
                         "\n\0";
-    auto whitespace_part = "\r\n\r\n\0\0\n";  // 7 байт: \r\n\r\n\0\0\n
     auto send_part = "SEND\r\n"
                      "destination:/topic/news\r\n"
                      "\r\n\0";
-    auto whitespace2_part = "\n\r\n\0";  // 4 байта: \n\r\n\0
     auto disconnect_part = "DISCONNECT\n"
                           "\n\0";
     
-    auto size = strlen(connect_part) + 1 + 7 + // whitespace_part фиксированный размер
-                strlen(send_part) + 1 + 4 +   // whitespace2_part фиксированный размер  
+    // Whitespace части содержат \0, поэтому используем фиксированные размеры
+    // "\r\n\r\n\0\0\n" = 7 байт, "\n\r\n\0" = 4 байта
+    auto size = strlen(connect_part) + 1 + 7 + // whitespace между CONNECT и SEND
+                strlen(send_part) + 1 + 4 +   // whitespace между SEND и DISCONNECT
                 strlen(disconnect_part) + 1;
     auto parsed = parser.run(hook, data, size);
     
