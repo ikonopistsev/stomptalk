@@ -412,20 +412,18 @@ void test_frames_with_lf_delimiters() {
     assert(frames.size() == 2);
     
     // First frame - CONNECT with LF
-    const auto& connect_frame = frames[0];
-    assert(connect_frame.completed);
-    assert(connect_frame.method_id == st_method_connect);
-    assert(connect_frame.method_name == "CONNECT");
-    assert(connect_frame.header_names.count("accept-version"));
-    assert(connect_frame.header_names.at("accept-version") == "1.2");
+    assert(frames[0].completed);
+    assert(frames[0].method_id == st_method_connect);
+    assert(frames[0].method_name == "CONNECT");
+    assert(frames[0].header_names.count("accept-version"));
+    assert(frames[0].header_names.at("accept-version") == "1.2");
     
     // Second frame - SEND with LF
-    const auto& send_frame = frames[1];
-    assert(send_frame.completed);
-    assert(send_frame.method_id == st_method_send);
-    assert(send_frame.method_name == "SEND");
-    assert(send_frame.header_names.count("destination"));
-    assert(send_frame.header_names.at("destination") == "/queue/test");
+    assert(frames[1].completed);
+    assert(frames[1].method_id == st_method_send);
+    assert(frames[1].method_name == "SEND");
+    assert(frames[1].header_names.count("destination"));
+    assert(frames[1].header_names.at("destination") == "/queue/test");
     
     std::cout << "✓ LF delimiters test passed" << std::endl;
 }
@@ -622,31 +620,28 @@ void test_header_id_validation() {
     assert(frames.size() == 3);
     
     // Проверяем CONNECT фрейм
-    const auto& connect_frame = frames[0];
-    assert(connect_frame.method_id == st_method_connect);
-    assert(connect_frame.header_names.count("accept-version"));
-    assert(connect_frame.header_names.count("host"));
-    assert(connect_frame.header_names.count("login"));
-    assert(connect_frame.header_names.count("passcode"));
-    assert(connect_frame.header_names.count("heart-beat"));
+    assert(frames[0].method_id == st_method_connect);
+    assert(frames[0].header_names.count("accept-version"));
+    assert(frames[0].header_names.count("host"));
+    assert(frames[0].header_names.count("login"));
+    assert(frames[0].header_names.count("passcode"));
+    assert(frames[0].header_names.count("heart-beat"));
     
     // Проверяем SEND фрейм  
-    const auto& send_frame = frames[1];
-    assert(send_frame.method_id == st_method_send);
-    assert(send_frame.header_names.count("destination"));
-    assert(send_frame.header_names.count("content-type"));
-    assert(send_frame.header_names.count("content-length"));
-    assert(send_frame.header_names.count("receipt"));
-    assert(send_frame.header_names.count("transaction"));
-    assert(send_frame.body == "{\"message\":\"hello world\"}");
+    assert(frames[1].method_id == st_method_send);
+    assert(frames[1].header_names.count("destination"));
+    assert(frames[1].header_names.count("content-type"));
+    assert(frames[1].header_names.count("content-length"));
+    assert(frames[1].header_names.count("receipt"));
+    assert(frames[1].header_names.count("transaction"));
+    assert(frames[1].body == "{\"message\":\"hello world\"}");
     
     // Проверяем MESSAGE фрейм
-    const auto& message_frame = frames[2];
-    assert(message_frame.method_id == st_method_message);
-    assert(message_frame.header_names.count("subscription"));
-    assert(message_frame.header_names.count("message-id"));
-    assert(message_frame.header_names.count("destination"));
-    assert(message_frame.header_names.count("timestamp"));
+    assert(frames[2].method_id == st_method_message);
+    assert(frames[2].header_names.count("subscription"));
+    assert(frames[2].header_names.count("message-id"));
+    assert(frames[2].header_names.count("destination"));
+    assert(frames[2].header_names.count("timestamp"));
     
     std::cout << "✓ Header ID validation test passed" << std::endl;
 }
