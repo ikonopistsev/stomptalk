@@ -1,3 +1,0 @@
-stomptalk_test 9 0.00653778
-stomptalk_unit_test 9 0.000167371
----

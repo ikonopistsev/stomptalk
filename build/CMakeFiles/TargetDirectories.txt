@@ -1,3 +1,0 @@
-/home/meil/devel/linux/stomptalk-meta/stomptalk/build/CMakeFiles/stomptalk.dir
-/home/meil/devel/linux/stomptalk-meta/stomptalk/build/CMakeFiles/edit_cache.dir
-/home/meil/devel/linux/stomptalk-meta/stomptalk/build/CMakeFiles/rebuild_cache.dir
