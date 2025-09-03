@@ -43,6 +43,15 @@ public:
                     const char* ptr, std::size_t len) noexcept override {
         if (current_frame_) {
             current_header_key_.assign(ptr, len);
+            
+            // Проверяем что header_id соответствует ожидаемому значению из header.h
+            std::uint64_t expected_id = get_header_id_by_name(current_header_key_);
+            if (expected_id != st_header_none && expected_id != header_id) {
+                std::cerr << "Header ID mismatch for '" << current_header_key_ 
+                          << "': expected " << expected_id 
+                          << ", got " << header_id << std::endl;
+                assert(false && "Header ID mismatch");
+            }
         }
     }
 
@@ -92,6 +101,7 @@ private:
             {"server", st_header_server},
             {"session", st_header_session},
             {"subscription", st_header_subscription},
+            {"timestamp", st_header_timestamp},
             {"transaction", st_header_transaction},
             {"version", st_header_version}
         };
@@ -574,6 +584,73 @@ void test_mixed_whitespace_between_frames() {
     std::cout << "✓ Mixed whitespace test passed" << std::endl;
 }
 
+void test_header_id_validation() {
+    std::cout << "Testing header ID validation..." << std::endl;
+    
+    // Тест с различными заголовками для проверки корректности header_id
+    const char* data = 
+        "CONNECT\r\n"
+        "accept-version:1.2\r\n"          // st_header_accept_version
+        "host:stomp.example.com\r\n"      // st_header_host
+        "login:testuser\r\n"              // st_header_login  
+        "passcode:secret123\r\n"          // st_header_passcode
+        "heart-beat:10000,10000\r\n"      // st_header_heart_beat
+        "\r\n\0"
+        "SEND\r\n"
+        "destination:/queue/test\r\n"     // st_header_destination
+        "content-type:application/json\r\n" // st_header_content_type
+        "content-length:25\r\n"           // st_header_content_length
+        "receipt:send-001\r\n"            // st_header_receipt
+        "transaction:tx-123\r\n"          // st_header_transaction
+        "\r\n"
+        "{\"message\":\"hello world\"}\0"
+        "MESSAGE\r\n"
+        "subscription:sub-1\r\n"          // st_header_subscription
+        "message-id:msg-456\r\n"          // st_header_message_id
+        "destination:/topic/updates\r\n"  // st_header_destination
+        "timestamp:1693737600000\r\n"     // st_header_timestamp
+        "\r\n\0";
+
+    std::vector<ParsedFrame> frames;
+    TestHook test_hook(frames);
+    stomptalk::parser_hook hook(test_hook);
+    stomptalk::parser parser;
+
+    auto size = strlen(data) + 25; // include JSON body
+    parser.run(hook, data, size);
+
+    assert(frames.size() == 3);
+    
+    // Проверяем CONNECT фрейм
+    const auto& connect_frame = frames[0];
+    assert(connect_frame.method_id == st_method_connect);
+    assert(connect_frame.header_names.count("accept-version"));
+    assert(connect_frame.header_names.count("host"));
+    assert(connect_frame.header_names.count("login"));
+    assert(connect_frame.header_names.count("passcode"));
+    assert(connect_frame.header_names.count("heart-beat"));
+    
+    // Проверяем SEND фрейм  
+    const auto& send_frame = frames[1];
+    assert(send_frame.method_id == st_method_send);
+    assert(send_frame.header_names.count("destination"));
+    assert(send_frame.header_names.count("content-type"));
+    assert(send_frame.header_names.count("content-length"));
+    assert(send_frame.header_names.count("receipt"));
+    assert(send_frame.header_names.count("transaction"));
+    assert(send_frame.body == "{\"message\":\"hello world\"}");
+    
+    // Проверяем MESSAGE фрейм
+    const auto& message_frame = frames[2];
+    assert(message_frame.method_id == st_method_message);
+    assert(message_frame.header_names.count("subscription"));
+    assert(message_frame.header_names.count("message-id"));
+    assert(message_frame.header_names.count("destination"));
+    assert(message_frame.header_names.count("timestamp"));
+    
+    std::cout << "✓ Header ID validation test passed" << std::endl;
+}
+
 void test_multiple_frames() {
     std::cout << "Testing multiple frames..." << std::endl;
     
@@ -633,6 +710,7 @@ int main() {
         test_receipt_frame();
         test_heartbeat_between_frames();
         test_mixed_whitespace_between_frames();
+        test_header_id_validation();
         test_multiple_frames();
         
         std::cout << std::endl << "🎉 All tests passed!" << std::endl;
