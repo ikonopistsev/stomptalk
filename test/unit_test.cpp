@@ -204,7 +204,8 @@ void test_send_frame() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data) + 11; // include body length
+    // Для сообщения с content-length включаем весь фрейм до нулевого символа включительно
+    auto size = strlen(data) + 1; 
     auto parsed = parser.run(hook, data, size);
     
     // Парсер должен поглотить все переданные данные
@@ -283,7 +284,7 @@ void test_message_frame() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data) + 13; // include body
+    auto size = strlen(data) + 1; // include null terminator
     auto parsed = parser.run(hook, data, size);
     
     // Парсер должен поглотить все переданные данные
@@ -392,7 +393,7 @@ void test_error_frame() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data) + 20; // include body
+    auto size = strlen(data) + 1; // include null terminator
     auto parsed = parser.run(hook, data, size);
     
     // Парсер должен поглотить все переданные данные
@@ -654,7 +655,7 @@ void test_header_id_validation() {
     stomptalk::parser_hook hook(test_hook);
     stomptalk::parser parser;
 
-    auto size = strlen(data) + 25; // include JSON body
+    auto size = strlen(data) + 1; // include null terminator
     auto parsed = parser.run(hook, data, size);
     
     // Парсер должен поглотить все переданные данные
