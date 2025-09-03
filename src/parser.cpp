@@ -2,7 +2,6 @@
 #include <cstring>
 #include <cassert>
 #include <algorithm>
-#include <emmintrin.h>
 
 namespace stomptalk {
 
