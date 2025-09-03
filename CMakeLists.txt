@@ -64,6 +64,12 @@ if (STOMPTALK_BUILD_TESTS)
         $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
             -march=native -fno-plt -fno-semantic-interposition>)    
 
+    add_executable(stomptalk_unit_test test/unit_test.cpp)
+    target_link_libraries(stomptalk_unit_test PRIVATE stomptalk)
+    target_compile_options(stomptalk_unit_test PRIVATE
+        $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
+            -march=native -fno-plt -fno-semantic-interposition>)
+
     add_executable(purestomp test/purestomp.c)
     set_target_properties(purestomp PROPERTIES 
         LINKER_LANGUAGE C
@@ -74,6 +80,7 @@ if (STOMPTALK_BUILD_TESTS)
             -march=native -fno-plt -fno-semantic-interposition>)    
 
     add_test(NAME stomptalk_test COMMAND stomptalk_test)
+    add_test(NAME stomptalk_unit_test COMMAND stomptalk_unit_test)
     #add_test(NAME purestomp_test COMMAND purestomp)
 endif()
 
