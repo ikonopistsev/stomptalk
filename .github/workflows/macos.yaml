@@ -1,76 +1,48 @@
-# Copyright (c) 2019-2020 Luca Cappa
-# Released under the term specified in file LICENSE.txt
-# SPDX short identifier: MIT
 name: macos
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  job:
-    name: ${{ matrix.os }}-hosted-basic
-    runs-on: ${{ matrix.os }}
-    env:
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+  build:
+    name: macOS Build
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest]
-        include:
-          - os: macos-latest
-            triplet: x64-osx
-            vcpkgCommitId: '8a9a97315aefb3f8bc5d81bf66ca0025938b9c91'
-            vcpkgPackages: 'sqlite3'
+        build_type: [Debug, Release]
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
-      - uses: lukka/get-cmake@latest
-      - name: dir
-        run: find $RUNNER_WORKSPACE
-        shell: bash
-      - name: Restore artifacts, or run vcpkg, build and cache artifacts
-        uses: lukka/run-vcpkg@v3
-        id: runvcpkg
-        with:
-          vcpkgArguments: '${{ matrix.vcpkgPackages }}'
-          vcpkgTriplet: '${{ matrix.triplet }}'
-          vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-          vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
-      - name: dir
-        run: find $RUNNER_WORKSPACE
-        shell: bash
-      - name: Prints outputs of run-vcpkg task
-        run: echo "'${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}' '${{  steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}' "
-      - name: Run CMake+Ninja without triplet
-        uses: lukka/run-cmake@v2
-        id: runcmake
-        with:
-          cmakeGenerator: 'Ninja'  
-          cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          useVcpkgToolchainFile: true
-          buildWithCMakeArgs: '-- -v'
-          buildDirectory: '${{ runner.workspace }}/b/ninja/'
-      - name: Run CMake+Ninja with triplet (cmd)
-        uses: lukka/run-cmake@v2
-        id: runcmake_cmd
-        with:
-          cmakeGenerator: 'Ninja'  
-          cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          useVcpkgToolchainFile: true
-          buildWithCMakeArgs: '-- -v'
-          vcpkgTriplet: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}
-          buildDirectory: '${{ runner.workspace }}/b/ninja/'
-      - name: Run CMake+Ninja with triplet (bash)
-        if: false
-        uses: lukka/run-cmake@v2
-        id: runcmake_bash
-        with:
-          cmakeGenerator: 'Ninja'  
-          cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          useVcpkgToolchainFile: true
-          buildWithCMakeArgs: '-- -v'
-          vcpkgTriplet: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}
-          buildDirectory: '${{ runner.workspace }}/b/ninja-bash/'
-          useShell: bash
+      - name: Setup build environment
+        run: |
+          # Проверяем наличие CMake и Ninja
+          echo "Checking build tools..."
+          
+          if command -v cmake &> /dev/null; then
+            echo "✅ CMake found: $(cmake --version | head -1)"
+          else
+            echo "❌ CMake not found, installing..."
+            brew install cmake
+          fi
+          
+          if command -v ninja &> /dev/null; then
+            echo "✅ Ninja found: $(ninja --version)"
+          else
+            echo "❌ Ninja not found, installing..."
+            brew install ninja
+          fi
+          
+          echo "✅ C++ compiler: $(c++ --version | head -1)"
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_CXX_FLAGS="-Wall -Wextra -Werror" \
+            -DSTOMPTALK_BUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type }} --verbose
+
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure

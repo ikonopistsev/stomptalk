@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.7.6 LANGUAGES CXX)
+project(stomptalk VERSION 1.8.0 LANGUAGES CXX C)
 
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
+option(STOMPTALK_BUILD_TESTS "Build tests" OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -51,6 +52,37 @@ set_target_properties(stomptalk
 )
 
 target_include_directories(stomptalk PUBLIC include/)
+
+if (STOMPTALK_BUILD_TESTS)
+    enable_testing()
+    
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+    
+    add_executable(stomptalk_test test/main.cpp)
+    target_link_libraries(stomptalk_test PRIVATE stomptalk)
+    target_compile_options(stomptalk_test PRIVATE
+        $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
+            -march=native -fno-plt -fno-semantic-interposition>)    
+
+    add_executable(stomptalk_unit_test test/unit_test.cpp)
+    target_link_libraries(stomptalk_unit_test PRIVATE stomptalk)
+    target_compile_options(stomptalk_unit_test PRIVATE
+        $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
+            -march=native -fno-plt -fno-semantic-interposition>)
+
+    add_executable(purestomp test/purestomp.c)
+    set_target_properties(purestomp PROPERTIES 
+        LINKER_LANGUAGE C
+        C_STANDARD 99)
+    target_link_libraries(purestomp PRIVATE stomptalk)
+    target_compile_options(purestomp PRIVATE
+        $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
+            -march=native -fno-plt -fno-semantic-interposition>)    
+
+    add_test(NAME stomptalk_test COMMAND stomptalk_test)
+    add_test(NAME stomptalk_unit_test COMMAND stomptalk_unit_test)
+    #add_test(NAME purestomp_test COMMAND purestomp)
+endif()
 
 if (STOMPTALK_LIBRARY_INSTALL)
     include(GNUInstallDirs)

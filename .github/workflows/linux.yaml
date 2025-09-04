@@ -1,76 +1,44 @@
-# Copyright (c) 2019-2020 Luca Cappa
-# Released under the term specified in file LICENSE.txt
-# SPDX short identifier: MIT
 name: linux
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  job:
-    name: ${{ matrix.os }}-hosted-basic
-    runs-on: ${{ matrix.os }}
-    env:
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+  build:
+    name: Linux Build
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        include:
-          - os: ubuntu-latest
-            triplet: x64-linux
-            vcpkgCommitId: '8a9a97315aefb3f8bc5d81bf66ca0025938b9c91'
-            vcpkgPackages: 'sqlite3'
+        compiler: [gcc, clang]
+        build_type: [Debug, Release]
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
-      - uses: lukka/get-cmake@latest
-      - name: dir
-        run: find $RUNNER_WORKSPACE
-        shell: bash
-      - name: Restore artifacts, or run vcpkg, build and cache artifacts
-        uses: lukka/run-vcpkg@v3
-        id: runvcpkg
-        with:
-          vcpkgArguments: '${{ matrix.vcpkgPackages }}'
-          vcpkgTriplet: '${{ matrix.triplet }}'
-          vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-          vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
-      - name: dir
-        run: find $RUNNER_WORKSPACE
-        shell: bash
-      - name: Prints outputs of run-vcpkg task
-        run: echo "'${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}' '${{  steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}' "
-      - name: Run CMake+Ninja without triplet
-        uses: lukka/run-cmake@v2
-        id: runcmake
-        with:
-          cmakeGenerator: 'Ninja'  
-          cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          useVcpkgToolchainFile: true
-          buildWithCMakeArgs: '-- -v'
-          buildDirectory: '${{ runner.workspace }}/b/ninja/'
-      - name: Run CMake+Ninja with triplet (cmd)
-        uses: lukka/run-cmake@v2
-        id: runcmake_cmd
-        with:
-          cmakeGenerator: 'Ninja'  
-          cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          useVcpkgToolchainFile: true
-          buildWithCMakeArgs: '-- -v'
-          vcpkgTriplet: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}
-          buildDirectory: '${{ runner.workspace }}/b/ninja/'
-      - name: Run CMake+Ninja with triplet (bash)
-        if: false
-        uses: lukka/run-cmake@v2
-        id: runcmake_bash
-        with:
-          cmakeGenerator: 'Ninja'  
-          cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          useVcpkgToolchainFile: true
-          buildWithCMakeArgs: '-- -v'
-          vcpkgTriplet: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}
-          buildDirectory: '${{ runner.workspace }}/b/ninja-bash/'
-          useShell: bash
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build
+
+      - name: Setup compiler
+        run: |
+          if [ "${{ matrix.compiler }}" = "clang" ]; then
+            sudo apt-get install -y clang
+            echo "CC=clang" >> $GITHUB_ENV
+            echo "CXX=clang++" >> $GITHUB_ENV
+          else
+            echo "CC=gcc" >> $GITHUB_ENV
+            echo "CXX=g++" >> $GITHUB_ENV
+          fi
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_CXX_FLAGS="-Wall -Wextra -Werror" \
+            -DSTOMPTALK_BUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type }} --verbose
+
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
