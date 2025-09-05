@@ -832,6 +832,58 @@ void test_multiple_frames() {
     std::cout << "✓ Multiple frames test passed" << std::endl;
 }
 
+void test_escaped_headers() {
+    std::cout << "Testing escaped characters in headers..." << std::endl;
+    
+    // Тест с эскейп символами в заголовках согласно STOMP спецификации
+    // \r, \n, \c, \\ должны быть заэскейплены как \\r, \\n, \\c, \\\\ (экранированы)
+    const char* data = 
+        "SEND\r\n"
+        "destination:/queue/test\\nwith\\rnewlines\r\n"
+        "custom-header:value\\cwith\\\\backslash\r\n"
+        "content-type:text\\nplain\r\n"
+        "content-length:12\r\n"
+        "\r\n"
+        "Test message\0";
+
+    std::vector<ParsedFrame> frames;
+    TestHook test_hook(frames);
+    stomptalk::parser_hook hook(test_hook);
+    stomptalk::parser parser;
+
+    auto size = strlen(data) + 1; // include null terminator
+    auto parsed = parser.run(hook, data, size);
+    
+    // Парсер должен поглотить все переданные данные
+    assert(parsed == size);
+    (void)parsed;
+
+    assert(frames.size() == 1);
+    const auto& frame = frames[0];
+    (void)frame;
+    
+    assert(frame.completed);
+    assert(frame.method_id == st_method_send);
+    assert(frame.method_name == "SEND");
+    
+    // Проверяем что заголовки содержат эскейп последовательности (как есть в сыром виде)
+    assert(frame.header_names.count("destination"));
+    assert(frame.header_names.count("custom-header"));
+    assert(frame.header_names.count("content-type"));
+    assert(frame.header_names.count("content-length"));
+    
+    // Парсер должен корректно декодировать STOMP эскейп последовательности:
+    // \\n -> \n, \\r -> \r, \\c -> :, \\\\ -> \ -
+    assert(frame.header_names.at("destination") == "/queue/test\nwith\rnewlines");
+    assert(frame.header_names.at("custom-header") == "value:with\\backslash");
+    assert(frame.header_names.at("content-type") == "text\nplain");
+    assert(frame.header_names.at("content-length") == "12");
+    
+    assert(frame.body == "Test message");
+    
+    std::cout << "✓ Escaped headers test passed" << std::endl;
+}
+
 int main() {
     std::cout << "Running STOMP parser unit tests..." << std::endl << std::endl;
     
@@ -851,6 +903,7 @@ int main() {
         test_mixed_whitespace_between_frames();
         test_header_id_validation();
         test_multiple_frames();
+        test_escaped_headers();
         
         std::cout << std::endl << "🎉 All tests passed!" << std::endl;
         return 0;
