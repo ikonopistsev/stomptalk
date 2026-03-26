@@ -1,0 +1,9 @@
+build*/
+.vscode/
+
+# libFuzzer artifacts — keep only fuzz/corpus/ seeds in the repo
+crash-*
+leak-*
+timeout-*
+oom-*
+fuzz/corpus-*/
