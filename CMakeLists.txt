@@ -92,14 +92,18 @@ if (STOMPTALK_BUILD_FUZZ)
             "Current C compiler: ${CMAKE_C_COMPILER_ID}")
     endif()
 
+    set(STOMPTALK_FUZZ_COMPILE_FLAGS -fsanitize=fuzzer-no-link)
+
     # OSS-Fuzz sets LIB_FUZZING_ENGINE to the path of libFuzzer.
-    # For local builds it is empty — fall back to -fsanitize=fuzzer.
+    # Compile the library itself with fuzzer coverage instrumentation;
+    # otherwise libFuzzer mostly sees the harness and not the parser code.
+    target_compile_options(stomptalk PRIVATE ${STOMPTALK_FUZZ_COMPILE_FLAGS})
+
+    # For local builds libFuzzer is linked via -fsanitize=fuzzer.
     if (DEFINED ENV{LIB_FUZZING_ENGINE})
         set(STOMPTALK_FUZZER_LDFLAGS "$ENV{LIB_FUZZING_ENGINE}")
     else()
         set(STOMPTALK_FUZZER_LDFLAGS "-fsanitize=fuzzer")
-        add_compile_options(-fsanitize=fuzzer-no-link)
-        add_link_options(-fsanitize=fuzzer-no-link)
     endif()
 
     foreach(_target fuzz_stomp_parser fuzz_stomp_chunked fuzz_stomp_large_header)
@@ -107,13 +111,17 @@ if (STOMPTALK_BUILD_FUZZ)
         set_target_properties(${_target} PROPERTIES
             LINKER_LANGUAGE C
             C_STANDARD 99)
+        target_compile_options(${_target} PRIVATE ${STOMPTALK_FUZZ_COMPILE_FLAGS})
         target_link_libraries(${_target} PRIVATE stomptalk)
         target_link_options(${_target} PRIVATE ${STOMPTALK_FUZZER_LDFLAGS})
     endforeach()
 
-    # Print corpus location hint after configuration
+    # Print per-target corpus location hints after configuration.
     message(STATUS
-        "Fuzz seed corpus: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/")
+        "Fuzz corpora:\n"
+        "  fuzz_stomp_parser: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/parser/\n"
+        "  fuzz_stomp_chunked: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/chunked/\n"
+        "  fuzz_stomp_large_header: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/large_header/")
 endif()
 
 if (STOMPTALK_LIBRARY_INSTALL)
