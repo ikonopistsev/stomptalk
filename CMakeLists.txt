@@ -102,7 +102,7 @@ if (STOMPTALK_BUILD_FUZZ)
         add_link_options(-fsanitize=fuzzer-no-link)
     endif()
 
-    foreach(_target fuzz_stomp_parser fuzz_stomp_chunked)
+    foreach(_target fuzz_stomp_parser fuzz_stomp_chunked fuzz_stomp_large_header)
         add_executable(${_target} fuzz/${_target}.c)
         set_target_properties(${_target} PROPERTIES
             LINKER_LANGUAGE C
