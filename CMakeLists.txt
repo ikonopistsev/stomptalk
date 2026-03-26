@@ -5,6 +5,7 @@ project(stomptalk VERSION 1.8.0 LANGUAGES CXX C)
 option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
 option(STOMPTALK_BUILD_TESTS "Build tests" OFF)
+option(STOMPTALK_BUILD_FUZZ "Build OSS-Fuzz targets (requires Clang + libFuzzer)" OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -82,6 +83,37 @@ if (STOMPTALK_BUILD_TESTS)
     add_test(NAME stomptalk_test COMMAND stomptalk_test)
     add_test(NAME stomptalk_unit_test COMMAND stomptalk_unit_test)
     #add_test(NAME purestomp_test COMMAND purestomp)
+endif()
+
+if (STOMPTALK_BUILD_FUZZ)
+    if (NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+        message(WARNING
+            "STOMPTALK_BUILD_FUZZ is designed for Clang. "
+            "Current C compiler: ${CMAKE_C_COMPILER_ID}")
+    endif()
+
+    # OSS-Fuzz sets LIB_FUZZING_ENGINE to the path of libFuzzer.
+    # For local builds it is empty — fall back to -fsanitize=fuzzer.
+    if (DEFINED ENV{LIB_FUZZING_ENGINE})
+        set(STOMPTALK_FUZZER_LDFLAGS "$ENV{LIB_FUZZING_ENGINE}")
+    else()
+        set(STOMPTALK_FUZZER_LDFLAGS "-fsanitize=fuzzer")
+        add_compile_options(-fsanitize=fuzzer-no-link)
+        add_link_options(-fsanitize=fuzzer-no-link)
+    endif()
+
+    foreach(_target fuzz_stomp_parser fuzz_stomp_chunked)
+        add_executable(${_target} fuzz/${_target}.c)
+        set_target_properties(${_target} PROPERTIES
+            LINKER_LANGUAGE C
+            C_STANDARD 99)
+        target_link_libraries(${_target} PRIVATE stomptalk)
+        target_link_options(${_target} PRIVATE ${STOMPTALK_FUZZER_LDFLAGS})
+    endforeach()
+
+    # Print corpus location hint after configuration
+    message(STATUS
+        "Fuzz seed corpus: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/")
 endif()
 
 if (STOMPTALK_LIBRARY_INSTALL)
