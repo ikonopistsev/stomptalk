@@ -1,0 +1,26 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu_core/cycles/u'
+# Event count (approx.): 5686251865
+#
+# Overhead  Symbol                                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................................  ....................
+#
+    54.55%  [.] stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)             -      -            
+    13.10%  [.] stomptalk::parser::method_state(stomptalk::parser_hook&, char const*, char const*)                -      -            
+    11.81%  [.] stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+     3.31%  [.] stomptalk::parser::hdrline_done(stomptalk::parser_hook&, char const*, char const*)                -      -            
+     2.32%  [.] value(stomptalk_parser*, char const*, unsigned long)                                              -      -            
+     1.98%  [.] stomptalk_parser::on_hdr_key(stomptalk::parser_hook&, unsigned long, char const*, unsigned long)  -      -            
+     1.90%  [.] stomptalk::parser_hook::on_hdr_val(char const*, unsigned long)                                    -      -            
+     1.55%  [.] stomptalk::parser::start_state(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+     1.46%  [.] stomptalk_get_hook_arg                                                                            -      -            
+     1.38%  [.] key(stomptalk_parser*, unsigned long, char const*, unsigned long)                                 -      -            
+
+
+#
+# (Tip: To show context switches in perf report sample context add --switch-events to perf record.)
+#

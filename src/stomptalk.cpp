@@ -1,268 +1,155 @@
-#include "stomptalk/hook_base.hpp"
-#include "stomptalk/antoull.hpp"
 #include "stomptalk/parser.hpp"
-#include "stomptalk/parser.h"
+#include "methods.hpp"
+#include "headers.hpp"
+#include "parser_dispatch.hpp"
+#include <algorithm>
+#include <cstdint>
+#include <cstring>
+#include <new>
 
-struct stomptalk_parser final
-    : stomptalk::hook_base
-{
-    std::size_t run(const char *begin, std::size_t len) noexcept
-    {
-        return parser_.run(hook_, begin, len);
-    }
-
-    std::uint64_t content_length() const noexcept
-    {
-        return hook_.content_length();
-    }
-
-    std::size_t get_error() const noexcept
-    {
-        return hook_.error();
-    }
-
-    void set(const stomptalk_parser_hook *user, void *arg) noexcept
-    {
-        if (user)
-        {
-            on_frame_ = user->on_frame;
-            on_method_ = user->on_method;
-            on_hdr_key_ = user->on_hdr_key;
-            on_hdr_val_ = user->on_hdr_val;
-            on_body_ = user->on_body;
-            on_frame_end_ = user->on_frame_end;
-        }
-        else
-        {
-            on_frame_ = on_frame_end_ = nullptr;
-            on_method_ = on_hdr_key_ = nullptr;
-            on_hdr_val_ = on_body_ = nullptr;
-        }
-
-        user_arg_ = arg;
-    }
-
-    void* user_arg() const noexcept
-    {
-        return user_arg_;
-    }
-
-private:
-    stomptalk::parser parser_{};
-    stomptalk::parser_hook hook_{*this};
-    stomptalk_cb on_frame_{};
-    stomptalk_id_cb on_method_{};
-    stomptalk_id_cb on_hdr_key_{};
-    stomptalk_data_cb on_hdr_val_{};
-    stomptalk_data_cb on_body_{};
-    stomptalk_cb on_frame_end_{};
-    void* user_arg_{};
-
-    void on_frame(
-        stomptalk::parser_hook&, const char* ptr) noexcept override
-    {
-        if (on_frame_)
-            on_frame_(this, ptr);
-    }
-
-    void on_method(stomptalk::parser_hook& hook, std::uint64_t id,
-        const char *at, std::size_t len) noexcept override
-    {
-        if (on_method_)
-        {
-            if (on_method_(this, id, at, len))
-                hook.set(stomptalk_error_generic);
-        }
-    }
-
-    void on_hdr_key(stomptalk::parser_hook& hook, std::uint64_t id,
-        const char *at, std::size_t len) noexcept override
-    {
-        if (on_hdr_key_)
-        {
-            if (on_hdr_key_(this, id, at, len))
-                hook.set(stomptalk_error_generic);
-        }
-    }
-
-    void on_hdr_val(stomptalk::parser_hook& hook,
-        const char *at, std::size_t len) noexcept override
-    {
-        if (on_hdr_val_)
-        {
-            if (on_hdr_val_(this, at, len))
-                hook.set(stomptalk_error_generic);
-        }
-    }
-
-    void on_body(stomptalk::parser_hook& hook,
-        const void* ptr, std::size_t size) noexcept override
-    {
-        if (on_body_)
-        {
-            if (on_body_(this, static_cast<const char*>(ptr), size))
-                hook.set(stomptalk_error_generic);
-        }
-    }
-
-    void on_frame_end(
-        stomptalk::parser_hook&, const char* ptr) noexcept override
-    {
-        if (on_frame_end_)
-            on_frame_end_(this, ptr);
-    }
+struct stomptalk_parser {
+    stomptalk::parser impl;
+    stomptalk_parser(const stomptalk_parser_config &c, stomptalk_frame_view *f,
+        stomptalk_header_view *h, char *b, stomptalk_backend backend) noexcept
+        : impl(c, f, h, b, backend) {}
 };
 
-stomptalk_parser* stomptalk_parser_new()
-{
-    return new (std::nothrow) stomptalk_parser();
+namespace {
+stomptalk_parser_config defaults() noexcept {
+    return {64, 256, 32768, 64, UINT64_MAX, STOMPTALK_BACKEND_AUTO};
+}
+struct layout {
+    size_t frames, headers, bytes, total;
+};
+bool area(size_t &offset, size_t count, size_t width, size_t alignment, size_t &start) noexcept {
+    const size_t padding = (alignment - offset % alignment) % alignment;
+    const size_t limit = size_t(PTRDIFF_MAX);
+    if (offset > limit - padding) return false;
+    offset += padding;
+    start = offset;
+    if (count > (limit - offset) / width) return false;
+    offset += count * width;
+    return true;
+}
+stomptalk_error_code get_layout(const stomptalk_parser_config &c, layout &l) noexcept {
+    if (!c.frame_capacity || !c.byte_capacity || c.max_headers_per_frame > c.header_capacity)
+        return STOMPTALK_ERROR_CONFIG;
+    if (c.backend > STOMPTALK_BACKEND_AVX2)
+        return STOMPTALK_ERROR_BACKEND;
+    if (c.backend && !(stomptalk_available_backends() & STOMPTALK_BACKEND_BIT(c.backend)))
+        return STOMPTALK_ERROR_BACKEND;
+    size_t offset = sizeof(stomptalk_parser);
+    if (!area(offset, c.frame_capacity, sizeof(stomptalk_frame_view),
+              alignof(stomptalk_frame_view), l.frames) ||
+        !area(offset, c.header_capacity, sizeof(stomptalk_header_view),
+              alignof(stomptalk_header_view), l.headers) ||
+        !area(offset, c.byte_capacity, 1, 1, l.bytes))
+        return STOMPTALK_ERROR_CONFIG;
+    l.total = offset;
+    return STOMPTALK_ERROR_NONE;
+}
 }
 
-void stomptalk_parser_free(stomptalk_parser *parser)
-{
-    delete parser;
+void stomptalk_parser_config_default(stomptalk_parser_config *c) {
+    if (c) *c = defaults();
 }
-
-size_t stomptalk_parser_execute(stomptalk_parser *parser,
-                                const char *data, size_t len)
-{
-    assert(data);
-    assert(parser);
-
-    return static_cast<size_t>(parser->run(data, len));
+stomptalk_error_code stomptalk_parser_get_memory_requirements(
+    const stomptalk_parser_config *config, stomptalk_memory_requirements *r) {
+    if (!r) return STOMPTALK_ERROR_ARGUMENT;
+    *r = {};
+    layout l{};
+    const auto error = get_layout(config ? *config : defaults(), l);
+    if (error) return error;
+    r->size = l.total;
+    r->alignment = (std::max)(alignof(stomptalk_parser),
+        (std::max)(alignof(stomptalk_frame_view), alignof(stomptalk_header_view)));
+    return STOMPTALK_ERROR_NONE;
 }
-
-void stomptalk_set_hook(stomptalk_parser *parser,
-                        const stomptalk_parser_hook *hook, void *arg)
-{
-    assert(parser);
-
-    parser->set(hook, arg);
+stomptalk_error_code stomptalk_parser_init(const stomptalk_parser_config *config,
+    void *memory, size_t size, stomptalk_parser **result) {
+    if (!result) return STOMPTALK_ERROR_ARGUMENT;
+    *result = nullptr;
+    if (!memory) return STOMPTALK_ERROR_ARGUMENT;
+    const auto c = config ? *config : defaults();
+    stomptalk_memory_requirements r{};
+    const auto error = stomptalk_parser_get_memory_requirements(&c, &r);
+    if (error) return error;
+    if (reinterpret_cast<uintptr_t>(memory) % r.alignment) return STOMPTALK_ERROR_ALIGNMENT;
+    if (size < r.size) return STOMPTALK_ERROR_MEMORY;
+    layout l{};
+    get_layout(c, l);
+    auto base = static_cast<char *>(memory);
+    auto frames = reinterpret_cast<stomptalk_frame_view *>(base + l.frames);
+    auto headers = reinterpret_cast<stomptalk_header_view *>(base + l.headers);
+    for (size_t i = 0; i < c.frame_capacity; ++i) new (frames + i) stomptalk_frame_view;
+    for (size_t i = 0; i < c.header_capacity; ++i) new (headers + i) stomptalk_header_view;
+    // Full-parser measurements select SSE2; unmeasured architectures keep the
+    // scalar fallback. SWAR remains available explicitly for comparison.
+    auto backend = c.backend;
+    if (!backend) backend = (stomptalk_available_backends() & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2))
+        ? stomptalk_backend(STOMPTALK_BACKEND_SSE2) : stomptalk_backend(STOMPTALK_BACKEND_SCALAR);
+    *result = new (memory) stomptalk_parser(c, frames, headers, base + l.bytes, backend);
+    return STOMPTALK_ERROR_NONE;
 }
-
-void *stomptalk_get_hook_arg(stomptalk_parser *parser)
-{
-    assert(parser);
-
-    return parser->user_arg();
+void stomptalk_parser_destroy(stomptalk_parser *p) {
+    if (p) p->~stomptalk_parser();
 }
-
-uint64_t stomptalk_get_content_length(stomptalk_parser *parser)
-{
-    assert(parser);
-
-    return parser->content_length();
+void stomptalk_parser_reset(stomptalk_parser *p) {
+    if (p) p->impl.reset();
 }
-
-size_t stomptalk_get_error(stomptalk_parser *parser)
-{
-    assert(parser);
-
-    return parser->get_error();
+stomptalk_parse_result stomptalk_parser_execute(stomptalk_parser *p, const char *data, size_t size) {
+    if (!p) return {0, nullptr, 0, STOMPTALK_PARSE_ERROR, STOMPTALK_ERROR_ARGUMENT, 0};
+    return p->impl.run(data, size);
 }
-
-int64_t stomptalk_antoull(const char *text, size_t len)
-{
-    return static_cast<int64_t>(stomptalk::antoull(text, len));
+stomptalk_method_id stomptalk_detect_method(stomptalk_view v) {
+    if (!v.data) return STOMPTALK_METHOD_UNKNOWN;
+    return stomptalk::detail::detect_method(v);
 }
-// convert string to int64_t
-size_t stomptalk_antoll(int64_t *res, const char *text, size_t len)
-{
-    assert(res);
-
-    if (text && len)
-    {
-        size_t minus = 0;
-
-        // negative number
-        if (*text == '-')
-        {
-            minus = 1;
-            ++text;
-            --len;
-        }
-
-        auto num = static_cast<int64_t>(stomptalk::antoull(text, len));
-        if (num)
-        {
-            *res = minus ? -num : num;
-            return 1;
-        }
+stomptalk_view stomptalk_method_name(stomptalk_method_id id) {
+    return stomptalk::detail::method_name(id);
+}
+stomptalk_view stomptalk_header_name(stomptalk_header_id id) {
+    return stomptalk::detail::header_name(id);
+}
+const stomptalk_header_view *stomptalk_find_header(const stomptalk_frame_view *f, stomptalk_view key) {
+    if (!f || (!key.data && key.size)) return nullptr;
+    for (size_t i = 0; i < f->parsed.header_count; ++i) {
+        const auto &h = f->headers[i];
+        if (h.key.size == key.size && (!key.size || std::memcmp(h.key.data, key.data, key.size) == 0))
+            return &h;
     }
-
-    return 0;
-}
-
-// trim text
-// remove spaceses from both sides
-// change len and return begin of string
-const char* stomptalk_trim(const char *text, size_t *len)
-{
-    assert(len);
-
-    size_t l = *len;
-    // skip spaceses
-    while (l && (' ' == *text))
-        ++text, --l;
-
-    if (l && text)
-    {
-        // last char
-        const char *last = text + l  - 1;
-        while ((text != last) && (' ' == *last))
-            --last, --l;
-
-        // new len
-        *len = l;
-        return text;
-    }
-
-    *len = 0;
     return nullptr;
 }
-
-const char* stomptalk_method_str(uint64_t method)
-{
-    switch (method)
-    {
-    case st_method_none: return "none";
-    case st_method_abort: return "ABORT";
-    case st_method_ack: return "ACK";
-    case st_method_begin: return "BEGIN";
-    case st_method_commit: return "COMMIT";
-    case st_method_connect: return "CONNECT";
-    case st_method_connected: return "CONNECTED";
-    case st_method_disconnect: return "DISCONNECT";
-    case st_method_error: return "ERROR";
-    case st_method_message: return "MESSAGE";
-    case st_method_nack: return "NACK";
-    case st_method_receipt: return "RECEIPT";
-    case st_method_send: return "SEND";
-    case st_method_stomp: return "STOMP";
-    case st_method_subscribe: return "SUBSCRIBE";
-    case st_method_unsubscribe: return "UNSUBSCRIBE";
-    default: ;
-    }
-    return "unknown";
+uint32_t stomptalk_cpu_features(void) {
+    uint32_t features = 0;
+#if (defined(__i386__) || defined(__x86_64__)) && (defined(__GNUC__) || defined(__clang__))
+    __builtin_cpu_init();
+    if (__builtin_cpu_supports("sse2")) features |= STOMPTALK_CPU_SSE2;
+    if (__builtin_cpu_supports("avx2")) features |= STOMPTALK_CPU_AVX2;
+#endif
+    return features;
 }
-
-const char* stomptalk_get_error_str(size_t error)
-{
-    static const char * const str[] = {
-        "none", "stack overflow", "invalid request line",
-        "invalid method", "invalid frame", "inval content size",
-        "call next frame", "generic error"
-    };
-
-    return (error >= stomptalk_error_generic) ?
-        str[stomptalk_error_generic] : str[error];
+uint32_t stomptalk_compiled_backends(void) {
+    return STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SCALAR) |
+           STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SWAR)
+#if defined(__SSE2__)
+           | STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2)
+#endif
+#if STOMPTALK_PARSER_AVX2
+           | STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2)
+#endif
+           ;
 }
-
-const char* stomptalk_version()
-{
-#define STOMPTALK_STR_HELPER(x) #x
-#define STOMPTALK_STR(x) STOMPTALK_STR_HELPER(x)
-    return STOMPTALK_STR(STOMPTALK_VERSION);
-#undef STOMPTALK_STR_HELPER
-#undef STOMPTALK_STR
+uint32_t stomptalk_available_backends(void) {
+    uint32_t mask = stomptalk_compiled_backends();
+    const auto features = stomptalk_cpu_features();
+    if (!(features & STOMPTALK_CPU_SSE2))
+        mask &= ~STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2);
+    if (!(features & STOMPTALK_CPU_AVX2))
+        mask &= ~STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2);
+    return mask;
 }
+stomptalk_backend stomptalk_parser_backend(const stomptalk_parser *p) {
+    return p ? p->impl.backend() : stomptalk_backend(STOMPTALK_BACKEND_AUTO);
+}
+const char *stomptalk_version(void) { return "2.0.0"; }

@@ -1,0 +1,30 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 696  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3341377090
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    18.98%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    17.49%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+    12.37%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     9.09%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+     6.88%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     6.20%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     6.09%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     5.35%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     4.43%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     2.04%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     2.01%  [.] main                                                                              -      -            
+     1.90%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     1.30%  [.] char const* stomptalk::parser::frame_end<4u>(char const*, char const*)            -      -            
+     1.02%  [.] char const* stomptalk::parser::done<4u>(char const*, char const*)                 -      -            
+
+
+#
+# (Tip: To measure approximate function latency with Processor Trace use perf record -e intel_pt// ... ; perf script --call-ret-trace)
+#

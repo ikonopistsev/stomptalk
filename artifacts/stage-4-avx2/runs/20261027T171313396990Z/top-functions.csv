@@ -1,0 +1,61 @@
+opt,backend,self_percent,symbol
+Os,1,25.92,"char const* stomptalk::parser::hdrline_hdr_key<1u>(char const*, char const*)"
+Os,1,15.99,"char const* stomptalk::parser::hdrline_val<1u>(char const*, char const*)"
+Os,1,11.14,stomptalk::parser::finish_value(char const*)
+Os,1,8.1,"char const* stomptalk::parser::start_state<1u>(char const*, char const*)"
+Os,1,7.76,"stomptalk::parser::append(char const*, unsigned long)"
+Os,2,22.41,"char const* stomptalk::parser::hdrline_val<2u>(char const*, char const*)"
+Os,2,19.5,"char const* stomptalk::parser::hdrline_hdr_key<2u>(char const*, char const*)"
+Os,2,10.14,"char const* stomptalk::parser::start_state<2u>(char const*, char const*)"
+Os,2,8.33,stomptalk::parser::publish(bool)
+Os,2,6.14,"stomptalk::parser::append(char const*, unsigned long)"
+Os,3,19.29,"char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)"
+Os,3,13.27,"char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)"
+Os,3,10.42,"char const* stomptalk::parser::start_state<3u>(char const*, char const*)"
+Os,3,9.39,stomptalk::parser::finish_value(char const*)
+Os,3,8.87,stomptalk::parser::publish(bool)
+Os,4,20.26,"char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)"
+Os,4,13.11,"char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)"
+Os,4,12.37,"char const* stomptalk::parser::start_state<4u>(char const*, char const*)"
+Os,4,9.08,stomptalk::parser::publish(bool)
+Os,4,7.87,"stomptalk::parser::append(char const*, unsigned long)"
+O2,1,23.74,"char const* stomptalk::parser::hdrline_hdr_key<1u>(char const*, char const*)"
+O2,1,12.61,"char const* stomptalk::parser::hdrline_val<1u>(char const*, char const*)"
+O2,1,12.44,stomptalk::parser::finish_value(char const*)
+O2,1,12.13,"stomptalk::parser::append(char const*, unsigned long)"
+O2,1,7.56,stomptalk::parser::publish(bool)
+O2,2,24.37,"char const* stomptalk::parser::hdrline_hdr_key<2u>(char const*, char const*)"
+O2,2,19.57,"char const* stomptalk::parser::hdrline_val<2u>(char const*, char const*)"
+O2,2,8.71,"char const* stomptalk::parser::start_state<2u>(char const*, char const*)"
+O2,2,7.79,"stomptalk::parser::append(char const*, unsigned long)"
+O2,2,7.12,stomptalk::parser::finish_value(char const*)
+O2,3,18.48,"char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)"
+O2,3,17.11,"char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)"
+O2,3,12.37,"stomptalk::parser::append(char const*, unsigned long)"
+O2,3,7.89,stomptalk::parser::publish(bool)
+O2,3,7.46,stomptalk::parser::finish_value(char const*)
+O2,4,18.98,"char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)"
+O2,4,17.49,"char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)"
+O2,4,12.37,"stomptalk::parser::append(char const*, unsigned long)"
+O2,4,9.09,"char const* stomptalk::parser::start_state<4u>(char const*, char const*)"
+O2,4,6.88,stomptalk::parser::publish(bool)
+O3,1,26.89,"char const* stomptalk::parser::hdrline_hdr_key<1u>(char const*, char const*)"
+O3,1,12.59,stomptalk::parser::finish_value(char const*)
+O3,1,11.35,"char const* stomptalk::parser::hdrline_val<1u>(char const*, char const*)"
+O3,1,8.66,"stomptalk::parser::append(char const*, unsigned long)"
+O3,1,8.02,"stomptalk::parser::reserve(unsigned long, char const*)"
+O3,2,24.89,"char const* stomptalk::parser::hdrline_val<2u>(char const*, char const*)"
+O3,2,24.86,"char const* stomptalk::parser::hdrline_hdr_key<2u>(char const*, char const*)"
+O3,2,7.19,stomptalk::parser::finish_value(char const*)
+O3,2,6.83,"stomptalk::parser::append(char const*, unsigned long)"
+O3,2,5.69,stomptalk::parser::publish(bool)
+O3,3,19.08,"char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)"
+O3,3,17.15,"char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)"
+O3,3,10.02,"stomptalk::parser::append(char const*, unsigned long)"
+O3,3,9.54,stomptalk::parser::finish_value(char const*)
+O3,3,8.45,stomptalk::parser::publish(bool)
+O3,4,18.08,"char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)"
+O3,4,17.83,"char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)"
+O3,4,10.61,"stomptalk::parser::append(char const*, unsigned long)"
+O3,4,8.58,stomptalk::parser::publish(bool)
+O3,4,8.09,stomptalk::parser::finish_value(char const*)

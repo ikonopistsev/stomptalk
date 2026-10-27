@@ -1,0 +1,28 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu_core/cycles/u'
+# Event count (approx.): 5233497702
+#
+# Overhead  Symbol                                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................................  ....................
+#
+    43.41%  [.] stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)             -      -            
+    24.19%  [.] stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+    13.47%  [.] stomptalk::parser::method_state(stomptalk::parser_hook&, char const*, char const*)                -      -            
+     3.72%  [.] stomptalk::parser_hook::on_hdr_val(char const*, unsigned long)                                    -      -            
+     2.14%  [.] stomptalk::parser::hdrline_done(stomptalk::parser_hook&, char const*, char const*)                -      -            
+     1.77%  [.] value(stomptalk_parser*, char const*, unsigned long)                                              -      -            
+     1.71%  [.] stomptalk_parser::on_hdr_key(stomptalk::parser_hook&, unsigned long, char const*, unsigned long)  -      -            
+     1.47%  [.] stomptalk::parser::done(stomptalk::parser_hook&, char const*, char const*)                        -      -            
+     1.40%  [.] stomptalk::parser::start_state(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+     1.40%  [.] key(stomptalk_parser*, unsigned long, char const*, unsigned long)                                 -      -            
+     1.30%  [.] stomptalk_parser::on_hdr_val(stomptalk::parser_hook&, char const*, unsigned long)                 -      -            
+     1.21%  [.] stomptalk_get_hook_arg                                                                            -      -            
+
+
+#
+# (Tip: Show current config key-value pairs: perf config --list)
+#

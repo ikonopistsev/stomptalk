@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 683  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3259210696
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    18.48%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)          -      -            
+    17.11%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)      -      -            
+    12.37%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     7.89%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     7.46%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     6.89%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     5.88%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     4.82%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     3.36%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     3.06%  [.] main                                                                              -      -            
+     2.68%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     2.42%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     1.19%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -            
+
+
+#
+# (Tip: Create an archive with symtabs to analyse on other machine: perf archive)
+#

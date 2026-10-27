@@ -1,30 +1,21 @@
 #include "stomptalk/parser.h"
-
-#include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int at_frame(stomptalk_parser* parser, const char* at);
-
-int at_method(stomptalk_parser* parser, uint64_t method_id, const char *at, size_t length);
-
-int at_hdr_key(stomptalk_parser* parser, uint64_t header_id, const char *at, size_t length);
-
-int at_hdr_val(stomptalk_parser* parser, const char *at, size_t length);
-
-int at_body(stomptalk_parser* parser, const char *at, size_t length);
-
-int at_frame_end(stomptalk_parser* parser, const char*);
-
-size_t connected_count = 0;
-size_t frame_count = 0;
-uint64_t header_num_id = 0;
-size_t content_length = 0;
-size_t application_json = 0;
-
-int main()
+int main(int argc, char **argv)
 {
-    fprintf(stdout, "stomptalk v%s\n", stomptalk_version());
-
+    const size_t iterations = argc > 2 ? (size_t)strtoull(argv[2], NULL, 10) : 10000000;
+    stomptalk_parser_config config;
+    stomptalk_parser_config_default(&config);
+    if (argc > 1) config.backend = (stomptalk_backend)strtoul(argv[1], NULL, 10);
+    stomptalk_memory_requirements req;
+    if (stomptalk_parser_get_memory_requirements(&config, &req)) return 2;
+    void *memory = malloc(req.size);
+    stomptalk_parser *parser = NULL;
+    if (!memory || stomptalk_parser_init(&config, memory, req.size, &parser)) return 2;
+    size_t connected = 0, frames = 0, json = 0, total = 0;
+    printf("stomptalk v%s\n", stomptalk_version());
     static const char example10[] =
         "CONNECTED\r\n"
             "version:1.2\r\n"
@@ -87,118 +78,37 @@ int main()
             "receipt:77\r\n"
             "\r\n\0";
 
-    stomptalk_parser *parser = stomptalk_parser_new();
-
-    stomptalk_parser_hook hook = {
-        .on_frame = at_frame,
-        .on_method = at_method,
-        .on_hdr_key = at_hdr_key,
-        .on_hdr_val = at_hdr_val,
-        .on_body = at_body,
-        .on_frame_end = at_frame_end
-    };
-
-    stomptalk_set_hook(parser, &hook, 0);
-
-    // parse 100 million of frames
-    // % time ./purestomp
-    // stomptalk v1.7.0
-    // connected 10000000, frame 100000000, json 10000000, total 670000000
-    // ./purestomp  8,35s user 0,00s system 99% cpu 8,351 total
-    // it over 10 million request per second
-
-    size_t count = 10000000;
-    size_t i = 0;
-    for ( ; i < count; ++i)
-    {
-        size_t needle = 0;
-        const char *data = example10;
-        size_t size = sizeof(example10) - 1;
-        const char *data_end = data + size;
-        size_t chunk_size = size;
-
-        while (data != data_end)
-        {
-            // сколько буфера осталось
-            needle = data_end - data;
-            // по сколько бдуем читать
-            //chunk_size = rand() % (size / 5);
-            size_t readsize = chunk_size < needle ? chunk_size :needle;
-            // парсим
-            size_t rc = stomptalk_parser_execute(parser, data, readsize);
-            if (rc != readsize)
-            {
-                // it's error!
-                stomptalk_parser_free(parser);
-                return 1;
+    for (size_t i = 0; i < iterations; ++i) {
+        size_t offset = 0;
+        while (offset < sizeof(example10) - 1) {
+            stomptalk_parse_result r = stomptalk_parser_execute(parser,
+                example10 + offset, sizeof(example10) - 1 - offset);
+            if (r.status == STOMPTALK_PARSE_ERROR || (!r.consumed && !r.frame_count)) {
+                fprintf(stderr, "error %u at %zu\n", r.error, offset + r.error_offset);
+                return 3;
             }
-
-            data += rc;
-
-            // проверяем все ли пропарсили
-            if (needle == rc)
-            {
-                // this is end
-                break;
+            for (size_t j = 0; j < r.frame_count; ++j) {
+                const stomptalk_frame_view *f = r.frames + j;
+                if (f->parsed.flags & STOMPTALK_FRAME_BEGIN) {
+                    connected += f->parsed.method_id == STOMPTALK_METHOD_CONNECTED;
+                    for (size_t k = 0; k < f->parsed.header_count; ++k) {
+                        const stomptalk_header_view *h = f->headers + k;
+                        if (h->key.size == 12 && memcmp(h->key.data, "content-type", 12) == 0) {
+                            json += h->value.size == 16 &&
+                                    memcmp(h->value.data, "application/json", 16) == 0;
+                            break;
+                        }
+                    }
+                }
+                frames += (f->parsed.flags & STOMPTALK_FRAME_COMPLETE) != 0;
+                total += f->parsed.payload_size;
             }
+            offset += r.consumed;
         }
     }
-
-    fprintf(stdout, "connected %zu, frame %zu, json %zu, total %zu\n", 
-       connected_count, frame_count, application_json, content_length);
-
-    stomptalk_parser_free(parser);
-
-    return 0;
-}
-
-int at_frame(stomptalk_parser* parser, const char* at)
-{
-    // no error
-    return 0;
-}
-
-int at_method(stomptalk_parser* parser, uint64_t method_id, const char* at, size_t length)
-{
-    if (st_method_connected == method_id)
-         ++connected_count;
-
-    return 0;
-}
-
-int at_hdr_key(stomptalk_parser* parser, uint64_t header_id, const char* at, size_t length)
-{
-    header_num_id = header_id;
-    return 0;
-}
-
-int at_hdr_val(stomptalk_parser* parser, const char* at, size_t length)
-{
-    static const char json[] = "application/json";
-    static const size_t json_size = sizeof(json) - 1;
-    if (st_header_content_type == header_num_id)
-    {
-        if (json_size == length)
-        {
-            if (memcmp(json, at, length) == 0)
-                ++application_json;
-        }
-
-        header_num_id = st_header_none;
-    }
-
-    return 0;
-}
-
-int at_body(stomptalk_parser* parser, const char* at, size_t length)
-{
-    content_length += length;
-    return 0;
-}
-
-int at_frame_end(stomptalk_parser* parser, const char* at)
-{
-    ++frame_count;
-    // no error
-    return 0;
+    printf("connected %zu, frame %zu, json %zu, total %zu\n", connected, frames, json, total);
+    stomptalk_parser_destroy(parser);
+    free(memory);
+    return connected != iterations || frames != 10 * iterations ||
+           json != iterations || total != 67 * iterations;
 }

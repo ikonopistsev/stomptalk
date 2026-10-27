@@ -1,0 +1,27 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 500  of event 'cpu_core/cycles/u'
+# Event count (approx.): 2403818892
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    31.24%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)          -      -            
+    23.28%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)      -      -            
+    11.14%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     9.07%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -            
+     6.56%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     5.44%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     3.44%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     3.36%  [.] main                                                                              -      -            
+     3.18%  [.] char const* stomptalk::parser::done<3u>(char const*, char const*)                 -      -            
+     1.22%  [.] stomptalk::parser::run(char const*, unsigned long)                                -      -            
+     1.21%  [.] char const* stomptalk::parser::body_read<3u>(char const*, char const*)            -      -            
+
+
+#
+# (Tip: To set sampling period of individual events use perf record -e cpu/cpu-cycles,period=100001/,cpu/branches,period=10001/ ...)
+#

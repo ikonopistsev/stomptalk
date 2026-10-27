@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stomptalk/fnv1a.hpp"
+#include "stomptalk/_fnv1a.hpp"
 
 namespace stomptalk {
 

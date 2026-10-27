@@ -1,7 +1,7 @@
 #pragma once
 
-#include "stomptalk/hook_base.hpp"
-#include "stomptalk/antoull.hpp"
+#include "stomptalk/_hook_base.hpp"
+#include "stomptalk/_antoull.hpp"
 #include "stomptalk/parser.h"
 
 namespace stomptalk {

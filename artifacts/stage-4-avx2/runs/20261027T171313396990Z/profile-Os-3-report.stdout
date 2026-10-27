@@ -1,0 +1,32 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 997  of event 'cpu_core/cycles/u'
+# Event count (approx.): 4832232111
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    19.29%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)      -      -            
+    13.27%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)          -      -            
+    10.42%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     9.39%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     8.87%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     8.78%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     3.62%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     3.51%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     2.93%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     2.82%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     2.59%  [.] main                                                                              -      -            
+     2.21%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     2.02%  [.] 0x000000000016465d                                                                -      -            
+     1.81%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)  -      -            
+     1.31%  [.] stomptalk::parser::own_token()                                                    -      -            
+     1.11%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: To record every process run by a user: perf record -u <user>)
+#

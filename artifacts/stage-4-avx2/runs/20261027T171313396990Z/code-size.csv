@@ -1,0 +1,7 @@
+opt,variant,text_bytes
+Os,before,22129
+Os,after,25726
+O2,before,32790
+O2,after,37749
+O3,before,35174
+O3,after,42029

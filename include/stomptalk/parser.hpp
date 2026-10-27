@@ -1,104 +1,75 @@
 #pragma once
-
-#include "stomptalk/parser_hook.hpp"
+#include "stomptalk/parser.h"
 #include "stomptalk/stackbuf.hpp"
-#include "stomptalk/hashval.hpp"
-#include <iterator>
 
 namespace stomptalk {
 
-#ifndef STOMPTALK_PARSER_STACK_SIZE
-#define STOMPTALK_PARSER_STACK_SIZE 4096
-#endif
-
-STOMPTALK_FORCE_INLINE
-static bool ch_isprint(unsigned char ch) noexcept { 
-    return ch >= 32 && ch <= 126; 
-}
-
-STOMPTALK_FORCE_INLINE
-static bool ch_isprint_nospace(unsigned char ch) noexcept { 
-    return ch > 32 && ch <= 126; 
-}
-
-STOMPTALK_FORCE_INLINE
-static bool ch_isupper(unsigned char ch) noexcept { 
-    return ch >= 'A' && ch <= 'Z';
-}
-
-class STOMPTALK_EXPORT parser
-{
+// State names and tail transitions follow 123/backup/parser.cpp.
+// Storage/publication replace its callbacks and per-byte hash accumulator.
+class parser {
 public:
-    using pointer = const char*;
-    using state_type = pointer (parser::*)(parser_hook&, pointer, pointer);
-
+    using pointer = const char *;
+    using state_type = pointer (parser::*)(pointer, pointer);
 private:
-    pointer start_state(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
+    stomptalk_parser_config config_;
+    stomptalk_frame_view *frames_;
+    stomptalk_header_view *headers_;
+    stackbuf bytes_;
+    stomptalk_backend backend_;
+    state_type state_{};
+    stomptalk_frame_view current_{};
+    stomptalk_view key_{}, token_{};
+    size_t frame_count_{0}, header_used_{0}, header_begin_{0}, byte_begin_{0};
+    size_t active_bytes_{0};
+    bool active_{false}, begun_{false}, escape_{false}, literal_{false};
+    bool length_header_{false}, token_owned_{false};
+    stomptalk_parse_status status_{STOMPTALK_PARSE_OK};
+    stomptalk_error_code error_{STOMPTALK_ERROR_NONE};
+    size_t error_offset_{0};
+    pointer begin_{nullptr}, stop_{nullptr}; // only valid during run()
 
-    pointer method_state(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
+    pointer fail(stomptalk_error_code, pointer) noexcept;
+    bool reserve(size_t, pointer) noexcept;
+    bool append(pointer, size_t) noexcept;
+    bool append(char, pointer) noexcept;
+    void own(stomptalk_view &) noexcept;
+    void own_metadata() noexcept;
+    void own_token() noexcept;
+    stomptalk_view finish_token() noexcept;
+    void recycle() noexcept;
+    void publish(bool complete) noexcept;
+    bool finish_value(pointer) noexcept;
+    bool check_body(size_t, pointer) noexcept;
 
-    pointer hdrline_hdr_key(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer hdrline_val(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer hdrline_done(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer hdrline_almost_done(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer done(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer almost_done(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer body_read(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer body_read_no_length(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    pointer frame_end(parser_hook& hook,
-        pointer curr, pointer end) noexcept;
-
-    state_type state_{&parser::start_state};
-    stackbuf<char, STOMPTALK_PARSER_STACK_SIZE> sbuf_{};
-    hashval<char> hval_{};
-    bool escape_{false};
-
-    STOMPTALK_FORCE_INLINE
-    auto push(parser_hook& hook, char c) noexcept 
-    {
-        if (sbuf_.push(c)) 
-        {
-            hval_.push(c);
-            return true;
-        }
-
-        hook.set(stomptalk_error_too_big); 
-        return false;
+    STOMPTALK_FORCE_INLINE pointer tailcall(state_type next, pointer p, pointer end) noexcept {
+        state_ = next;
+#if defined(__OPTIMIZE__) && !defined(STOMPTALK_TRAMPOLINE) && !defined(__SANITIZE_ADDRESS__)
+        if (p < end && status_ == STOMPTALK_PARSE_OK)
+            return (this->*next)(p, end);
+#else
+        (void)end;
+#endif
+        return p;
     }
 
-    STOMPTALK_FORCE_INLINE
-    auto tailcall(parser_hook& hook, state_type next, 
-        pointer curr, pointer end) noexcept 
-    {
-        state_ = next;
-        return (curr < end) ? 
-            (this->*next)(hook, curr, end) : curr;
-    }       
-
+    static state_type avx2_state() noexcept;
+    template<stomptalk_backend B> pointer start_state(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer start_cr(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer method_state(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer hdrline_done(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer hdrline_hdr_key(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer hdrline_val(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer hdrline_almost_done(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer almost_done(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer done(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer body_read(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer body_read_no_length(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer frame_end(pointer, pointer) noexcept;
 public:
-    parser() = default;
-
-    std::size_t run(parser_hook& hook,
-        const char *ptr, std::size_t len) noexcept;
-
+    parser(const stomptalk_parser_config &, stomptalk_frame_view *,
+           stomptalk_header_view *, char *, stomptalk_backend) noexcept;
+    void reset() noexcept;
+    stomptalk_parse_result run(pointer, size_t) noexcept;
+    stomptalk_backend backend() const noexcept { return backend_; }
 };
-
-} // namespace stomptalk
+}

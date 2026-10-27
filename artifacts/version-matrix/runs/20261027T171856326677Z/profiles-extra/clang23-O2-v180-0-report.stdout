@@ -1,0 +1,27 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu_core/cycles/u'
+# Event count (approx.): 5651970613
+#
+# Overhead  Symbol                                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................................  ....................
+#
+    42.43%  [.] stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)             -      -            
+    21.51%  [.] stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+     9.21%  [.] stomptalk::parser::method_state(stomptalk::parser_hook&, char const*, char const*)                -      -            
+     8.26%  [.] stomptalk::parser::hdrline_done(stomptalk::parser_hook&, char const*, char const*)                -      -            
+     2.83%  [.] stomptalk::parser_hook::on_hdr_val(char const*, unsigned long)                                    -      -            
+     2.41%  [.] stomptalk_parser::on_hdr_key(stomptalk::parser_hook&, unsigned long, char const*, unsigned long)  -      -            
+     2.23%  [.] value(stomptalk_parser*, char const*, unsigned long)                                              -      -            
+     1.81%  [.] stomptalk_get_hook_arg                                                                            -      -            
+     1.65%  [.] stomptalk::parser::start_state(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+     1.38%  [.] key(stomptalk_parser*, unsigned long, char const*, unsigned long)                                 -      -            
+     1.29%  [.] stomptalk_parser::on_hdr_val(stomptalk::parser_hook&, char const*, unsigned long)                 -      -            
+
+
+#
+# (Tip: Boolean options have negative forms, e.g.: perf report --no-children)
+#

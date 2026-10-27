@@ -1,0 +1,27 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 2K of event 'cpu_core/cycles/u'
+# Event count (approx.): 10659243480
+#
+# Overhead  Symbol                                                                                                      IPC   [IPC Coverage]
+# ........  ..........................................................................................................  ....................
+#
+    53.35%  [.] stomptalk::stackbuf<char, 4096ul>::push(char)                                                           -      -            
+    12.25%  [.] stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)                   -      -            
+     7.91%  [.] stomptalk::hashval<char>::push(char)                                                                    -      -            
+     3.30%  [.] stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)                       -      -            
+     2.52%  [.] stomptalk::parser::hdrline_done(stomptalk::parser_hook&, char const*, char const*)                      -      -            
+     2.29%  [.] stomptalk::stackbuf<char, 4096ul>::pop()                                                                -      -            
+     2.14%  [.] stomptalk::parser::method_state(stomptalk::parser_hook&, char const*, char const*)                      -      -            
+     1.92%  [.] void stomptalk::parser_hook::on_hdr_val<std::pair<char*, long> >(std::pair<char*, long>)                -      -            
+     1.88%  [.] value(stomptalk_parser*, char const*, unsigned long)                                                    -      -            
+     1.65%  [.] stomptalk_parser::on_hdr_key(stomptalk::parser_hook&, unsigned long, char const*, unsigned long)        -      -            
+     1.37%  [.] key(stomptalk_parser*, unsigned long, char const*, unsigned long)                                       -      -            
+
+
+#
+# (Tip: For tracepoint events, try: perf report -s trace_fields)
+#

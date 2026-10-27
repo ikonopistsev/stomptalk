@@ -1,0 +1,28 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 684  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3301398986
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    22.88%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    20.08%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+    10.16%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     9.08%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+     6.97%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     6.77%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     5.60%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     5.46%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     5.30%  [.] main                                                                              -      -            
+     3.68%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     1.92%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     1.18%  [.] char const* stomptalk::parser::body_read_no_length<4u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: To count events every 1000 msec: perf stat -I 1000)
+#

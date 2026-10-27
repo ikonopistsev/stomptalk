@@ -1,0 +1,27 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu_core/cycles/u'
+# Event count (approx.): 5738730057
+#
+# Overhead  Symbol                                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................................  ....................
+#
+    44.99%  [.] stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)             -      -            
+    22.97%  [.] stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+    13.68%  [.] stomptalk::parser::method_state(stomptalk::parser_hook&, char const*, char const*)                -      -            
+     2.89%  [.] stomptalk::parser::hdrline_done(stomptalk::parser_hook&, char const*, char const*)                -      -            
+     2.72%  [.] stomptalk::parser_hook::on_hdr_val(char const*, unsigned long)                                    -      -            
+     1.86%  [.] value(stomptalk_parser*, char const*, unsigned long)                                              -      -            
+     1.53%  [.] stomptalk_parser::on_hdr_key(stomptalk::parser_hook&, unsigned long, char const*, unsigned long)  -      -            
+     1.52%  [.] stomptalk_get_hook_arg                                                                            -      -            
+     1.45%  [.] stomptalk::parser::done(stomptalk::parser_hook&, char const*, char const*)                        -      -            
+     1.27%  [.] stomptalk::parser::start_state(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+     1.02%  [.] stomptalk_parser::on_hdr_val(stomptalk::parser_hook&, char const*, unsigned long)                 -      -            
+
+
+#
+# (Tip: For tracepoint events, try: perf report -s trace_fields)
+#

@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 608  of event 'cpu_core/cycles/u'
+# Event count (approx.): 2941814247
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    18.54%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)      -      -            
+    17.67%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)          -      -            
+    11.29%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     9.44%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     9.14%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     8.11%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     5.13%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     5.00%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     3.98%  [.] main                                                                              -      -            
+     3.62%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     3.15%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     1.82%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -            
+     1.06%  [.] 0x00000000001640e8                                                                -      -            
+
+
+#
+# (Tip: To separate samples by time use perf report --sort time,overhead,sym)
+#

@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 723  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3422430671
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    18.08%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    17.83%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+    10.61%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     8.58%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     8.09%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     7.49%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+     6.34%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     5.43%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     4.51%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     2.55%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     2.27%  [.] main                                                                              -      -            
+     2.16%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     1.43%  [.] char const* stomptalk::parser::body_read_no_length<4u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: Print event counts in machine readable CSV format with: perf stat -x\;)
+#

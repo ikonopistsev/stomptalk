@@ -1,0 +1,27 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu_core/cycles/u'
+# Event count (approx.): 4845168810
+#
+# Overhead  Symbol                                                                                                    IPC   [IPC Coverage]
+# ........  ........................................................................................................  ....................
+#
+    45.13%  [.] stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+    23.41%  [.] stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)                     -      -            
+    12.38%  [.] stomptalk::parser::method_state(stomptalk::parser_hook&, char const*, char const*)                    -      -            
+     3.81%  [.] stomptalk::parser::hdrline_done(stomptalk::parser_hook&, char const*, char const*)                    -      -            
+     2.60%  [.] stomptalk::parser_hook::on_hdr_key(std::basic_string_view<char, std::char_traits<char> >)             -      -            
+     2.21%  [.] stomptalk::parser::start_state(stomptalk::parser_hook&, char const*, char const*)                     -      -            
+     1.60%  [.] stomptalk::parser_hook::on_hdr_val(std::basic_string_view<char, std::char_traits<char> >)             -      -            
+     1.60%  [.] counters::on_hdr_val(stomptalk::parser_hook&, std::basic_string_view<char, std::char_traits<char> >)  -      -            
+     1.11%  [.] counters::on_hdr_key(stomptalk::parser_hook&, std::basic_string_view<char, std::char_traits<char> >)  -      -            
+     1.01%  [.] stomptalk::parser::hdrline_almost_done(stomptalk::parser_hook&, char const*, char const*)             -      -            
+     1.00%  [.] counters::on_frame(stomptalk::parser_hook&)                                                           -      -            
+
+
+#
+# (Tip: Use parent filter to see specific call path: perf report -p <regex>)
+#

@@ -1,0 +1,26 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu_core/cycles/u'
+# Event count (approx.): 5157681012
+#
+# Overhead  Symbol                                                                                                    IPC   [IPC Coverage]
+# ........  ........................................................................................................  ....................
+#
+    43.64%  [.] stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)                 -      -            
+    25.91%  [.] stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)                     -      -            
+    12.77%  [.] stomptalk::parser::method_state(stomptalk::parser_hook&, char const*, char const*)                    -      -            
+     3.59%  [.] stomptalk::parser_hook::on_hdr_val(std::basic_string_view<char, std::char_traits<char> >)             -      -            
+     2.64%  [.] stomptalk::parser::hdrline_done(stomptalk::parser_hook&, char const*, char const*)                    -      -            
+     2.08%  [.] counters::on_hdr_key(stomptalk::parser_hook&, std::basic_string_view<char, std::char_traits<char> >)  -      -            
+     1.61%  [.] stomptalk::parser::done(stomptalk::parser_hook&, char const*, char const*)                            -      -            
+     1.61%  [.] stomptalk::parser_hook::on_hdr_key(std::basic_string_view<char, std::char_traits<char> >)             -      -            
+     1.60%  [.] stomptalk::parser::start_state(stomptalk::parser_hook&, char const*, char const*)                     -      -            
+     1.34%  [.] counters::on_hdr_val(stomptalk::parser_hook&, std::basic_string_view<char, std::char_traits<char> >)  -      -            
+
+
+#
+# (Tip: Profiling branch (mis)predictions with: perf record -b / perf report)
+#

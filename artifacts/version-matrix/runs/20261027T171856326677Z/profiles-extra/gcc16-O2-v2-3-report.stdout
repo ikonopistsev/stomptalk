@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 649  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3119152097
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    23.25%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)      -      -            
+    17.26%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)          -      -            
+     9.83%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     9.14%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     7.04%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     6.74%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     5.77%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     4.31%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     4.22%  [.] main                                                                              -      -            
+     3.45%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     3.30%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     2.04%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -            
+     1.41%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: See assembly instructions with percentage: perf annotate <symbol>)
+#

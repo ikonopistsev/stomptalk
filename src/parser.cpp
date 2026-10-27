@@ -1,362 +1,254 @@
+// Derived from 123/backup/parser.cpp: small state functions and tailcall tree.
 #include "stomptalk/parser.hpp"
-#include <cstring>
-#include <cassert>
+#include "stomptalk/antoull.hpp"
+#include "methods.hpp"
+#include "content_length.hpp"
+#include "scan.hpp"
+#include "parser_dispatch.hpp"
 #include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <limits>
 
 namespace stomptalk {
 
-parser::pointer parser::start_state(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    do {
-        auto ch = *curr++;
-        // пропускаем символы до первого значимого
-        if ((ch == '\r') || (ch == '\n') || (ch == '\0'))
-            continue;
+parser::parser(const stomptalk_parser_config &config, stomptalk_frame_view *frames,
+    stomptalk_header_view *headers, char *bytes, stomptalk_backend backend) noexcept
+    : config_(config), frames_(frames), headers_(headers), bytes_(bytes, config.byte_capacity),
+      backend_(backend) { reset(); }
 
-        if (!ch_isupper(ch))
-        {
-            hook.set(stomptalk_error_inval_reqline);
-            return curr;
+void parser::reset() noexcept {
+    bytes_.reset();
+    frame_count_ = header_used_ = header_begin_ = byte_begin_ = active_bytes_ = 0;
+    current_ = {};
+    key_ = token_ = {nullptr, 0};
+    active_ = begun_ = escape_ = literal_ = length_header_ = token_owned_ = false;
+    error_ = STOMPTALK_ERROR_NONE;
+    status_ = STOMPTALK_PARSE_OK;
+    error_offset_ = 0;
+    begin_ = stop_ = nullptr;
+    switch (backend_) {
+    case STOMPTALK_BACKEND_SWAR: state_ = &parser::start_state<STOMPTALK_BACKEND_SWAR>; break;
+#if defined(__SSE2__)
+    case STOMPTALK_BACKEND_SSE2: state_ = &parser::start_state<STOMPTALK_BACKEND_SSE2>; break;
+#endif
+#if STOMPTALK_PARSER_AVX2
+    case STOMPTALK_BACKEND_AVX2: state_ = avx2_state(); break;
+#endif
+    default: state_ = &parser::start_state<STOMPTALK_BACKEND_SCALAR>; break;
+    }
+}
+
+parser::pointer parser::fail(stomptalk_error_code error, pointer at) noexcept {
+    error_ = error;
+    status_ = STOMPTALK_PARSE_ERROR;
+    error_offset_ = static_cast<size_t>(at - begin_);
+    return stop_ = at + 1;
+}
+
+// Reserve logical bytes, including borrowed active strings. Already completed
+// records occupy [0, byte_begin_); reclaiming them must free this exact resource.
+bool parser::reserve(size_t count, pointer at) noexcept {
+    if (count > config_.byte_capacity - active_bytes_) {
+        fail(STOMPTALK_ERROR_BYTE_LIMIT, at + (config_.byte_capacity - active_bytes_));
+        return false;
+    }
+    if (count > config_.byte_capacity - byte_begin_ - active_bytes_) {
+        assert(frame_count_ && byte_begin_);
+        status_ = STOMPTALK_PARSE_OUTPUT_FULL;
+        stop_ = at;
+        return false;
+    }
+    active_bytes_ += count;
+    return true;
+}
+
+void parser::own(stomptalk_view &v) noexcept {
+    if (!v.size) { v.data = nullptr; return; }
+    const uintptr_t offset = reinterpret_cast<uintptr_t>(v.data) -
+                             reinterpret_cast<uintptr_t>(bytes_.data());
+    if (offset < config_.byte_capacity) return;
+    char *dest = bytes_.next();
+    const bool ok = bytes_.push(v.data, v.size);
+    assert(ok); // space was reserved before the source bytes were consumed
+    (void)ok;
+    v.data = dest;
+}
+
+void parser::own_metadata() noexcept {
+    own(current_.method_text);
+    for (size_t i = header_begin_; i < header_used_; ++i) {
+        own(headers_[i].key);
+        own(headers_[i].value);
+    }
+    own(key_);
+}
+
+void parser::own_token() noexcept {
+    if (token_owned_) return;
+    own_metadata(); // the open string must remain last in the accumulator
+    char *dest = bytes_.next();
+    const bool ok = bytes_.push(token_.data, token_.size);
+    assert(ok);
+    (void)ok;
+    token_.data = dest;
+    token_owned_ = true;
+}
+
+bool parser::append(pointer data, size_t count) noexcept {
+    if (!count) return true;
+    if (!reserve(count, data)) return false;
+    if (token_owned_) {
+        const bool ok = bytes_.push(data, count);
+        assert(ok);
+        (void)ok;
+    } else if (!token_.size) {
+        token_.data = data;
+    } else {
+        assert(token_.data + token_.size == data);
+    }
+    token_.size += count;
+    return true;
+}
+
+bool parser::append(char value, pointer source) noexcept {
+    if (!reserve(1, source)) return false;
+    own_token();
+    const bool ok = bytes_.push(value);
+    assert(ok);
+    (void)ok;
+    ++token_.size;
+    return true;
+}
+
+stomptalk_view parser::finish_token() noexcept {
+    const stomptalk_view result = token_.size ? token_ : stomptalk_view{nullptr, 0};
+    token_ = {nullptr, 0};
+    token_owned_ = false;
+    return result;
+}
+
+void parser::recycle() noexcept {
+    frame_count_ = 0;
+    current_.payload = nullptr;
+    current_.parsed.payload_size = 0;
+    if (!active_) {
+        bytes_.reset();
+        header_used_ = header_begin_ = byte_begin_ = 0;
+        return;
+    }
+    const size_t count = header_used_ - header_begin_;
+    if (header_begin_ && count)
+        std::memmove(headers_, headers_ + header_begin_, count * sizeof(*headers_));
+    header_used_ = count;
+    header_begin_ = 0;
+    // All persistent active views were promoted before the preceding return.
+    if (byte_begin_) {
+        auto shift = [this](stomptalk_view &v) {
+            if (v.data) v.data -= byte_begin_;
+        };
+        shift(current_.method_text);
+        shift(key_);
+        shift(token_);
+        for (size_t i = 0; i < count; ++i) {
+            shift(headers_[i].key);
+            shift(headers_[i].value);
         }
-
-        sbuf_.reset();
-        hval_.reset();
-        hook.reset();
-        escape_ = false;
-        // передаем позицию в буфере
-        hook.on_frame(curr - 1);
-
-        // сохраняем стек
-        sbuf_.push(ch);
-        // инкрементируем хэш
-        hval_.push(ch);
-
-        // переходим к разбору метода
-        return tailcall(hook, &parser::method_state, curr, end);
-    } while (curr < end);
-
-    return curr;
+        bytes_.retain(byte_begin_);
+        byte_begin_ = 0;
+    }
 }
 
-parser::pointer parser::method_state(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    do {
-        auto ch = *curr++;
+void parser::publish(bool complete) noexcept {
+    assert(frame_count_ < config_.frame_capacity);
+    current_.headers = current_.parsed.header_count ? headers_ + header_begin_ : nullptr;
+    current_.parsed.flags &= STOMPTALK_FRAME_HAS_CONTENT_LENGTH;
+    if (!begun_) current_.parsed.flags |= STOMPTALK_FRAME_BEGIN;
+    if (complete) current_.parsed.flags |= STOMPTALK_FRAME_COMPLETE;
+    frames_[frame_count_++] = current_;
+    current_.parsed.payload_offset += current_.parsed.payload_size;
+    current_.payload = nullptr;
+    current_.parsed.payload_size = 0;
+    begun_ = true;
+    if (complete) active_ = false;
+}
 
-        if (ch_isupper(ch))
-        {
-            if (!push(hook, ch)) { 
-                return curr; 
-            }
+bool parser::finish_value(pointer eol) noexcept {
+    const stomptalk_view value = finish_token();
+    if (length_header_) {
+        uint64_t length;
+        if (!antoull(length, value.data, value.size)) {
+            fail(STOMPTALK_ERROR_CONTENT_LENGTH, eol);
+            return false;
         }
-        else
-        {
-            if (ch == '\n')
-            {
-                // определяем метод
-                // вызываем каллбек
-                hook.on_method(hval_.pop(), sbuf_.pop());
-
-                // переходим к поиску конца метода
-                return tailcall(hook, &parser::hdrline_done, curr, end);
-            }
-            else if (ch == '\r')
-            {
-                // определяем метод
-                // вызываем каллбек
-                hook.on_method(hval_.pop(), sbuf_.pop());
-
-                // переходим к поиску конца метода
-                return tailcall(hook, &parser::hdrline_almost_done, curr, end);
-            }
-            else
-            {
-                hook.set(stomptalk_error_inval_method);
-                return curr;
-            }
+        if (length > config_.max_body_size) {
+            fail(STOMPTALK_ERROR_BODY_LIMIT, eol);
+            return false;
         }
-
-    } while (curr < end);
-
-    return curr;
+        current_.parsed.content_length = length;
+        current_.parsed.flags |= STOMPTALK_FRAME_HAS_CONTENT_LENGTH;
+    }
+    headers_[header_used_++] = {key_, value};
+    ++current_.parsed.header_count;
+    key_ = {nullptr, 0};
+    length_header_ = false;
+    return true;
 }
 
-parser::pointer parser::hdrline_hdr_key(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    do {
-        unsigned char ch = static_cast<unsigned char>(*curr++);
+bool parser::check_body(size_t count, pointer source) noexcept {
+    if (count > config_.max_body_size - current_.parsed.payload_offset) {
+        fail(STOMPTALK_ERROR_BODY_LIMIT,
+             source + static_cast<size_t>(config_.max_body_size - current_.parsed.payload_offset));
+        return false;
+    }
+    return true;
+}
 
-        // 1) Продолжение escape-последовательности?
-        if (escape_) 
-        {
-            switch (ch) {
-                case 'n': ch = '\n'; break;
-                case 'r': ch = '\r'; break;
-                case 'c': ch = ':';  break;
-                case '\\': ch = '\\'; break;
-                default:
-                    hook.set(stomptalk_error_inval_frame);
-                    return curr;
-            }
-            // записали раскодированный символ в ключ + хэш
-            if (!push(hook, ch)) { 
-                return curr; 
-            }
+// Baseline states stay usable on CPUs without AVX2.
+#define STOMPTALK_STATE_TARGET
+#include "parser_states.hpp"
+#undef STOMPTALK_STATE_TARGET
 
-            escape_ = false;
-            continue; // берём следующий байт
+stomptalk_parse_result parser::run(pointer data, size_t size) noexcept {
+    if (error_) return {0, frames_, 0, STOMPTALK_PARSE_ERROR, error_, 0};
+    recycle();
+    status_ = STOMPTALK_PARSE_OK;
+    error_offset_ = 0;
+    if ((!data && size) || size > size_t(PTRDIFF_MAX)) {
+        error_ = STOMPTALK_ERROR_ARGUMENT;
+        return {0, frames_, 0, STOMPTALK_PARSE_ERROR, error_, 0};
+    }
+    pointer curr = data;
+    begin_ = data;
+    if (size) {
+        const pointer end = data + size;
+        while (curr < end && status_ == STOMPTALK_PARSE_OK)
+            curr = (this->*state_)(curr, end);
+    }
+    if (status_ != STOMPTALK_PARSE_ERROR && active_) {
+        // An owned open token already has all earlier metadata before it.
+        // BEGIN is published only after promotion, so body continuations also
+        // need no repeated walk of the same header views.
+        if (!begun_) {
+            if (token_.size || token_owned_) own_token();
+            else own_metadata();
         }
-
-        // 2) Не в escape-режиме: специальные символы
-        switch (ch) 
-        {
-            case '\\':
-                escape_ = true;
-                continue; // ждём следующий байт (сам бэкслеш не пишем)
-
-            case ':':
-                // конец ключа → в значение
-                hook.on_hdr_key(hval_.pop(), sbuf_.pop());
-                escape_ = false;  // на всякий случай
-                return tailcall(hook, &parser::hdrline_val, curr, end);
-
-            case '\n':
-                // пустая строка → конец заголовков
-                sbuf_.reset();
-                hval_.reset();
-                escape_ = false;
-                return tailcall(hook, &parser::hdrline_done, curr, end);
-            case '\r':
-                sbuf_.reset();
-                hval_.reset();
-                escape_ = false;
-                return tailcall(hook, &parser::hdrline_almost_done, curr, end);
-
-            default:
-                // 3) Обычный символ ключа
-                if (ch_isprint_nospace(ch)) 
-                {
-                    if (!push(hook, ch)) { 
-                        return curr; 
-                    }
-                } 
-                else 
-                {
-                    hook.set(stomptalk_error_inval_frame);
-                    return curr;
-                }
-        }
-    } while (curr < end);
-
-    return curr;
-}
-
-parser::pointer parser::hdrline_val(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    do {
-        unsigned char ch = static_cast<unsigned char>(*curr++);
-
-        if (escape_) 
-        {
-            switch (ch) 
-            {
-                case 'n': ch = '\n'; break;
-                case 'r': ch = '\r'; break;
-                case 'c': ch = ':';  break;
-                case '\\': ch = '\\'; break;
-                default:
-                    hook.set(stomptalk_error_inval_frame);
-                    return curr;
-            }
-            if (!sbuf_.push(static_cast<char>(ch))) {
-                hook.set(stomptalk_error_too_big);
-                return curr;
-            }
-            escape_ = false;
-            continue;
-        }
-
-        if (ch_isprint(ch)) 
-        {
-            if (ch == '\\') {
-                escape_ = true;
-                continue;
-            }
-            if (!sbuf_.push(static_cast<char>(ch))) {
-                hook.set(stomptalk_error_too_big);
-                return curr;
-            }
-        } else {
-            if (ch == '\r') {
-                hook.on_hdr_val(sbuf_.pop());
-                escape_ = false;
-                return tailcall(hook, &parser::hdrline_almost_done, curr, end);
-            } else if (ch == '\n') {
-                hook.on_hdr_val(sbuf_.pop());
-                escape_ = false;
-                return tailcall(hook, &parser::hdrline_done, curr, end);
-            } else {
-                hook.set(stomptalk_error_inval_frame);
-                return curr;
-            }
-        }
-    } while (curr < end);
-
-    return curr;
-}
-
-parser::pointer parser::hdrline_done(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    auto ch = *curr++;
-
-    // начала боди через
-    if (ch == '\r')
-    {
-        // переходим к поиску конца метода
-        return tailcall(hook, &parser::almost_done, curr, end);
+        if (current_.parsed.payload_size) publish(false);
     }
-    else if (ch == '\n')
-    {
-        // переходим к поиску конца метода
-        return tailcall(hook, &parser::done, curr, end);
+    if (status_ == STOMPTALK_PARSE_OK) {
+        const bool boundary = state_ == &parser::start_state<STOMPTALK_BACKEND_SCALAR> ||
+                              state_ == &parser::start_state<STOMPTALK_BACKEND_SWAR>
+#if defined(__SSE2__)
+                              || state_ == &parser::start_state<STOMPTALK_BACKEND_SSE2>
+#endif
+#if STOMPTALK_PARSER_AVX2
+                              || (backend_ == STOMPTALK_BACKEND_AVX2 && state_ == avx2_state())
+#endif
+                              ;
+        if (!boundary) status_ = STOMPTALK_PARSE_NEED_INPUT;
     }
-
-    // иначе это следующий хидер
-    if (!ch_isprint_nospace(ch))
-    {
-        hook.set(stomptalk_error_inval_reqline);
-        return curr;
-    }
-
-    if (!push(hook, ch))
-        return curr;
-
-    escape_ = false;  
-    return tailcall(hook, &parser::hdrline_hdr_key, curr, end);
+    const size_t consumed = size ? static_cast<size_t>(curr - data) : 0;
+    begin_ = stop_ = nullptr;
+    return {consumed, frames_, frame_count_, status_, error_, error_offset_};
 }
-
-parser::pointer parser::hdrline_almost_done(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    if (*curr++ != '\n')
-    {
-        hook.set(stomptalk_error_inval_reqline);
-        return curr;
-    }
-
-    // переходим к поиску конца метода
-    return tailcall(hook, &parser::hdrline_done, curr, end);
 }
-
-parser::pointer parser::done(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    if (*curr == '\0') 
-    {
-        hook.on_frame_end(curr);
-        return tailcall(hook, &parser::start_state, ++curr, end);
-    }
-    // выбираем как будем читать боди
-    return tailcall(hook, 
-        (hook.content_left() > 0) ? &parser::body_read : 
-            &parser::body_read_no_length, curr, end);
-}
-
-
-parser::pointer parser::almost_done(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    if (*curr++ != '\n')
-    {
-        hook.set(stomptalk_error_inval_reqline);
-        return curr;
-    }
-
-    // переходим к поиску конца метода
-    return tailcall(hook, &parser::done, curr, end);
-}
-
-parser::pointer parser::body_read(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    auto avail = static_cast<std::size_t>(end - curr);
-    auto left = hook.content_left();
-    auto to_read = static_cast<std::size_t>(
-        (std::min)(static_cast<std::uint64_t>(avail), left)
-    );
-
-    if (to_read > 0)
-    {
-        left -= to_read;
-        hook.set(left);
-        hook.on_body(curr, to_read);
-    }
-
-    curr += to_read;
-
-    if (left == 0)
-        return tailcall(hook, &parser::frame_end, curr, end);
-
-    // данных больше нет
-    return curr;
-}
-
-parser::pointer parser::body_read_no_length(parser_hook& hook,
-    parser::pointer curr, parser::pointer end) noexcept
-{
-    auto beg = curr;
-    auto avail = static_cast<std::size_t>(end - curr);
-    auto nul = static_cast<parser::pointer>(
-        std::memchr(curr, '\0', avail)
-    );
-
-    if (nul) {
-        auto to_read = static_cast<std::size_t>(nul - beg);
-        if (to_read > 0) {
-            hook.on_body(beg, to_read);
-        }
-        return tailcall(hook, &parser::frame_end, nul, end);
-    }
-
-    if (avail > 0) {
-        hook.on_body(beg, avail);
-    }
-
-    return end;
-}
-
-parser::pointer parser::frame_end(parser_hook& hook,
-    parser::pointer curr, parser::pointer) noexcept
-{
-
-    state_ = &parser::start_state;
-
-    if (*curr++ != '\0')
-        hook.set(stomptalk_error_inval_frame);
-
-    // закончили
-    hook.on_frame_end(curr - 1);
-
-    return curr;
-}
-
-std::size_t parser::run(parser_hook& hook,
-    const char *begin, std::size_t len) noexcept
-{
-    hook.set(stomptalk_error_none);
-
-    const char* curr = begin;
-    const char* end = begin + len;
-
-    while ((curr < end) && hook.ok())
-        curr = (this->*state_)(hook, curr, end);
-
-    return static_cast<std::size_t>(curr - begin);
-}
-
-} // namespace stomptalk

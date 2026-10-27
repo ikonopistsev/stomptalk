@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 813  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3930137006
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    24.89%  [.] char const* stomptalk::parser::hdrline_val<2u>(char const*, char const*)          -      -            
+    24.86%  [.] char const* stomptalk::parser::hdrline_hdr_key<2u>(char const*, char const*)      -      -            
+     7.19%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     6.83%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     5.69%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     4.95%  [.] char const* stomptalk::parser::start_state<2u>(char const*, char const*)          -      -            
+     4.34%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     3.83%  [.] char const* stomptalk::parser::method_state<2u>(char const*, char const*)         -      -            
+     3.36%  [.] main                                                                              -      -            
+     2.90%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     2.48%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     2.35%  [.] char const* stomptalk::parser::hdrline_done<2u>(char const*, char const*)         -      -            
+     1.34%  [.] char const* stomptalk::parser::done<2u>(char const*, char const*)                 -      -            
+
+
+#
+# (Tip: To change sampling frequency to 100 Hz: perf record -F 100)
+#

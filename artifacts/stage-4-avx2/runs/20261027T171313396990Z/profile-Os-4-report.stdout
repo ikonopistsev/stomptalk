@@ -1,0 +1,31 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 966  of event 'cpu_core/cycles/u'
+# Event count (approx.): 4677570693
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    20.26%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    13.11%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+    12.37%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+     9.08%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     7.87%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     6.00%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     5.72%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     3.62%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     3.12%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     2.99%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     2.71%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     2.08%  [.] main                                                                              -      -            
+     1.95%  [.] 0x000000000016465d                                                                -      -            
+     1.45%  [.] stomptalk::parser::run(char const*, unsigned long)                                -      -            
+     1.04%  [.] char const* stomptalk::parser::body_read_no_length<4u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: To compute metrics for samples use perf record -e '{cycles,instructions}' ... ; perf script -F +metric)
+#

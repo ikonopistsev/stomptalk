@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 913  of event 'cpu_core/cycles/u'
+# Event count (approx.): 4421532108
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    17.34%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+    16.57%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    12.61%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+    11.69%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     7.04%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     6.28%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     5.31%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     4.19%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     2.98%  [.] main                                                                              -      -            
+     2.53%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     2.43%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     2.20%  [.] 0x000000000016465d                                                                -      -            
+     1.43%  [.] char const* stomptalk::parser::body_read_no_length<4u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: Show current config key-value pairs: perf config --list)
+#

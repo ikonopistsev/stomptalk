@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.8.0 LANGUAGES CXX C)
+project(stomptalk VERSION 2.0.0 LANGUAGES CXX C)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -9,6 +9,16 @@ option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
 option(STOMPTALK_BUILD_TESTS "Build tests" OFF)
 option(STOMPTALK_BUILD_FUZZ "Build OSS-Fuzz targets (requires Clang + libFuzzer)" OFF)
+option(STOMPTALK_BUILD_AVX2_NAMES "Build the optional AVX2 name classifier" ON)
+option(STOMPTALK_BUILD_AVX2_PARSER "Build the optional AVX2 parser scanner" ON)
+
+if (NOT STOMPTALK_BUILD_AVX2_NAMES)
+    add_definitions(-DSTOMPTALK_DISABLE_AVX2)
+endif()
+
+if (NOT STOMPTALK_BUILD_AVX2_PARSER)
+    add_definitions(-DSTOMPTALK_DISABLE_AVX2_PARSER)
+endif()
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -21,7 +31,10 @@ endif()
 
 set(source
     src/parser.cpp
+    src/parser_avx2.cpp
     src/stomptalk.cpp
+    src/names.cpp
+    src/names_avx2.cpp
 )
 
 set(pub_header
@@ -29,14 +42,6 @@ set(pub_header
     include/stomptalk/parser.h
     include/stomptalk/method.h
     include/stomptalk/header.h
-    include/stomptalk/antoull.h
-    include/stomptalk/antoull.hpp
-    include/stomptalk/fnv1a.hpp
-    include/stomptalk/hook_base.hpp
-    include/stomptalk/parser_hook.hpp
-    include/stomptalk/stackbuf.hpp
-    include/stomptalk/hashval.hpp
-    include/stomptalk/parser.hpp
 )
 
 set(STOMPTALK_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/stomptalk")
@@ -52,7 +57,7 @@ else()
     if (WIN32)
         target_compile_definitions(stomptalk PRIVATE STOMPTALK_MAKEDLL)
     endif()
-    set_target_properties(stomptalk PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
+    set_target_properties(stomptalk PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 2)
 endif()
 
 add_library(stomptalk::stomptalk ALIAS stomptalk)
@@ -67,72 +72,32 @@ target_include_directories(stomptalk
 
 if (STOMPTALK_BUILD_TESTS)
     enable_testing()
-
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
-
-    add_executable(stomptalk_test test/main.cpp)
-    target_link_libraries(stomptalk_test PRIVATE stomptalk)
-    target_compile_options(stomptalk_test PRIVATE
-        $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
-            -march=native -fno-plt -fno-semantic-interposition>)
-
-    add_executable(stomptalk_unit_test test/unit_test.cpp)
+    add_executable(stomptalk_unit_test test/unit_v2.cpp test/unit_names_avx2.cpp test/unit_scan_avx2.cpp)
     target_link_libraries(stomptalk_unit_test PRIVATE stomptalk)
-    target_compile_options(stomptalk_unit_test PRIVATE
-        $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
-            -march=native -fno-plt -fno-semantic-interposition>)
-
-    add_executable(purestomp test/purestomp.c)
-    set_target_properties(purestomp PROPERTIES
-        LINKER_LANGUAGE C
-        C_STANDARD 99)
-    target_link_libraries(purestomp PRIVATE stomptalk)
-    target_compile_options(purestomp PRIVATE
-        $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
-            -march=native -fno-plt -fno-semantic-interposition>)
-
-    add_test(NAME stomptalk_test COMMAND stomptalk_test)
     add_test(NAME stomptalk_unit_test COMMAND stomptalk_unit_test)
-    #add_test(NAME purestomp_test COMMAND purestomp)
+
+    # The source is C99. CMake supplies the C++ runtime required by the library.
+    add_executable(purestomp test/purestomp.c)
+    set_target_properties(purestomp PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON)
+    target_link_libraries(purestomp PRIVATE stomptalk)
+    add_test(NAME stomptalk_c99_smoke COMMAND purestomp 0 10)
 endif()
 
 if (STOMPTALK_BUILD_FUZZ)
-    if (NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
-        message(WARNING
-            "STOMPTALK_BUILD_FUZZ is designed for Clang. "
-            "Current C compiler: ${CMAKE_C_COMPILER_ID}")
+    if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "STOMPTALK_BUILD_FUZZ requires Clang/libFuzzer")
     endif()
-
-    set(STOMPTALK_FUZZ_COMPILE_FLAGS -fsanitize=fuzzer-no-link)
-
-    # OSS-Fuzz sets LIB_FUZZING_ENGINE to the path of libFuzzer.
-    # Compile the library itself with fuzzer coverage instrumentation;
-    # otherwise libFuzzer mostly sees the harness and not the parser code.
-    target_compile_options(stomptalk PRIVATE ${STOMPTALK_FUZZ_COMPILE_FLAGS})
-
-    # For local builds libFuzzer is linked via -fsanitize=fuzzer.
+    target_compile_definitions(stomptalk PRIVATE STOMPTALK_TRAMPOLINE)
+    target_compile_options(stomptalk PRIVATE -fsanitize=fuzzer-no-link,address,undefined)
+    target_link_libraries(stomptalk PUBLIC -fsanitize=address,undefined)
+    add_executable(fuzz_stomptalk_v2 fuzz/fuzz_v2.cpp)
+    target_compile_options(fuzz_stomptalk_v2 PRIVATE -fsanitize=fuzzer-no-link,address,undefined)
+    target_link_libraries(fuzz_stomptalk_v2 PRIVATE stomptalk)
     if (DEFINED ENV{LIB_FUZZING_ENGINE})
-        set(STOMPTALK_FUZZER_LDFLAGS "$ENV{LIB_FUZZING_ENGINE}")
+        target_link_libraries(fuzz_stomptalk_v2 PRIVATE "$ENV{LIB_FUZZING_ENGINE}" -fsanitize=address,undefined)
     else()
-        set(STOMPTALK_FUZZER_LDFLAGS "-fsanitize=fuzzer")
+        target_link_libraries(fuzz_stomptalk_v2 PRIVATE -fsanitize=fuzzer,address,undefined)
     endif()
-
-    foreach(_target fuzz_stomp_parser fuzz_stomp_chunked fuzz_stomp_large_header)
-        add_executable(${_target} fuzz/${_target}.c)
-        set_target_properties(${_target} PROPERTIES
-            LINKER_LANGUAGE C
-            C_STANDARD 99)
-        target_compile_options(${_target} PRIVATE ${STOMPTALK_FUZZ_COMPILE_FLAGS})
-        target_link_libraries(${_target} PRIVATE stomptalk)
-        target_link_options(${_target} PRIVATE ${STOMPTALK_FUZZER_LDFLAGS})
-    endforeach()
-
-    # Print per-target corpus location hints after configuration.
-    message(STATUS
-        "Fuzz corpora:\n"
-        "  fuzz_stomp_parser: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/parser/\n"
-        "  fuzz_stomp_chunked: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/chunked/\n"
-        "  fuzz_stomp_large_header: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/large_header/")
 endif()
 
 if (STOMPTALK_LIBRARY_INSTALL)
@@ -182,27 +147,50 @@ if (STOMPTALK_LIBRARY_INSTALL)
 endif()
 
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set(CPACK_GENERATOR "DEB")
-    set(CPACK_DEB_COMPONENT_INSTALL ON)
-    set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
-    set(CPACK_COMPONENTS_GROUPING IGNORE)
     set(CPACK_PACKAGE_NAME "stomptalk")
     set(CPACK_PACKAGE_CONTACT "${STOMPTALK_PACKAGE_MAINTAINER}")
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${STOMPTALK_PACKAGE_MAINTAINER}")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "STOMP protocol parser")
+    set(CPACK_COMPONENTS_GROUPING IGNORE)
 
     if (STOMPTALK_LIBRARY_STATIC)
         set(CPACK_COMPONENTS_ALL dev)
-        set(CPACK_DEBIAN_DEV_PACKAGE_NAME "libstomptalk-dev")
-        set(CPACK_DEBIAN_DEV_PACKAGE_SECTION "libdevel")
     else()
         set(CPACK_COMPONENTS_ALL runtime;dev)
-        set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "libstomptalk1")
-        set(CPACK_DEBIAN_RUNTIME_PACKAGE_SECTION "libs")
-        set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
-        set(CPACK_DEBIAN_DEV_PACKAGE_NAME "libstomptalk-dev")
-        set(CPACK_DEBIAN_DEV_PACKAGE_SECTION "libdevel")
-        set(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS "libstomptalk1 (= ${PROJECT_VERSION})")
+    endif()
+
+    if (WIN32)
+        set(CPACK_GENERATOR "ZIP;WIX")
+        set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+        set(CPACK_PACKAGE_INSTALL_DIRECTORY "stomptalk")
+
+        # Stable GUID is required for WiX upgrades to work correctly.
+        # Without it each version installs as a separate product.
+        set(CPACK_WIX_UPGRADE_GUID "A1B2C3D4-E5F6-7890-ABCD-EF1234567890")
+
+        set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "stomptalk runtime")
+        set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "stomptalk shared library (DLL)")
+        set(CPACK_COMPONENT_DEV_DISPLAY_NAME "stomptalk dev")
+        set(CPACK_COMPONENT_DEV_DESCRIPTION "stomptalk headers, import library and CMake config")
+        if (NOT STOMPTALK_LIBRARY_STATIC)
+            set(CPACK_COMPONENT_DEV_DEPENDS runtime)
+        endif()
+    else()
+        set(CPACK_GENERATOR "DEB")
+        set(CPACK_DEB_COMPONENT_INSTALL ON)
+        set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${STOMPTALK_PACKAGE_MAINTAINER}")
+
+        if (STOMPTALK_LIBRARY_STATIC)
+            set(CPACK_DEBIAN_DEV_PACKAGE_NAME "libstomptalk-dev")
+            set(CPACK_DEBIAN_DEV_PACKAGE_SECTION "libdevel")
+        else()
+            set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "libstomptalk2")
+            set(CPACK_DEBIAN_RUNTIME_PACKAGE_SECTION "libs")
+            set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
+            set(CPACK_DEBIAN_DEV_PACKAGE_NAME "libstomptalk-dev")
+            set(CPACK_DEBIAN_DEV_PACKAGE_SECTION "libdevel")
+            set(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS "libstomptalk2 (= ${PROJECT_VERSION})")
+        endif()
     endif()
 
     include(CPack)

@@ -1,0 +1,30 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 896  of event 'cpu_core/cycles/u'
+# Event count (approx.): 4339461529
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    17.39%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)      -      -            
+    13.15%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)          -      -            
+    12.45%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+    11.88%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     8.01%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     7.06%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     4.29%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     4.06%  [.] main                                                                              -      -            
+     4.05%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     2.90%  [.] 0x000000000016465d                                                                -      -            
+     2.82%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     2.47%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     1.34%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)  -      -            
+     1.24%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -            
+
+
+#
+# (Tip: If you prefer Intel style assembly, try: perf annotate -M intel)
+#

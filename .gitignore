@@ -1,5 +1,8 @@
 build*/
+dist/
 .vscode/
+.claude/settings.local.json
+.claude/memory/
 
 # libFuzzer artifacts — keep only fuzz/corpus/ seeds in the repo
 crash-*

@@ -1,0 +1,30 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 914  of event 'cpu_core/cycles/u'
+# Event count (approx.): 4420661165
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    26.89%  [.] char const* stomptalk::parser::hdrline_hdr_key<1u>(char const*, char const*)      -      -            
+    12.59%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+    11.35%  [.] char const* stomptalk::parser::hdrline_val<1u>(char const*, char const*)          -      -            
+     8.66%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     8.02%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     5.93%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     5.13%  [.] char const* stomptalk::parser::start_state<1u>(char const*, char const*)          -      -            
+     4.97%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     3.88%  [.] char const* stomptalk::parser::method_state<1u>(char const*, char const*)         -      -            
+     2.39%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     1.98%  [.] char const* stomptalk::parser::hdrline_done<1u>(char const*, char const*)         -      -            
+     1.87%  [.] main                                                                              -      -            
+     1.54%  [.] char const* stomptalk::parser::body_read_no_length<1u>(char const*, char const*)  -      -            
+     1.47%  [.] char const* stomptalk::parser::done<1u>(char const*, char const*)                 -      -            
+
+
+#
+# (Tip: To see call chains by final symbol taking CPU time (bottom up) use perf report -G)
+#

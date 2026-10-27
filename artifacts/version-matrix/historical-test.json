@@ -1,0 +1,11 @@
+{
+  "old_source": "/home/meil/devel/linux/stomptalk-meta/purestomp/main.c",
+  "old_source_sha256": "e2eb5392221cff117601e2d51faea9a4df86fcdd6c432830ce737806e5414388",
+  "wire_bytes": 838,
+  "wire_sha256": "57e696117dfd8d0f494528ebcf6b2f2dd1b3d1f75267daf057e0bfc005ee2d59",
+  "same_wire_as_current_purestomp": true,
+  "historical_version": "1.7.0",
+  "historical_frames": 100000000,
+  "historical_seconds": 8.351,
+  "historical_mframes_per_second": 11.974613818704345
+}

@@ -1,0 +1,41 @@
+{
+  "Os": {
+    "stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)": {
+      "static_instruction_lines": 73,
+      "stackbuf_calls": [
+        "2f35:\te8 c6 04 00 00       \tcall   3400 <stomptalk::stackbuf<char, 4096ul>::pop()>",
+        "2f7b:\te8 80 04 00 00       \tcall   3400 <stomptalk::stackbuf<char, 4096ul>::pop()>",
+        "2fbb:\te8 06 04 00 00       \tcall   33c6 <stomptalk::stackbuf<char, 4096ul>::push(char)>"
+      ]
+    },
+    "stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)": {
+      "static_instruction_lines": 90,
+      "stackbuf_calls": [
+        "300e:\te8 ed 03 00 00       \tcall   3400 <stomptalk::stackbuf<char, 4096ul>::pop()>",
+        "305a:\te8 a1 03 00 00       \tcall   3400 <stomptalk::stackbuf<char, 4096ul>::pop()>",
+        "3097:\te8 64 03 00 00       \tcall   3400 <stomptalk::stackbuf<char, 4096ul>::pop()>",
+        "30d3:\te8 ee 02 00 00       \tcall   33c6 <stomptalk::stackbuf<char, 4096ul>::push(char)>"
+      ]
+    }
+  },
+  "O2": {
+    "stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)": {
+      "static_instruction_lines": 95,
+      "stackbuf_calls": []
+    },
+    "stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)": {
+      "static_instruction_lines": 98,
+      "stackbuf_calls": []
+    }
+  },
+  "O3": {
+    "stomptalk::parser::hdrline_val(stomptalk::parser_hook&, char const*, char const*)": {
+      "static_instruction_lines": 95,
+      "stackbuf_calls": []
+    },
+    "stomptalk::parser::hdrline_hdr_key(stomptalk::parser_hook&, char const*, char const*)": {
+      "static_instruction_lines": 98,
+      "stackbuf_calls": []
+    }
+  }
+}
