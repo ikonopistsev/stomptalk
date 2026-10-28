@@ -1,0 +1,1592 @@
+{
+  "status": "completed",
+  "commands": [
+    {
+      "label": "clang23-Os-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.3234403980895877
+    },
+    {
+      "label": "clang23-Os-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 3.875568791059777
+    },
+    {
+      "label": "clang23-Os-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.20217317692004144
+    },
+    {
+      "label": "clang23-Os-probe",
+      "args": [
+        "/usr/lib/llvm/23/bin/clang++",
+        "-Os",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.3086683568544686
+    },
+    {
+      "label": "clang23-Os-before.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/before.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.002258273074403405
+    },
+    {
+      "label": "clang23-Os-after.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/after.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0011701970361173153
+    },
+    {
+      "label": "clang23-Os-before.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/before.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0014594849199056625
+    },
+    {
+      "label": "clang23-Os-after.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/after.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0013820359017699957
+    },
+    {
+      "label": "clang23-O2-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.3165473830886185
+    },
+    {
+      "label": "clang23-O2-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 6.151523520005867
+    },
+    {
+      "label": "clang23-O2-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.20649823802523315
+    },
+    {
+      "label": "clang23-O2-probe",
+      "args": [
+        "/usr/lib/llvm/23/bin/clang++",
+        "-O2",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.32588877785019577
+    },
+    {
+      "label": "clang23-O2-before.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/before.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0020169608760625124
+    },
+    {
+      "label": "clang23-O2-after.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/after.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0018181088380515575
+    },
+    {
+      "label": "clang23-O2-before.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/before.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0016098290216177702
+    },
+    {
+      "label": "clang23-O2-after.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/after.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.001528355060145259
+    },
+    {
+      "label": "clang23-O3-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.3107492309063673
+    },
+    {
+      "label": "clang23-O3-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 6.690867354860529
+    },
+    {
+      "label": "clang23-O3-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.18989841197617352
+    },
+    {
+      "label": "clang23-O3-probe",
+      "args": [
+        "/usr/lib/llvm/23/bin/clang++",
+        "-O3",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.31485777092166245
+    },
+    {
+      "label": "clang23-O3-before.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/before.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.002034442964941263
+    },
+    {
+      "label": "clang23-O3-after.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/after.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.001967487158253789
+    },
+    {
+      "label": "clang23-O3-before.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/before.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.001975730061531067
+    },
+    {
+      "label": "clang23-O3-after.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/after.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0015562169719487429
+    },
+    {
+      "label": "gcc16-Os-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os",
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.2783832917921245
+    },
+    {
+      "label": "gcc16-Os-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 5.598019659984857
+    },
+    {
+      "label": "gcc16-Os-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.25661432719789445
+    },
+    {
+      "label": "gcc16-Os-probe",
+      "args": [
+        "/usr/bin/g++-16",
+        "-Os",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.2996059521101415
+    },
+    {
+      "label": "gcc16-Os-before.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/before.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0020234689582139254
+    },
+    {
+      "label": "gcc16-Os-after.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/after.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0019128629937767982
+    },
+    {
+      "label": "gcc16-Os-before.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/before.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0015097791329026222
+    },
+    {
+      "label": "gcc16-Os-after.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/after.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0016203520353883505
+    },
+    {
+      "label": "gcc16-O2-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2",
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.27426063688471913
+    },
+    {
+      "label": "gcc16-O2-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 8.041065498022363
+    },
+    {
+      "label": "gcc16-O2-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.18704273598268628
+    },
+    {
+      "label": "gcc16-O2-probe",
+      "args": [
+        "/usr/bin/g++-16",
+        "-O2",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.32281573000364006
+    },
+    {
+      "label": "gcc16-O2-before.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/before.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0019918980542570353
+    },
+    {
+      "label": "gcc16-O2-after.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/after.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.001571022905409336
+    },
+    {
+      "label": "gcc16-O2-before.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/before.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0014832529705017805
+    },
+    {
+      "label": "gcc16-O2-after.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/after.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0013879667967557907
+    },
+    {
+      "label": "gcc16-O3-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3",
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.2785986950621009
+    },
+    {
+      "label": "gcc16-O3-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 9.047470293939114
+    },
+    {
+      "label": "gcc16-O3-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.1843526780139655
+    },
+    {
+      "label": "gcc16-O3-probe",
+      "args": [
+        "/usr/bin/g++-16",
+        "-O3",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.35310305189341307
+    },
+    {
+      "label": "gcc16-O3-before.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/before.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.001725188922137022
+    },
+    {
+      "label": "gcc16-O3-after.text",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/after.text.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0017744270153343678
+    },
+    {
+      "label": "gcc16-O3-before.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/before.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.001636760774999857
+    },
+    {
+      "label": "gcc16-O3-after.rodata",
+      "args": [
+        "objcopy",
+        "-O",
+        "binary",
+        "--only-section=.rodata",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/after.rodata.bin"
+      ],
+      "exit": 0,
+      "seconds": 0.0010534960310906172
+    },
+    {
+      "label": "debug-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/debug",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O0 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O0 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DCMAKE_BUILD_TYPE=Debug"
+      ],
+      "exit": 0,
+      "seconds": 0.3211494751740247
+    },
+    {
+      "label": "debug-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/debug",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 1.3050060840323567
+    },
+    {
+      "label": "debug-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/debug",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.6170098430011421
+    },
+    {
+      "label": "sanitize-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/sanitize",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_BUILD_FUZZ=ON",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -g",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g"
+      ],
+      "exit": 0,
+      "seconds": 0.3295088019222021
+    },
+    {
+      "label": "sanitize-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/sanitize",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 6.5967967370525
+    },
+    {
+      "label": "sanitize-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/sanitize",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.5019302798900753
+    },
+    {
+      "label": "clang23-Os-before--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6628702860325575
+    },
+    {
+      "label": "clang23-Os-after--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6486663850955665
+    },
+    {
+      "label": "clang23-Os-after-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6484805569052696
+    },
+    {
+      "label": "clang23-Os-before-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6510036450345069
+    },
+    {
+      "label": "clang23-Os-before-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.7682235739193857
+    },
+    {
+      "label": "clang23-Os-after-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.7472500740550458
+    },
+    {
+      "label": "clang23-Os-after-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6629889998584986
+    },
+    {
+      "label": "clang23-Os-before-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6499809499364346
+    },
+    {
+      "label": "clang23-O2-before--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4827581769786775
+    },
+    {
+      "label": "clang23-O2-after--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.47966055222786963
+    },
+    {
+      "label": "clang23-O2-after-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.48478812212124467
+    },
+    {
+      "label": "clang23-O2-before-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.49235948803834617
+    },
+    {
+      "label": "clang23-O2-before-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5176790689583868
+    },
+    {
+      "label": "clang23-O2-after-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4815962251741439
+    },
+    {
+      "label": "clang23-O2-after-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4874987779185176
+    },
+    {
+      "label": "clang23-O2-before-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6859325340483338
+    },
+    {
+      "label": "clang23-O3-before--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.48194835311733186
+    },
+    {
+      "label": "clang23-O3-after--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4844386901240796
+    },
+    {
+      "label": "clang23-O3-after-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.493824718054384
+    },
+    {
+      "label": "clang23-O3-before-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.48749670293182135
+    },
+    {
+      "label": "clang23-O3-before-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.48882790515199304
+    },
+    {
+      "label": "clang23-O3-after-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4828846789896488
+    },
+    {
+      "label": "clang23-O3-after-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/clang23-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5671925579663366
+    },
+    {
+      "label": "clang23-O3-before-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6345682220999151
+    },
+    {
+      "label": "gcc16-Os-before--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.8864353259559721
+    },
+    {
+      "label": "gcc16-Os-after--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.9040715410374105
+    },
+    {
+      "label": "gcc16-Os-after-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.9044121890328825
+    },
+    {
+      "label": "gcc16-Os-before-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.892268514027819
+    },
+    {
+      "label": "gcc16-Os-before-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.8833750057965517
+    },
+    {
+      "label": "gcc16-Os-after-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.8874496060889214
+    },
+    {
+      "label": "gcc16-Os-after-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-Os/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.8929071151651442
+    },
+    {
+      "label": "gcc16-Os-before-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.8973972641397268
+    },
+    {
+      "label": "gcc16-O2-before--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4738351700361818
+    },
+    {
+      "label": "gcc16-O2-after--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.47436677501536906
+    },
+    {
+      "label": "gcc16-O2-after-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.47983193094842136
+    },
+    {
+      "label": "gcc16-O2-before-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4803821269888431
+    },
+    {
+      "label": "gcc16-O2-before-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.46960596996359527
+    },
+    {
+      "label": "gcc16-O2-after-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.47504716413095593
+    },
+    {
+      "label": "gcc16-O2-after-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.46625055000185966
+    },
+    {
+      "label": "gcc16-O2-before-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.46345589496195316
+    },
+    {
+      "label": "gcc16-O3-before--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.44138494203798473
+    },
+    {
+      "label": "gcc16-O3-after--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4430005229078233
+    },
+    {
+      "label": "gcc16-O3-after-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4433667289558798
+    },
+    {
+      "label": "gcc16-O3-before-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.438894429942593
+    },
+    {
+      "label": "gcc16-O3-before-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.44468450895510614
+    },
+    {
+      "label": "gcc16-O3-after-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.44616828789003193
+    },
+    {
+      "label": "gcc16-O3-after-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/gcc16-O3/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.44398035993799567
+    },
+    {
+      "label": "gcc16-O3-before-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-after/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.44715813896618783
+    },
+    {
+      "label": "pgo-O2",
+      "args": [
+        "ctest",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/cmake/ClangPGO.cmake",
+        "-DPGO_LLVM_DIR=/usr/lib/llvm/23/bin",
+        "-DPGO_OPT=O2",
+        "-DPGO_WORK=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/pgo-O2",
+        "-VV"
+      ],
+      "exit": 0,
+      "seconds": 18.14356314809993
+    },
+    {
+      "label": "pgo-O3",
+      "args": [
+        "ctest",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/cmake/ClangPGO.cmake",
+        "-DPGO_LLVM_DIR=/usr/lib/llvm/23/bin",
+        "-DPGO_OPT=O3",
+        "-DPGO_WORK=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/equality-contract/2026-10-28/build/pgo-O3",
+        "-VV"
+      ],
+      "exit": 0,
+      "seconds": 19.795910802902654
+    }
+  ],
+  "code": [
+    {
+      "compiler": "clang23",
+      "opt": "Os",
+      ".text": {
+        "before": "e94107417fd8d390686d077c7e6020615ac4e17803e70bdb9f87c911af485d55",
+        "after": "e94107417fd8d390686d077c7e6020615ac4e17803e70bdb9f87c911af485d55",
+        "same": true
+      },
+      ".rodata": {
+        "before": "bc528f30b99537f663e7500a5c62d866fa428e8da89dbceda9a29058d386cd68",
+        "after": "bc528f30b99537f663e7500a5c62d866fa428e8da89dbceda9a29058d386cd68",
+        "same": true
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      ".text": {
+        "before": "fb107302f5d076ce70a22a44505a1aa7f6e4c93e3cb367c9381f25b309a891e0",
+        "after": "fb107302f5d076ce70a22a44505a1aa7f6e4c93e3cb367c9381f25b309a891e0",
+        "same": true
+      },
+      ".rodata": {
+        "before": "484292e1b872aaedc2ef2736cc4d06c30140c9811145c6418b931e3c7fcc6535",
+        "after": "484292e1b872aaedc2ef2736cc4d06c30140c9811145c6418b931e3c7fcc6535",
+        "same": true
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      ".text": {
+        "before": "48bebb056639fd2cfb23b5c676d8bfb313bccaeb2153eeeb32b2d2af5bed3eb5",
+        "after": "48bebb056639fd2cfb23b5c676d8bfb313bccaeb2153eeeb32b2d2af5bed3eb5",
+        "same": true
+      },
+      ".rodata": {
+        "before": "6c016120e9318c6d81dcb2e4b4a64444a670fc37fce7a0347761b106461e60fc",
+        "after": "6c016120e9318c6d81dcb2e4b4a64444a670fc37fce7a0347761b106461e60fc",
+        "same": true
+      }
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "Os",
+      ".text": {
+        "before": "d6e37ad0585479f1d6fa016c2d7e72c5936caa0606c4f94a061864338c00c3d6",
+        "after": "d6e37ad0585479f1d6fa016c2d7e72c5936caa0606c4f94a061864338c00c3d6",
+        "same": true
+      },
+      ".rodata": {
+        "before": "fe832520cf9a2a5b9ed8d3c0d9ed794c2c1c807cff085b03d7962b81eea2dfc2",
+        "after": "fe832520cf9a2a5b9ed8d3c0d9ed794c2c1c807cff085b03d7962b81eea2dfc2",
+        "same": true
+      }
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      ".text": {
+        "before": "791a1eca992f964afabad5ab5eed0b563a52a7fd0ab4867ef55eb82030f76fbb",
+        "after": "791a1eca992f964afabad5ab5eed0b563a52a7fd0ab4867ef55eb82030f76fbb",
+        "same": true
+      },
+      ".rodata": {
+        "before": "70df9e8db75601d64a5abc7904cc93db7c0e0f6d3da090cc1d8eef0cc4915b18",
+        "after": "70df9e8db75601d64a5abc7904cc93db7c0e0f6d3da090cc1d8eef0cc4915b18",
+        "same": true
+      }
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      ".text": {
+        "before": "e78c55d780b64ccad7bf8088d934b4616692dea3f6dabb249b2bfbd1f07491de",
+        "after": "e78c55d780b64ccad7bf8088d934b4616692dea3f6dabb249b2bfbd1f07491de",
+        "same": true
+      },
+      ".rodata": {
+        "before": "7de765b3995965093b201b85ed1a99b027ee90a1bab9f2a6e3656ef71a1b1a2c",
+        "after": "7de765b3995965093b201b85ed1a99b027ee90a1bab9f2a6e3656ef71a1b1a2c",
+        "same": true
+      }
+    }
+  ],
+  "matrix": [
+    {
+      "compiler": "clang23",
+      "opt": "Os",
+      "before": {
+        "samples": [
+          0.648512754,
+          0.765912522,
+          0.647315638
+        ],
+        "median": 0.648512754,
+        "spread_percent": 18.287517595991645
+      },
+      "after": {
+        "samples": [
+          0.646164508,
+          0.744430112,
+          0.660271388
+        ],
+        "median": 0.660271388,
+        "spread_percent": 14.882608240477014
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "before": {
+        "samples": [
+          0.49025054,
+          0.515184993,
+          0.683525068
+        ],
+        "median": 0.515184993,
+        "spread_percent": 37.51555861022528
+      },
+      "after": {
+        "samples": [
+          0.482641608,
+          0.479137828,
+          0.485057788
+        ],
+        "median": 0.482641608,
+        "spread_percent": 1.2265747299598757
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "before": {
+        "samples": [
+          0.484834952,
+          0.486591564,
+          0.631902282
+        ],
+        "median": 0.486591564,
+        "spread_percent": 30.223978564494804
+      },
+      "after": {
+        "samples": [
+          0.491530816,
+          0.480522769,
+          0.564291203
+        ],
+        "median": 0.491530816,
+        "spread_percent": 17.0423565060873
+      }
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "Os",
+      "before": {
+        "samples": [
+          0.889645126,
+          0.881060719,
+          0.894450735
+        ],
+        "median": 0.889645126,
+        "spread_percent": 1.5050963141004163
+      },
+      "after": {
+        "samples": [
+          0.902079716,
+          0.885257652,
+          0.89060217
+        ],
+        "median": 0.89060217,
+        "spread_percent": 1.8888415688455016
+      }
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "before": {
+        "samples": [
+          0.478101319,
+          0.467232133,
+          0.461193908
+        ],
+        "median": 0.467232133,
+        "spread_percent": 3.6186318974769742
+      },
+      "after": {
+        "samples": [
+          0.477404401,
+          0.472772436,
+          0.463962367
+        ],
+        "median": 0.472772436,
+        "spread_percent": 2.843235556143969
+      }
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "before": {
+        "samples": [
+          0.436571355,
+          0.442369253,
+          0.44461436
+        ],
+        "median": 0.442369253,
+        "spread_percent": 1.818165468204453
+      },
+      "after": {
+        "samples": [
+          0.440979994,
+          0.443973568,
+          0.441946629
+        ],
+        "median": 0.441946629,
+        "spread_percent": 0.6773609760919794
+      }
+    }
+  ],
+  "pgo_identical_to_previous": true
+}

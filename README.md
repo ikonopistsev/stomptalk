@@ -161,6 +161,10 @@ The backend is a compile-time choice; AVX2 helpers must be included/called in an
 AVX2 target context after checking CPU/OS support. Valid views require non-null
 data for nonzero size (asserted internally); empty views are supported. These
 internal C++ helpers do not add templates or C++ types to the public C ABI.
+`is_header` handles empty views before invoking the comparison backend.
+Raw `equal` requires valid non-null pointers, even for an empty SIMD tail, and
+delegates zero-length equality to `memcmp`. For known sizes the compiler removes
+the terminal zero-length comparison.
 
 The parser checks only `content-length`. `src/content_length.hpp` generates
 one aligned wire constant, `\ncontent-length:` (16 bytes plus an unused C-string

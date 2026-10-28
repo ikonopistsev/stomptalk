@@ -14,7 +14,9 @@ struct is_header
     bool operator()(stomptalk_view name, const char (&text)[Size]) const noexcept
     {
         assert(name.data || !name.size);
-        return name.size == Size - 1 && Backend::template equal<Size - 1>(name.data, text);
+        if (Size > 1)
+            return name.size == Size - 1 && Backend::template equal<Size - 1>(name.data, text);
+        return name.size == 0;
     }
 
     STOMPTALK_FORCE_INLINE
@@ -22,7 +24,9 @@ struct is_header
     {
         assert(name.data || !name.size);
         assert(expected.data || !expected.size);
-        return name.size == expected.size && Backend::equal(name.data, expected.data, name.size);
+        if (name.size)
+            return name.size == expected.size && Backend::equal(name.data, expected.data, name.size);
+        return expected.size == 0;
     }
 };
 

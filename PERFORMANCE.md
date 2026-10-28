@@ -614,3 +614,18 @@ checks**; ручной fuzz **348369 запусков / 31 с**, без нахо
 [Отчёт и сырые данные](artifacts/internal-simplification/2026-10-28/README.md),
 [обоснование по файлам](artifacts/internal-simplification/2026-10-28/FILE_REVIEW.md),
 [top-5](artifacts/internal-simplification/2026-10-28/TOP5.md).
+
+## Контракт equal и пустой SIMD-хвост — 2026-10-28
+
+Из raw equal удалён `size == 0 ||`; проверка nullable пустого view перенесена
+в is_header. Внутреннее сравнение — assert указателей + memcmp; остаток нулевой
+длины допустим. Сигнатуры C API и поведение пустых views сохранены.
+
+GCC16/Clang23 × Os/O2/O3: `.text` и `.rodata` parser+consumer побайтно равны
+базе 5af4d3d. Поэтому ускорение парсера не заявляется. Контрольные 3 пары
+purestomp выполнены и сохранены; Clang шумный (spread до 37.52%), сравнивать
+эти медианы как эффект патча некорректно. Runtime C++ helper отдельно не измерялся.
+
+Все 6 Release, Debug/assert, ASan/UBSan/assert CTest/C99 прошли: 21008 streams /
+4198701 checks. PGO O2/O3 пересозданы, совпали с прежним профилем; обновлён
+source.sha256. [Разбор нулевой длины и оставшихся условий, замеры и команды](artifacts/equality-contract/2026-10-28/README.md).

@@ -24,6 +24,6 @@
     }
   },
   "note": "O2 and O3 were generated independently. Their IR profiles are byte-identical for this training; one file is shipped, validated with both optimization levels.",
-  "source_base_commit": "e30e2aa8b2b49daebaf07ceea3dcbccdfe8177fe",
-  "source_manifest": "source.sha256 (authoritative contents after internal simplification)"
+  "source_base_commit": "5af4d3d11626e08d06775c0096d47b77fb90d9e9",
+  "source_manifest": "source.sha256 (after separating nullable views from raw equality)"
 }

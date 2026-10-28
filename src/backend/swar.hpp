@@ -3,6 +3,7 @@
 #include "config.hpp"
 #include "stomptalk/parser.h"
 #include "../content_length.hpp"
+#include <cassert>
 #include <cstring>
 
 namespace stomptalk {
@@ -22,10 +23,12 @@ struct header_line
 
 struct scalar
 {
+    // Valid pointers, including an empty SIMD tail. is_header handles empty views.
     STOMPTALK_FORCE_INLINE
     static bool equal(const char* data, const char* text, std::size_t size) noexcept
     {
-        return size == 0 || std::memcmp(data, text, size) == 0;
+        assert(data && text);
+        return std::memcmp(data, text, size) == 0;
     }
 
     template<std::size_t Size>
@@ -33,7 +36,8 @@ struct scalar
     static bool equal(const char* data, const char* text) noexcept
     {
         // One comparison of the entire known length; the compiler selects loads.
-        return Size == 0 || std::memcmp(data, text, Size) == 0;
+        assert(data && text);
+        return std::memcmp(data, text, Size) == 0;
     }
 
     STOMPTALK_FORCE_INLINE
