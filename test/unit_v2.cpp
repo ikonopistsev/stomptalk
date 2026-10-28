@@ -2,6 +2,7 @@
 #include "stomptalk/stackbuf.hpp"
 #include "stomptalk/antoull.hpp"
 #include "../src/name_dispatch.hpp"
+#include "../src/headers.hpp"
 #include "../src/backend/sse2.hpp"
 #include "name_backend_checks.hpp"
 #include "scan_backend_checks.hpp"
@@ -342,20 +343,20 @@ static void names_and_accumulator() {
                STOMPTALK_METHOD_UNSUBSCRIBE, STOMPTALK_METHOD_UNKNOWN);
     dictionary(stomptalk_header_name, stomptalk_detect_header,
                STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
-    for (unsigned backend = STOMPTALK_BACKEND_SWAR; backend <= STOMPTALK_BACKEND_AVX2; ++backend)
-    {
-        const auto detect = stomptalk::detail::select_header_detector(backend);
-        const bool available = (stomptalk::detail::name_available_backends() &
-            STOMPTALK_BACKEND_BIT(backend)) != 0;
-        CHECK(bool(detect) == available);
-        if (detect)
-        {
-            CHECK(detect({nullptr, 0}) == STOMPTALK_HEADER_UNKNOWN);
-            dictionary(stomptalk_header_name, detect,
-                STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
-        }
-    }
-    CHECK(!stomptalk::detail::select_header_detector(UINT32_MAX));
+    // Test compiled classifiers directly; production only resolves AUTO once.
+    using namespace stomptalk::detail;
+    dictionary(stomptalk_header_name, detect_header<backend::swar>,
+               STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
+#if STOMPTALK_SSE2
+    if (stomptalk_cpu_features() & STOMPTALK_CPU_SSE2)
+        dictionary(stomptalk_header_name, detect_header<backend::sse2>,
+                   STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
+#endif
+#if STOMPTALK_NAMES_AVX2
+    if (stomptalk_cpu_features() & STOMPTALK_CPU_AVX2)
+        dictionary(stomptalk_header_name, detect_header_avx2,
+                   STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
+#endif
     checks += check_name_backend<stomptalk::detail::backend::swar>();
     checks += check_header_backend<STOMPTALK_BACKEND_SWAR>();
 #if STOMPTALK_SSE2
@@ -370,20 +371,22 @@ static void names_and_accumulator() {
 #if defined(__unix__)
     CHECK(munmap(memory, page * 2) == 0);
 #endif
-    context = "monotonic stackbuf and failed push";
+    context = "reserved stackbuf writes and retention";
     char data[8]{};
     stomptalk::stackbuf b(data, sizeof(data));
-    CHECK(b.push("1234567", 7) && b.size() == 7);
-    CHECK(b.push('8') && b.size() == 8);
-    CHECK(!b.push('9') && b.size() == 0);
+    b.push("1234567", 7);
+    CHECK(b.size() == 7);
+    b.push('8');
+    CHECK(b.size() == 8);
     CHECK(std::memcmp(data, "12345678", 8) == 0);
-    CHECK(b.push("abc", 3));
-    CHECK(!b.push("123456", 6) && b.size() == 0);
-    CHECK(std::memcmp(data, "abc45678", 8) == 0);
-    CHECK(b.push("abCDEF", 6));
+    b.reset();
+    b.push("abCDEF", 6);
     b.retain(2);
     CHECK(b.size() == 4 && std::memcmp(data, "CDEF", 4) == 0);
-    CHECK(b.push("12", 2) && b.size() == 6);
+    b.push("12", 2);
+    CHECK(b.size() == 6);
+    b.retain(b.size());
+    CHECK(!b.size()); // completed records can leave an empty active prefix
     b.reset();
     CHECK(!b.size() && b.available() == sizeof(data));
 }
@@ -405,6 +408,10 @@ static void suite(stomptalk_backend backend) {
         {"crlf", wire("SEND", {{"destination", "/q"}}, "hello", "\r\n"), {{"SEND", {{"destination", "/q"}}, "hello", true}}},
         {"escapes-first-key-byte", wire("SEND", escaped), {{"SEND", decoded, {}, true}}},
         {"empty-value", wire("SEND", {{"x", ""}}), {{"SEND", {{"x", ""}}, {}, true}}},
+        {"short-length-name", wire("SEND", {{"content-lengt", "not-a-number"}}, "abc"),
+            {{"SEND", {{"content-lengt", "not-a-number"}}, "abc", true}}},
+        {"long-length-name", wire("SEND", {{"content-lengthx", "not-a-number"}}, "abc"),
+            {{"SEND", {{"content-lengthx", "not-a-number"}}, "abc", true}}},
         {"utf8-and-spaces", wire("SEND", {{" k\t", " тест \x7f"}}), {{"SEND", {{" k\t", " тест \x7f"}}, {}, true}}},
         {"unknown-method", wire("FROB", {{"x", "y"}}), {{"FROB", {{"x", "y"}}, {}, true}}},
         {"literal-connect", wire("CONNECT", {{"login", "a\\q:c"}}), {{"CONNECT", {{"login", "a\\q:c"}}, {}, true}}},

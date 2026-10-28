@@ -1,0 +1,35 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 9K of event 'cpu_core/cycles/u'
+# Event count (approx.): 47054030332
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    26.45%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -
+    12.99%  [.] stomptalk::parser::finish_value(char const*)                                      -      -
+    11.03%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -
+    10.69%  [.] stomptalk::parser::publish(bool)                                                  -      -
+     6.62%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -
+     4.64%  [.] stomptalk::parser::finish_token()                                                 -      -
+     3.92%  [.] main                                                                              -      -
+     3.50%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -
+     3.01%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -
+     2.51%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -
+     2.26%  [.] 0x000000000016465d                                                                -      -
+     1.93%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -
+     1.03%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)  -      -
+     0.93%  [.] stomptalk::parser::own_token()                                                    -      -
+     0.81%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -
+     0.71%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -
+     0.71%  [.] 0x0000000000164659                                                                -      -
+     0.59%  [.] stomptalk::parser::own_metadata()                                                 -      -
+     0.52%  [.] 0x00000000001640e8                                                                -      -
+
+
+#
+# (Tip: Limit to show entries above 5% only: perf report --percent-limit 5)
+#

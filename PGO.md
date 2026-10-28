@@ -5,6 +5,11 @@
 Он обучен на тестах и purestomp, а не на серверном RPC. Для серверного A/B
 предпочтительно получить собственный профиль тем же сценарием ниже.
 
+Профиль обновлён после упрощения reserve/append/stackbuf. На текущем коде
+Clang O3 PGO даёт 23,80 млн кадров/с на purestomp; при O2 сценарий escaping
+с PGO медленнее plain на 26,83%. Поэтому выбор профиля проверяется на целевой
+нагрузке. [Матрица, GNU time и сценарии](artifacts/internal-simplification/2026-10-28/README.md).
+
 ## Один запуск через CTest
 
 Нужны CMake/CTest 3.21+, Make, Clang и `llvm-profdata` из одной установки LLVM

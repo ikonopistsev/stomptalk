@@ -186,6 +186,16 @@ No persistent cursor/mask cache, arena expansion or C ABI change is introduced.
 The old split key/value states and their scanners have been removed.
 [Experiment and measurements](artifacts/header-line-study/2026-10-28/README.md).
 
+The private accumulator writes only bytes already accounted for by the parser.
+One remaining-byte counter covers both copied strings and borrowed strings that
+may need copying before return. Capacity is checked once before accepting input;
+only a failed reservation distinguishes a frame limit from reclaimable output.
+The accumulator's write bounds and successful tailcall status are debug assertions.
+Protocol errors and actual resource limits remain runtime checks. Small storage
+helpers are visible to both parser translation units through `parser.hpp`, without
+forcing the entire state tree inline.
+[File-by-file rationale and measurements](artifacts/internal-simplification/2026-10-28/README.md).
+
 `include/stomptalk/antoull.hpp` restores the original length-dispatched template
 converter for `content-length`. Its checked overload also accepts 19/20-digit
 values through `UINT64_MAX` and leading zeroes, without allocating or changing

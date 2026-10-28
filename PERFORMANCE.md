@@ -559,3 +559,58 @@ Debug, noSIMD/SSE2-only, relocation/static/shared/install/C99, ASan/UBSan
 прошли; 20688 streams / 4185057 checks. Ручной fuzz 351884/31 с без находок.
 [Полный отчёт](artifacts/server-handoff/2026-10-28/README.md),
 [PGO инструкция](PGO.md), [серверное задание](SERVER_HANDOFF.md).
+
+## Упрощение внутренних гарантий по файлам — 2026-10-28
+
+База `e30e2aa8`: проверены 23 production-файла, изменены 8. Место проверяется
+одним reserve до принятия байтов, включая borrowed строки; stackbuf пишет
+уже учтённые данные. active_bytes заменён на byte_left без новых полей.
+Убраны повторные push/own_token/status/length/layout проверки; малые helpers
+видны AVX2 TU без дополнительного force-inline. Ошибки ввода и реальные
+ресурсные ограничения остались runtime-проверками. Original 1.8.0 не менялся.
+
+P CPU 4, original purestomp + тот же consumer, прогрев и 5 чередующихся
+повторов по 10 млн кадров, без PGO/LTO/native. Млн кадров/с, до → после:
+
+| Compiler | Opt | SWAR | SSE2 | AVX2 |
+| --- | --- | ---: | ---: | ---: |
+| Clang 23 | Os | 12.11 → 14.09 | 13.11 → 15.77 | 12.84 → 16.05 |
+| Clang 23 | O2 | 17.63 → 18.83 | 19.46 → 21.46 | 15.24 → 20.78 |
+| Clang 23 | O3 | 17.47 → 18.51 | 19.53 → 21.56 | 16.06 → 20.84 |
+| GCC 16 | Os | 9.66 → 10.66 | 10.37 → 11.52 | 10.22 → 12.44 |
+| GCC 16 | O2 | 15.63 → 18.50 | 17.20 → 21.76 | 17.67 → 23.18 |
+| GCC 16 | O3 | 16.61 → 18.58 | 18.06 → 23.04 | 17.70 → 21.97 |
+
+Выбросы сохранены: Clang Os/AVX2 после имеет spread 35.47%, O2/AVX2 6.86%.
+У Clang/GCC O3 SSE2 spread до/после 0.90/0.70% и 1.29/1.03%.
+24 сценария на compiler/opt; потери перепроверены 7 парами около 300 мс.
+Остаются Clang O3 `h0_lf` +7.89%, `fragment_chunk_63` +3.20%,
+`send_length_byte` +2.21%; GCC O2 `send_length_chunk_7` +2.75% времени.
+Универсального ускорения всех сценариев не заявляем.
+
+Perf stat O3/SSE2, медиана 3 пар, cpu_core user events, running=100%:
+переходы/кадр Clang **269.4 → 238.0**, GCC **295.5 → 243.6**;
+инструкции **1405.2 → 1297.0**, **1415.0 → 1191.4** соответственно.
+12 perf-профилей (оба compiler, Os/O2/O3, до/после), top-5, lost=0.
+В AVX2 O2/O3 больше нет отдельных calls append/reserve/finish_token.
+
+Production src/include **2725 → 2692 строки**. `.text` probe O2/O3:
+Clang **43092/45188 → 41690/43114**, GCC **45669/57653 → 47829/64059**.
+GCC генерирует больше кода при меньшем числе исполняемых инструкций;
+уменьшение исходника не подменяется утверждением об уменьшении любого бинарника.
+
+Новый Clang profile создан отдельно для O2/O3 через CTest; файлы совпали,
+20968 байтов, 86 функций. В отдельной PGO-матрице старый → новый PGO:
+O2 **23.06 → 23.47**, O3 **22.59 → 23.80 млн/с**. GNU time 100 млн:
+O2 plain **5.18 → 4.67 с**, PGO **4.26 → 4.19 с**;
+O3 plain **4.89 → 4.76 с**, PGO **4.34 → 4.19 с**.
+Новый PGO O2 ухудшает escaping на **26.83%** относительно нового plain;
+при O3 +2.32%. Для сервера нужен профиль его нагрузки и отдельный A/B.
+Старые данные не заменены; обновлены pgo/metadata и source.sha256.
+
+Release матрица, Debug/assert, noSIMD/SSE2-only, ASan/UBSan с assertions,
+PGO relocation/static/shared/install/C99 прошли. **21008 streams / 4198701
+checks**; ручной fuzz **348369 запусков / 31 с**, без находок.
+[Отчёт и сырые данные](artifacts/internal-simplification/2026-10-28/README.md),
+[обоснование по файлам](artifacts/internal-simplification/2026-10-28/FILE_REVIEW.md),
+[top-5](artifacts/internal-simplification/2026-10-28/TOP5.md).

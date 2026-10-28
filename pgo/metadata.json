@@ -10,19 +10,20 @@
   "profiles": {
     "O2": {
       "file": "clang23.profdata",
-      "sha256": "ab73d8001b447b3623cb6569990321e3760a01cc776c63548776a6225094025d",
-      "bytes": 21856,
-      "summary": "Instrumentation level: IR  entry_first = 0  instrument_loop_entries = 0\nTotal functions: 88\nMaximum function count: 41955756\nMaximum internal block count: 41537141\nTotal number of blocks: 1268\nTotal count: 807653261\n",
+      "sha256": "2b86cabbef37c97765c80432089c610e77b2acdf23dce6e5cd82535ca398fcbf",
+      "bytes": 20968,
+      "summary": "Instrumentation level: IR  entry_first = 0  instrument_loop_entries = 0\nTotal functions: 86\nMaximum function count: 41957244\nMaximum internal block count: 41934916\nTotal number of blocks: 1182\nTotal count: 747496094\n",
       "options": "-DCMAKE_BUILD_TYPE=Release;-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang;-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++;-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG;-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG;-DSTOMPTALK_BUILD_TESTS=ON;-DSTOMPTALK_LIBRARY_INSTALL=ON;-DSTOMPTALK_PGO_ITERATIONS=500000"
     },
     "O3": {
       "file": "clang23.profdata",
-      "sha256": "ab73d8001b447b3623cb6569990321e3760a01cc776c63548776a6225094025d",
-      "bytes": 21856,
-      "summary": "Instrumentation level: IR  entry_first = 0  instrument_loop_entries = 0\nTotal functions: 88\nMaximum function count: 41955756\nMaximum internal block count: 41537141\nTotal number of blocks: 1268\nTotal count: 807653261\n",
+      "sha256": "2b86cabbef37c97765c80432089c610e77b2acdf23dce6e5cd82535ca398fcbf",
+      "bytes": 20968,
+      "summary": "Instrumentation level: IR  entry_first = 0  instrument_loop_entries = 0\nTotal functions: 86\nMaximum function count: 41957244\nMaximum internal block count: 41934916\nTotal number of blocks: 1182\nTotal count: 747496094\n",
       "options": "-DCMAKE_BUILD_TYPE=Release;-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang;-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++;-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG;-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG;-DSTOMPTALK_BUILD_TESTS=ON;-DSTOMPTALK_LIBRARY_INSTALL=ON;-DSTOMPTALK_PGO_ITERATIONS=500000"
     }
   },
   "note": "O2 and O3 were generated independently. Their IR profiles are byte-identical for this training; one file is shipped, validated with both optimization levels.",
-  "source_commit": "68d553f3578460e9f4f9d66d708c60cfdf153706"
+  "source_base_commit": "e30e2aa8b2b49daebaf07ceea3dcbccdfe8177fe",
+  "source_manifest": "source.sha256 (authoritative contents after internal simplification)"
 }

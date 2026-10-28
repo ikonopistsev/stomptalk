@@ -1,0 +1,30 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 5K of event 'cpu_core/cycles/u'
+# Event count (approx.): 28118963833
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    37.47%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -
+    10.34%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -
+    10.17%  [.] stomptalk::parser::finish_value(char const*)                                      -      -
+     9.66%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -
+     8.67%  [.] stomptalk::parser::publish(bool)                                                  -      -
+     5.44%  [.] main                                                                              -      -
+     4.50%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -
+     2.85%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -
+     2.18%  [.] stomptalk::parser::own_metadata()                                                 -      -
+     1.50%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -
+     1.11%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -
+     0.88%  [.] char const* stomptalk::parser::done<3u>(char const*, char const*)                 -      -
+     0.85%  [.] 0x00000000001640e8                                                                -      -
+     0.60%  [.] memcpy@plt                                                                        -      -
+
+
+#
+# (Tip: To show information about system the samples were collected on use perf report --header)
+#

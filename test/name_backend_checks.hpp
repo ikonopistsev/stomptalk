@@ -140,9 +140,6 @@ std::size_t check_header_backend()
     check(match({nullptr, 0}, ""));
     check(match({"a\0b", 3}, "a\0b")); // known size includes embedded NUL
     check(!match({"a\0c", 3}, "a\0b"));
-    check(!is_content_length<Backend>({nullptr, 0}));
-    check(!is_content_length<Backend>({"content-length?", 15}));
-    check(!is_content_length<Backend>({"content-lengt", 13}));
     char storage[14 + 32];
     auto content_length = [&](char* data)
     {

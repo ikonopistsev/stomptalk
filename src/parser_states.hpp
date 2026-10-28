@@ -16,8 +16,8 @@ parser::pointer parser::start_state(pointer curr, pointer end) noexcept {
         key_ = token_ = {nullptr, 0};
         token_owned_ = escape_ = literal_ = length_header_ = begun_ = false;
         active_ = true;
-        active_bytes_ = 0;
         byte_begin_ = bytes_.size();
+        byte_left_ = bytes_.available();
         header_begin_ = header_used_;
         return tailcall(&parser::method_state<B>, curr, end);
     }

@@ -1,0 +1,26 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 4K of event 'cpu_core/cycles/u'
+# Event count (approx.): 21066156482
+#
+# Overhead  Symbol                                                                         IPC   [IPC Coverage]
+# ........  .............................................................................  ....................
+#
+    44.01%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)       -      -
+    11.56%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)   -      -
+    11.04%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)     -      -
+     9.14%  [.] stomptalk::parser::finish_value(char const*)                               -      -
+     5.95%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)  -      -
+     5.65%  [.] main                                                                       -      -
+     4.41%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)  -      -
+     3.19%  [.] stomptalk::parser::own_metadata()                                          -      -
+     1.43%  [.] char const* stomptalk::parser::done<3u>(char const*, char const*)          -      -
+     0.58%  [.] stomptalk_parser_execute                                                   -      -
+
+
+#
+# (Tip: To change sampling frequency to 100 Hz: perf record -F 100)
+#

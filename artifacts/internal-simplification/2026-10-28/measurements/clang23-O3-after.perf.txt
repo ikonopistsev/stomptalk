@@ -1,0 +1,28 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 4K of event 'cpu_core/cycles/u'
+# Event count (approx.): 22720197471
+#
+# Overhead  Symbol                                                                                       IPC   [IPC Coverage]
+# ........  ...........................................................................................  ....................
+#
+    38.18%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)                     -      -
+    27.09%  [.] stomptalk::parser::finish_value(char const*)                                             -      -
+     8.03%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)         -      -
+     7.21%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)                -      -
+     4.62%  [.] main                                                                                     -      -
+     3.10%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)                 -      -
+     2.69%  [.] char const* stomptalk::parser::done<3u>(char const*, char const*)                        -      -
+     2.38%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)                -      -
+     1.82%  [.] stomptalk::parser::own_metadata()                                                        -      -
+     1.63%  [.] char const* stomptalk::parser::body_read<3u>(char const*, char const*)                   -      -
+     0.71%  [.] stomptalk::parser::run(char const*, unsigned long)                                       -      -
+     0.60%  [.] memcpy@plt                                                                               -      -
+
+
+#
+# (Tip: When collecting LBR backtraces use --stitch-lbr to handle more than 32 deep entries: perf record --call-graph lbr ; perf report --stitch-lbr)
+#

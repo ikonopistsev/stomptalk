@@ -1,0 +1,40 @@
+Start testing: Oct 28 19:11 EET
+----------------------------------------------------------
+1/2 Testing: stomptalk_unit_test
+1/2 Test: stomptalk_unit_test
+Command: "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after/stomptalk_unit_test"
+Directory: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after
+"stomptalk_unit_test" start time: Oct 28 19:11 EET
+Output:
+----------------------------------------------------------
+backend 1 passed
+backend 2 passed
+backend 3 passed
+backend 4 passed
+21008 streams, 4198701 checks
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"stomptalk_unit_test" end time: Oct 28 19:11 EET
+"stomptalk_unit_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: stomptalk_c99_smoke
+2/2 Test: stomptalk_c99_smoke
+Command: "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after/purestomp" "0" "10"
+Directory: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-Os-after
+"stomptalk_c99_smoke" start time: Oct 28 19:11 EET
+Output:
+----------------------------------------------------------
+stomptalk v2.0.0
+connected 10, frame 100, json 10, total 670
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"stomptalk_c99_smoke" end time: Oct 28 19:11 EET
+"stomptalk_c99_smoke" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 28 19:11 EET

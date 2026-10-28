@@ -1,0 +1,32 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 7K of event 'cpu_core/cycles/u'
+# Event count (approx.): 36897319342
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    32.03%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -
+    13.43%  [.] stomptalk::parser::finish_value(char const*)                                      -      -
+    11.98%  [.] stomptalk::parser::publish(bool)                                                  -      -
+    10.53%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -
+     6.12%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -
+     5.26%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -
+     4.12%  [.] main                                                                              -      -
+     3.12%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -
+     2.23%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -
+     2.01%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -
+     1.18%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)  -      -
+     0.98%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -
+     0.87%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -
+     0.75%  [.] stomptalk::parser::own_metadata()                                                 -      -
+     0.74%  [.] stomptalk::parser::append(char, char const*)                                      -      -
+     0.51%  [.] 0x00000000001640e8                                                                -      -
+
+
+#
+# (Tip: To add Node.js USDT(User-Level Statically Defined Tracing): perf buildid-cache --add `which node`)
+#

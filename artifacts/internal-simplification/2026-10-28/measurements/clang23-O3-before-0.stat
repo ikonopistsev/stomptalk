@@ -1,0 +1,6 @@
+# started on Wed Oct 28 19:23:10 2026
+
+2492360671;;cpu_core/cycles/u;514256418;100.00;;
+14051676276;;cpu_core/instructions/u;514256418;100.00;;
+2694481230;;cpu_core/branches/u;514256418;100.00;;
+31933;;cpu_core/branch-misses/u;514256418;100.00;;

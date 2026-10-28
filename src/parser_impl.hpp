@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <limits>
 
 namespace stomptalk {
 
@@ -19,7 +18,8 @@ parser::parser(const stomptalk_parser_config &config, stomptalk_frame_view *fram
 
 void parser::reset() noexcept {
     bytes_.reset();
-    frame_count_ = header_used_ = header_begin_ = byte_begin_ = active_bytes_ = 0;
+    frame_count_ = header_used_ = header_begin_ = byte_begin_ = 0;
+    byte_left_ = config_.byte_capacity;
     current_ = {};
     key_ = token_ = {nullptr, 0};
     active_ = begun_ = escape_ = literal_ = length_header_ = token_owned_ = false;
@@ -46,32 +46,14 @@ parser::pointer parser::fail(stomptalk_error_code error, pointer at) noexcept {
     return stop_ = at + 1;
 }
 
-// Reserve logical bytes, including borrowed active strings. Already completed
-// records occupy [0, byte_begin_); reclaiming them must free this exact resource.
-bool parser::reserve(size_t count, pointer at) noexcept {
-    if (count > config_.byte_capacity - active_bytes_) {
-        fail(STOMPTALK_ERROR_BYTE_LIMIT, at + (config_.byte_capacity - active_bytes_));
-        return false;
-    }
-    if (count > config_.byte_capacity - byte_begin_ - active_bytes_) {
-        assert(frame_count_ && byte_begin_);
-        status_ = STOMPTALK_PARSE_OUTPUT_FULL;
-        stop_ = at;
-        return false;
-    }
-    active_bytes_ += count;
-    return true;
-}
-
 void parser::own(stomptalk_view &v) noexcept {
-    if (!v.size) { v.data = nullptr; return; }
+    assert(v.size || !v.data);
+    if (!v.size) return;
     const uintptr_t offset = reinterpret_cast<uintptr_t>(v.data) -
                              reinterpret_cast<uintptr_t>(bytes_.data());
     if (offset < config_.byte_capacity) return;
     char *dest = bytes_.next();
-    const bool ok = bytes_.push(v.data, v.size);
-    assert(ok); // space was reserved before the source bytes were consumed
-    (void)ok;
+    bytes_.push(v.data, v.size);
     v.data = dest;
 }
 
@@ -88,44 +70,9 @@ void parser::own_token() noexcept {
     if (token_owned_) return;
     own_metadata(); // the open string must remain last in the accumulator
     char *dest = bytes_.next();
-    const bool ok = bytes_.push(token_.data, token_.size);
-    assert(ok);
-    (void)ok;
+    if (token_.size) bytes_.push(token_.data, token_.size);
     token_.data = dest;
     token_owned_ = true;
-}
-
-bool parser::append(pointer data, size_t count) noexcept {
-    if (!count) return true;
-    if (!reserve(count, data)) return false;
-    if (token_owned_) {
-        const bool ok = bytes_.push(data, count);
-        assert(ok);
-        (void)ok;
-    } else if (!token_.size) {
-        token_.data = data;
-    } else {
-        assert(token_.data + token_.size == data);
-    }
-    token_.size += count;
-    return true;
-}
-
-bool parser::append(char value, pointer source) noexcept {
-    if (!reserve(1, source)) return false;
-    own_token();
-    const bool ok = bytes_.push(value);
-    assert(ok);
-    (void)ok;
-    ++token_.size;
-    return true;
-}
-
-stomptalk_view parser::finish_token() noexcept {
-    const stomptalk_view result = token_.size ? token_ : stomptalk_view{nullptr, 0};
-    token_ = {nullptr, 0};
-    token_owned_ = false;
-    return result;
 }
 
 void parser::recycle() noexcept {
@@ -137,8 +84,9 @@ void parser::recycle() noexcept {
         header_used_ = header_begin_ = byte_begin_ = 0;
         return;
     }
+    assert(header_begin_ <= header_used_);
     const size_t count = header_used_ - header_begin_;
-    if (header_begin_ && count)
+    if (header_begin_)
         std::memmove(headers_, headers_ + header_begin_, count * sizeof(*headers_));
     header_used_ = count;
     header_begin_ = 0;
@@ -155,8 +103,10 @@ void parser::recycle() noexcept {
             shift(headers_[i].value);
         }
         bytes_.retain(byte_begin_);
+        byte_left_ += byte_begin_;
         byte_begin_ = 0;
     }
+    assert(byte_left_ == bytes_.available());
 }
 
 void parser::publish(bool complete) noexcept {

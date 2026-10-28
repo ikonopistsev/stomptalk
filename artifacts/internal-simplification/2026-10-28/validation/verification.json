@@ -1,0 +1,440 @@
+{
+  "status": "completed",
+  "commands": [
+    {
+      "label": "final-debug-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-debug",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DCMAKE_BUILD_TYPE=Debug"
+      ],
+      "exit": 0,
+      "seconds": 0.3754133000038564
+    },
+    {
+      "label": "final-debug-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-debug",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 1.1921213760506362
+    },
+    {
+      "label": "final-debug-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-debug",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.6253349359612912
+    },
+    {
+      "label": "final-sse2-only-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-sse2-only",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_BUILD_AVX2=OFF"
+      ],
+      "exit": 0,
+      "seconds": 0.31907318509183824
+    },
+    {
+      "label": "final-sse2-only-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-sse2-only",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 6.236430878052488
+    },
+    {
+      "label": "final-sse2-only-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-sse2-only",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.10449652909301221
+    },
+    {
+      "label": "final-no-simd-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-no-simd",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_BUILD_SSE2=OFF"
+      ],
+      "exit": 0,
+      "seconds": 0.31430115597322583
+    },
+    {
+      "label": "final-no-simd-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-no-simd",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 3.480909327045083
+    },
+    {
+      "label": "final-no-simd-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-no-simd",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.06653160392306745
+    },
+    {
+      "label": "final-sanitize-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-sanitize",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_BUILD_FUZZ=ON",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -g",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g"
+      ],
+      "exit": 0,
+      "seconds": 0.31939804507419467
+    },
+    {
+      "label": "final-sanitize-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-sanitize",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 6.361247627995908
+    },
+    {
+      "label": "final-sanitize-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-sanitize",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.4953229520469904
+    },
+    {
+      "label": "manual-fuzz",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/final-sanitize/fuzz_stomptalk_v2",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/fuzz-corpus",
+        "-max_total_time=30",
+        "-max_len=8192",
+        "-seed=1801"
+      ],
+      "exit": 0,
+      "seconds": 31.05220050411299
+    },
+    {
+      "label": "pgo-O2",
+      "args": [
+        "ctest",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/cmake/ClangPGO.cmake",
+        "-DPGO_LLVM_DIR=/usr/lib/llvm/23/bin",
+        "-DPGO_OPT=O2",
+        "-DPGO_WORK=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/pgo-O2",
+        "-VV"
+      ],
+      "exit": 0,
+      "seconds": 17.51432297518477
+    },
+    {
+      "label": "pgo-O3",
+      "args": [
+        "ctest",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/cmake/ClangPGO.cmake",
+        "-DPGO_LLVM_DIR=/usr/lib/llvm/23/bin",
+        "-DPGO_OPT=O3",
+        "-DPGO_WORK=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/pgo-O3",
+        "-VV"
+      ],
+      "exit": 0,
+      "seconds": 19.13772673299536
+    },
+    {
+      "label": "relocated-O2-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-O2",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_PGO_PROFILE=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-source/portable.profdata"
+      ],
+      "exit": 0,
+      "seconds": 0.3305901209823787
+    },
+    {
+      "label": "relocated-O2-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-O2",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 5.670780934859067
+    },
+    {
+      "label": "relocated-O2-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-O2",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.19563104584813118
+    },
+    {
+      "label": "relocated-O3-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-O3",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_PGO_PROFILE=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-source/portable.profdata"
+      ],
+      "exit": 0,
+      "seconds": 0.3299356298521161
+    },
+    {
+      "label": "relocated-O3-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-O3",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 6.370071002980694
+    },
+    {
+      "label": "relocated-O3-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-O3",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.16308689606375992
+    },
+    {
+      "label": "relocated-shared-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-shared",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_PGO_PROFILE=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-source/portable.profdata",
+        "-DSTOMPTALK_LIBRARY_STATIC=OFF",
+        "-DSTOMPTALK_LIBRARY_INSTALL=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.32599090901203454
+    },
+    {
+      "label": "relocated-shared-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-shared",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 6.967700101900846
+    },
+    {
+      "label": "relocated-shared-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-shared",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.15633963886648417
+    },
+    {
+      "label": "shared-install",
+      "args": [
+        "cmake",
+        "--install",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-shared",
+        "--prefix",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/install"
+      ],
+      "exit": 0,
+      "seconds": 0.01251201587729156
+    },
+    {
+      "label": "shared-exports",
+      "args": [
+        "nm",
+        "-D",
+        "--defined-only",
+        "-C",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/relocated-shared/libstomptalk.so"
+      ],
+      "exit": 0,
+      "seconds": 0.008639664156362414
+    },
+    {
+      "label": "consumer-configure",
+      "args": [
+        "cmake",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/consumer-source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/consumer",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_PREFIX_PATH=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/install"
+      ],
+      "exit": 0,
+      "seconds": 0.14644729695282876
+    },
+    {
+      "label": "consumer-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/consumer"
+      ],
+      "exit": 0,
+      "seconds": 0.10185488988645375
+    },
+    {
+      "label": "consumer-run",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/consumer/consumer",
+        "0",
+        "10000"
+      ],
+      "exit": 0,
+      "seconds": 0.00849894993007183
+    }
+  ],
+  "source_sha256": {
+    "src/is_header.hpp": "adaaeb7697bfd1e65683de698fc6592dcb31eabe13c23939a77ca3f3c9ff1ef4",
+    "src/name_group.hpp": "b2f8a3c1e6eee786c74b7618963c909150b410b9efdc12b434fe66002cd1e1c1",
+    "src/parser_states.hpp": "a3c88f9d1a613ce33de29c84e2b3e35f5a92f1de242a4798c62041e6e62ca49f",
+    "src/name_dispatch.hpp": "e8f46d6a76d313240e3c1b901643c1fcb77168e0c8e31b7c1535c15663fa5a40",
+    "src/headers.hpp": "b80bdb5c5aac4b96a166a36ff6bcb3637e3b1b60cd2d250abf9fda790d070683",
+    "src/names.cpp": "b16d6f5ef83a203c96b0bc687a4c8ddb8c503619d64493828933c48b04d2d8f7",
+    "src/stomptalk.cpp": "0d5bffb46c2d6a277cc1bb5f67bdf9344c253ee628bb9aa86e20803a70927298",
+    "src/names_avx2.cpp": "930bd2466b55fe47064357e98001718f724877fd3c302a5b4853558db468f3d2",
+    "src/methods.hpp": "8ea1a9242a18cd318ff01d01a45de0ea30873a5fa4a21795375c114dc5bb96a6",
+    "src/parser_impl.hpp": "3a99fcb07aa37dc63a9c457d95530c6789257894b50fc7dcded6affd13bdd920",
+    "src/content_length.hpp": "3f15c11a49e9f160526f280cda2c03840a00798b60504f05af83bf8e69759d99",
+    "src/parser_avx2.cpp": "c0b2cacac10f53825a32b0cb642fd8bca75a225919c2e488e9ad9227a5f1d046",
+    "src/backend/avx2.hpp": "0550001f26f3a6f303de021bf15b2f2b1a5ebf6f2560e78fb9222b37682c2e88",
+    "src/backend/config.hpp": "855da9f0a425645dd6fbc0ee59b490e83f1a6cd062e09eb62f0a30f56ee5bf1c",
+    "src/backend/swar.hpp": "b2d759632c37c5fd2b196685b7d93e9b99995d4909d647a7d146209214b5b5c3",
+    "src/backend/sse2.hpp": "6fde811b3895ee9d5b247e68dfbabc9acd0143aa2a8becde44f17ceb30609e0b",
+    "include/stomptalk/parser.hpp": "72759125639d465740ecf48e11e0aa6a4bd34e9f2d069ca1329d6e470fb94c54",
+    "include/stomptalk/method.h": "64a7a30b5f09987b0770e7797acd36c899ca5aebaebfe77c024c8b31b39df530",
+    "include/stomptalk/type.h": "751620bb3c6237962f8c02038411547fea4150aff782866cda0b0eae336db4a3",
+    "include/stomptalk/header.h": "036b0191bac15299d63528d5607181fa9e579d6c675f54a6600ea6abf2e4a6cf",
+    "include/stomptalk/antoull.hpp": "5dde280db69a8f8fca3eaca4fb974d8bfd7df924d8e9bfb4ed893985950e113a",
+    "include/stomptalk/stackbuf.hpp": "379349d23866063e609637b91fb42d6872c15d42c411ad30e3ede743437e129a",
+    "include/stomptalk/parser.h": "b3cbf08ba9e8def6633805151dcdc738ac823ddfdd024c0f232f1f263779c79b"
+  }
+}

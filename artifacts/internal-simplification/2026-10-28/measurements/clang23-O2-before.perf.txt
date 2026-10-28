@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 5K of event 'cpu_core/cycles/u'
+# Event count (approx.): 24894388464
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    39.52%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -
+    25.40%  [.] stomptalk::parser::finish_value(char const*)                                      -      -
+     7.60%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -
+     6.93%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -
+     5.06%  [.] main                                                                              -      -
+     3.32%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -
+     2.61%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -
+     2.36%  [.] char const* stomptalk::parser::done<3u>(char const*, char const*)                 -      -
+     1.86%  [.] stomptalk::parser::own_metadata()                                                 -      -
+     0.90%  [.] char const* stomptalk::parser::body_read<3u>(char const*, char const*)            -      -
+     0.61%  [.] stomptalk::parser::run(char const*, unsigned long)                                -      -
+     0.51%  [.] memcpy@plt                                                                        -      -
+     0.51%  [.] 0x00000000001640e8                                                                -      -
+
+
+#
+# (Tip: Treat branches as callchains: perf record -b ... ; perf report --branch-history)
+#

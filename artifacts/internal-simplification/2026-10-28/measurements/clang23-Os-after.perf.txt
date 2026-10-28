@@ -1,0 +1,30 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 6K of event 'cpu_core/cycles/u'
+# Event count (approx.): 30400162868
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    30.08%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -
+    16.81%  [.] stomptalk::parser::finish_value(char const*)                                      -      -
+    13.16%  [.] stomptalk::parser::publish(bool)                                                  -      -
+    11.80%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -
+     7.32%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -
+     4.79%  [.] main                                                                              -      -
+     2.99%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -
+     2.36%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -
+     1.84%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -
+     1.25%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)  -      -
+     0.99%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -
+     0.85%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -
+     0.82%  [.] stomptalk::parser::own_metadata()                                                 -      -
+     0.58%  [.] stomptalk::parser::run(char const*, unsigned long)                                -      -
+
+
+#
+# (Tip: To add Node.js USDT(User-Level Statically Defined Tracing): perf buildid-cache --add `which node`)
+#

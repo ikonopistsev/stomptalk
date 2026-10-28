@@ -32,10 +32,9 @@ template<stomptalk_backend Backend>
 STOMPTALK_FORCE_INLINE
 bool is_content_length(stomptalk_view name, const char* wire = nullptr) noexcept
 {
-    assert(name.data || !name.size);
-    return name.size == sizeof(backend::content_length_wire) - 3 &&
-        (wire ? backend::engine<Backend>::is_content_length_wire(wire)
-              : backend::swar::is_content_length(name.data));
+    assert(name.data && name.size == sizeof(backend::content_length_wire) - 3);
+    return wire ? backend::engine<Backend>::is_content_length_wire(wire)
+                : backend::swar::is_content_length(name.data);
 }
 
 } // namespace detail

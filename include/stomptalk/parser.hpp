@@ -20,7 +20,7 @@ private:
     stomptalk_frame_view current_{};
     stomptalk_view key_{}, token_{};
     size_t frame_count_{0}, header_used_{0}, header_begin_{0}, byte_begin_{0};
-    size_t active_bytes_{0};
+    size_t byte_left_{0}; // remaining after accounting for borrowed and copied strings
     bool active_{false}, begun_{false}, escape_{false}, literal_{false};
     bool length_header_{false}, token_owned_{false};
     stomptalk_parse_status status_{STOMPTALK_PARSE_OK};
@@ -29,22 +29,63 @@ private:
     pointer begin_{nullptr}, stop_{nullptr}; // only valid during run()
 
     pointer fail(stomptalk_error_code, pointer) noexcept;
-    bool reserve(size_t, pointer) noexcept;
-    bool append(pointer, size_t) noexcept;
-    bool append(char, pointer) noexcept;
+    // One limit check on the successful path. Only a failed reservation needs to
+    // distinguish a frame limit from space occupied by earlier completed records.
+    bool reserve(size_t count, pointer at) noexcept {
+        if (count <= byte_left_) {
+            byte_left_ -= count;
+            return true;
+        }
+        assert(byte_left_ <= config_.byte_capacity - byte_begin_);
+        if (count > byte_left_ + byte_begin_) {
+            fail(STOMPTALK_ERROR_BYTE_LIMIT, at + byte_left_ + byte_begin_);
+        } else {
+            assert(frame_count_ && byte_begin_);
+            status_ = STOMPTALK_PARSE_OUTPUT_FULL;
+            stop_ = at;
+        }
+        return false;
+    }
+    bool append(pointer data, size_t count) noexcept {
+        if (!count) return true;
+        if (!reserve(count, data)) return false;
+        if (token_owned_) {
+            bytes_.push(data, count);
+        } else if (!token_.size) {
+            token_.data = data;
+        } else {
+            assert(token_.data + token_.size == data);
+        }
+        token_.size += count;
+        return true;
+    }
+    bool append(char value, pointer source) noexcept {
+        assert(token_owned_); // the backslash path already promoted the token
+        if (!reserve(1, source)) return false;
+        bytes_.push(value);
+        ++token_.size;
+        return true;
+    }
     void own(stomptalk_view &) noexcept;
     void own_metadata() noexcept;
     void own_token() noexcept;
-    stomptalk_view finish_token() noexcept;
+    stomptalk_view finish_token() noexcept {
+        assert(token_.size || !token_.data); // an empty owned token is awaiting an escape byte
+        const stomptalk_view result = token_;
+        token_ = {nullptr, 0};
+        token_owned_ = false;
+        return result;
+    }
     void recycle() noexcept;
     void publish(bool complete) noexcept;
     bool finish_value(pointer) noexcept;
     bool check_body(size_t, pointer) noexcept;
 
     STOMPTALK_FORCE_INLINE pointer tailcall(state_type next, pointer p, pointer end) noexcept {
+        assert(status_ == STOMPTALK_PARSE_OK);
         state_ = next;
 #if defined(__OPTIMIZE__) && !defined(STOMPTALK_TRAMPOLINE) && !defined(__SANITIZE_ADDRESS__)
-        if (p < end && status_ == STOMPTALK_PARSE_OK)
+        if (p < end)
             return (this->*next)(p, end);
 #else
         (void)end;

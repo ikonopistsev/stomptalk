@@ -408,3 +408,33 @@ O2 шумнее. GNU time 100 млн **5.13→4.30**, **4.95→4.36 с**. 24 с�
 4 perf top-5 без lost samples. Unit/C99/matrix/install/sanitize успешны;
 manual fuzz **351884/31 с**, без находок. Профиль синтетический; RPC эффект
 ожидает серверного A/B. [Отчёт](../../server-handoff/2026-10-28/README.md).
+
+### Закрытые инварианты и упрощение по файлам — 2026-10-28
+
+По просьбе пользователя разобраны связи всех 23 production-файлов. Изменены 8:
+byte_left вместо повторной арифметики в reserve, безусловная запись в уже
+учтённое место в stackbuf, assert для внутренних гарантий, удаление повторных
+own_token/status/length/layout проверок. reserve/append/finish_token видны
+AVX2 TU без нового force-inline. Original 1.8.0 оставлен без изменений;
+публичный C API, malformed input и ошибки ресурсов сохранены.
+
+Оценка простоты: 2725 → 2692 строки, нет новых объектов/флагов/allocator-ов.
+Обоснование каждого изменённого и оставленного файла записано отдельно.
+Оценка скорости: GCC/Clang Os/O2/O3 × SWAR/SSE2/AVX2, original purestomp,
+P CPU4, 5 чередующихся повторов. SSE2 O2/O3 Clang **19.46/19.53 →
+21.46/21.56**, GCC **17.20/18.06 → 21.76/23.04 млн/с**. Машинный код
+Clang меньше; GCC O2/O3 больше из-за inline. Переходы O3 Clang
+269.4 → 238.0, GCC 295.5 → 243.6 на кадр. 12 perf top-5, lost=0.
+
+24 сценария/compiler/opt; 7 длинных пар для выявленных потерь. Остались
+Clang O3 h0_lf +7.89%, fragment_chunk_63 +3.20%, send_length_byte +2.21%;
+GCC O2 send_length_chunk_7 +2.75% времени. Не скрыты за основной медианой.
+Новые Clang PGO O2/O3 совпали и опубликованы с хэшами: основной корпус
+23.47/23.80 млн/с; GNU time 100 млн 4.19 с в обоих случаях. PGO O2
+escaping +26.83% к новому plain, ограничение профиля явно зафиксировано.
+
+Debug/assert, Release matrix, noSIMD/SSE2-only, ASan/UBSan с assertions,
+PGO relocation/static/shared/install/C99 прошли. 21008 streams / 4198701
+checks; manual fuzz 348369/31 с без находок. Обновлены ТЗ, README,
+PERFORMANCE, PGO и серверная передача. Новый внешний Claude review не запускался.
+[Артефакты](../../internal-simplification/2026-10-28/README.md).

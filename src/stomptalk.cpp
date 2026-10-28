@@ -15,6 +15,8 @@ struct stomptalk_parser {
 };
 
 namespace {
+constexpr size_t memory_alignment = (std::max)(alignof(stomptalk_parser),
+    (std::max)(alignof(stomptalk_frame_view), alignof(stomptalk_header_view)));
 stomptalk_parser_config defaults() noexcept {
     return {64, 256, 32768, 64, UINT64_MAX, STOMPTALK_BACKEND_AUTO};
 }
@@ -61,8 +63,7 @@ stomptalk_error_code stomptalk_parser_get_memory_requirements(
     const auto error = get_layout(config ? *config : defaults(), l);
     if (error) return error;
     r->size = l.total;
-    r->alignment = (std::max)(alignof(stomptalk_parser),
-        (std::max)(alignof(stomptalk_frame_view), alignof(stomptalk_header_view)));
+    r->alignment = memory_alignment;
     return STOMPTALK_ERROR_NONE;
 }
 stomptalk_error_code stomptalk_parser_init(const stomptalk_parser_config *config,
@@ -71,13 +72,11 @@ stomptalk_error_code stomptalk_parser_init(const stomptalk_parser_config *config
     *result = nullptr;
     if (!memory) return STOMPTALK_ERROR_ARGUMENT;
     const auto c = config ? *config : defaults();
-    stomptalk_memory_requirements r{};
-    const auto error = stomptalk_parser_get_memory_requirements(&c, &r);
-    if (error) return error;
-    if (reinterpret_cast<uintptr_t>(memory) % r.alignment) return STOMPTALK_ERROR_ALIGNMENT;
-    if (size < r.size) return STOMPTALK_ERROR_MEMORY;
     layout l{};
-    get_layout(c, l);
+    const auto error = get_layout(c, l);
+    if (error) return error;
+    if (reinterpret_cast<uintptr_t>(memory) % memory_alignment) return STOMPTALK_ERROR_ALIGNMENT;
+    if (size < l.total) return STOMPTALK_ERROR_MEMORY;
     auto base = static_cast<char *>(memory);
     auto frames = reinterpret_cast<stomptalk_frame_view *>(base + l.frames);
     auto headers = reinterpret_cast<stomptalk_header_view *>(base + l.headers);
