@@ -256,7 +256,25 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 # backend: 0 AUTO, 1 scalar, 2 SWAR, 3 SSE2, 4 AVX2; default 10 million input iterations
 ./build/purestomp 3
+# Sweep every input chunk size, 1..838 bytes; 100000 repeats = 1 million frames per size
+./build/purestomp 3 100000 all > chunks.csv
+# Measure one chunk size (for example, byte-by-byte)
+./build/purestomp 3 100000 1
 ```
+
+The optional third argument is a chunk size or `all`. Omitting it feeds the whole
+838-byte, 10-frame fixture and retains the previous summary format. CSV rows report
+chunk size, input repetitions, execute calls, complete frames, headers, payload
+bytes, elapsed seconds, million frames/s and decimal MB/s of input. Timing uses a
+monotonic clock when available, otherwise process CPU time, as stated in the output.
+Each row checks the original useful totals (10 frames, 35 headers, 67 payload bytes,
+one CONNECTED and one JSON frame per repetition).
+
+Before timing each size, the test compares fragmented output with a whole-input
+reference: methods, decoded headers, content length, payload bytes/offsets and
+BEGIN/COMPLETE. It reuses and overwrites input memory between calls. This verification,
+allocation and output are outside timing; parsing and the result consumer are timed.
+CTest runs a short sweep as `stomptalk_c99_chunks`.
 
 The [design](PARSER_V2_DRAFT.md) describes publication and lifetime rules.
 [Stage 1 artifacts](artifacts/parser-v2-implementation/stage-1/README.md) contain

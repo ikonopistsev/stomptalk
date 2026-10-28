@@ -1,0 +1,35 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-f",
+    "real %e\nuser %U\nsys %S",
+    "-o",
+    "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/purestomp-chunks/2026-10-28/sweep.time",
+    "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/purestomp-chunks/2026-10-28/build/clang23-O3-pgo/purestomp",
+    "3",
+    "100000",
+    "all"
+  ],
+  "cpu": 4,
+  "compiler": "Clang 23.1.4",
+  "opt": "O3",
+  "backend": "SSE2",
+  "pgo_source_commit": "52d1648",
+  "iterations_per_size": 100000,
+  "frames_per_size": 1000000,
+  "repeats": 1,
+  "status": "completed",
+  "source_base_commit": "52d1648d1693b8d42559a0735a964ec6de24c86a",
+  "sha256": {
+    "test/purestomp.c": "38da114a0ca6360aea51e5b0d980630850a322a8c166ed43f56394102b3f1d8b",
+    "CMakeLists.txt": "3e0e3aa2bbe40225184a61ea8c43736229f41fc860a63daba5c8e45ae83ee7e7",
+    "pgo/clang23.profdata": "71022a154399912e42c0b229b8139e7a434646de867a5d90c4920b5ccde256ec",
+    "artifacts/purestomp-chunks/2026-10-28/build/clang23-O3-pgo/purestomp": "cf0a4bea6bd5316eac76a0868b71cd935a73777426d269a6a862d73eccfabeb7"
+  },
+  "exit": 0,
+  "seconds": 48.521372684976086,
+  "verified_sizes": 838,
+  "frames": 838000000,
+  "input_bytes": 70224400000,
+  "timing": "real 48.51\nuser 48.25\nsys 0.00\n"
+}

@@ -1,0 +1,11 @@
+Test project /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/purestomp-chunks/2026-10-28/build/sanitize
+    Start 1: stomptalk_unit_test
+1/3 Test #1: stomptalk_unit_test ..............   Passed    0.67 sec
+    Start 2: stomptalk_c99_smoke
+2/3 Test #2: stomptalk_c99_smoke ..............   Passed    0.01 sec
+    Start 3: stomptalk_c99_chunks
+3/3 Test #3: stomptalk_c99_chunks .............   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.71 sec

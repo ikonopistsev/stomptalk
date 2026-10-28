@@ -1,0 +1,50 @@
+[
+  {
+    "backend": 1,
+    "args": [
+      "artifacts/purestomp-chunks/2026-10-28/build/clang23-O3-pgo/purestomp",
+      "1",
+      "3",
+      "all"
+    ],
+    "exit": 0,
+    "rows": 838,
+    "status": "passed"
+  },
+  {
+    "backend": 2,
+    "args": [
+      "artifacts/purestomp-chunks/2026-10-28/build/clang23-O3-pgo/purestomp",
+      "2",
+      "3",
+      "all"
+    ],
+    "exit": 0,
+    "rows": 838,
+    "status": "passed"
+  },
+  {
+    "backend": 3,
+    "args": [
+      "artifacts/purestomp-chunks/2026-10-28/build/clang23-O3-pgo/purestomp",
+      "3",
+      "3",
+      "all"
+    ],
+    "exit": 0,
+    "rows": 838,
+    "status": "passed"
+  },
+  {
+    "backend": 4,
+    "args": [
+      "artifacts/purestomp-chunks/2026-10-28/build/clang23-O3-pgo/purestomp",
+      "4",
+      "3",
+      "all"
+    ],
+    "exit": 0,
+    "rows": 838,
+    "status": "passed"
+  }
+]
