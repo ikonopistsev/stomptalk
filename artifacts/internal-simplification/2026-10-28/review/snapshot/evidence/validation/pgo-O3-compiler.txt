@@ -1,0 +1,5 @@
+clang version 23.1.4
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/lib/llvm/23/bin
+Configuration file: /etc/clang/23/x86_64-pc-linux-gnu-clang++.cfg

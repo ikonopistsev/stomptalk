@@ -1,0 +1,112 @@
+[
+  {
+    "label": "clang23-O2-before",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-before/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "7e1e913d5ba90373f6b577e0bb6557bf5d37f64534a1f51bb564977ee368f886",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-before/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 12
+  },
+  {
+    "label": "clang23-O2-after",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-after/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "2233436602d1634393fce5485023d1b3914bd91ba0d17cf1bdab4d6a0c737889",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O2-after/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 8
+  },
+  {
+    "label": "clang23-O3-before",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-before/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "91faf8b2043b3873e199ebf191db362c7ab340f9531056a58a1b3b74ba2b1cbc",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-before/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 12
+  },
+  {
+    "label": "clang23-O3-after",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-after/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "5214fe83e43ce5c7d430c3797b5f701ecff006580d41a7f58f1ef3b30d163c85",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/clang23-O3-after/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 8
+  },
+  {
+    "label": "gcc16-O2-before",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-before/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "1c57f97e3aaa8739d7ad8d43c42ec4af8dcc91e2aafadf1f3fdfaf7093a2a612",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-before/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 13
+  },
+  {
+    "label": "gcc16-O2-after",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-after/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "acbda65ba81afad0f1e42b85fc96d00af474dbd094098a526c9d115397a57679",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O2-after/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 8
+  },
+  {
+    "label": "gcc16-O3-before",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-before/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "9095bdec9aff978f9867978ac8afd597afe1c804091cc7a2acb944fae93d7bf0",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-before/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 13
+  },
+  {
+    "label": "gcc16-O3-after",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-after/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "bb7f7e3b0df465e35a3f7d24e37bd1e94934026125c62a7c1da92697fb93dc76",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/20261028T171057-final/gcc16-O3-after/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 8
+  },
+  {
+    "label": "clang23-O2-after-pgo",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/pgo-O2/use/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "7348115059aad263bd60a888832bd47185ac2292951f3fc30b21fd18c5615236",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/pgo-O2/use/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 8
+  },
+  {
+    "label": "clang23-O3-after-pgo",
+    "object": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/pgo-O3/use/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o",
+    "object_sha256": "f966b6dda98d1021b37ac42bc8b62cd3e156bb18bfc7038303fa0a64fff2334f",
+    "command": [
+      "objdump",
+      "-drC",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/build/pgo-O3/use/CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o"
+    ],
+    "function_blocks": 8
+  }
+]

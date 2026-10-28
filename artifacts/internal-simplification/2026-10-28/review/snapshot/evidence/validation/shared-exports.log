@@ -1,0 +1,16 @@
+00000000000020a0 T stomptalk_available_backends
+0000000000002180 T stomptalk_compiled_backends
+0000000000002150 T stomptalk_cpu_features
+000000000000f940 T stomptalk_detect_header
+000000000000bd60 T stomptalk_detect_method
+00000000000020d0 T stomptalk_find_header
+000000000000bfd0 T stomptalk_header_name
+000000000000bfa0 T stomptalk_method_name
+0000000000002190 T stomptalk_parser_backend
+0000000000002060 T stomptalk_parser_config_default
+000000000000bc88 T stomptalk_parser_destroy
+0000000000005a00 T stomptalk_parser_execute
+000000000000b790 T stomptalk_parser_get_memory_requirements
+000000000000b920 T stomptalk_parser_init
+000000000000bc90 T stomptalk_parser_reset
+00000000000021a0 T stomptalk_version

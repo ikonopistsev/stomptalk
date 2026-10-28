@@ -1,0 +1,98 @@
+[
+  {
+    "compiler": "clang23",
+    "opt": "Os",
+    "before": {
+      "cycles": 367.0178832,
+      "instructions": 1746.2692134,
+      "branches": 331.6484769,
+      "branch-misses": 0.0036289
+    },
+    "after": {
+      "cycles": 304.106866,
+      "instructions": 1527.2691926,
+      "branches": 270.5484627,
+      "branch-misses": 0.0068957
+    }
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O2",
+    "before": {
+      "cycles": 249.705211,
+      "instructions": 1401.2690368,
+      "branches": 271.1483751,
+      "branch-misses": 0.0041126
+    },
+    "after": {
+      "cycles": 227.1040814,
+      "instructions": 1298.7690226,
+      "branches": 241.5483683,
+      "branch-misses": 0.0022817
+    }
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O3",
+    "before": {
+      "cycles": 249.2360671,
+      "instructions": 1405.1676276,
+      "branches": 269.448123,
+      "branch-misses": 0.0028917
+    },
+    "after": {
+      "cycles": 227.1300005,
+      "instructions": 1296.9676203,
+      "branches": 238.0481177,
+      "branch-misses": 0.0029012
+    }
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "Os",
+    "before": {
+      "cycles": 469.8683703,
+      "instructions": 1700.9718629,
+      "branches": 379.2499261,
+      "branch-misses": 0.1418576
+    },
+    "after": {
+      "cycles": 422.791561,
+      "instructions": 1608.5718382,
+      "branches": 344.1499127,
+      "branch-misses": 0.1960232
+    }
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O2",
+    "before": {
+      "cycles": 282.5900504,
+      "instructions": 1454.6684925,
+      "branches": 296.7482257,
+      "branch-misses": 0.0019998
+    },
+    "after": {
+      "cycles": 223.3810783,
+      "instructions": 1223.4684673,
+      "branches": 246.7482102,
+      "branch-misses": 0.0177482
+    }
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O3",
+    "before": {
+      "cycles": 270.6972179,
+      "instructions": 1414.9686571,
+      "branches": 295.5482441,
+      "branch-misses": 0.0048738
+    },
+    "after": {
+      "cycles": 211.0813759,
+      "instructions": 1191.3686335,
+      "branches": 243.648229,
+      "branch-misses": 0.0078781
+    }
+  }
+]

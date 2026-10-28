@@ -1,0 +1,577 @@
+diff --git a/include/stomptalk/parser.hpp b/include/stomptalk/parser.hpp
+index d34ea74..e0f8f16 100644
+--- a/include/stomptalk/parser.hpp
++++ b/include/stomptalk/parser.hpp
+@@ -20,7 +20,7 @@ private:
+     stomptalk_frame_view current_{};
+     stomptalk_view key_{}, token_{};
+     size_t frame_count_{0}, header_used_{0}, header_begin_{0}, byte_begin_{0};
+-    size_t active_bytes_{0};
++    size_t byte_left_{0}; // remaining after accounting for borrowed and copied strings
+     bool active_{false}, begun_{false}, escape_{false}, literal_{false};
+     bool length_header_{false}, token_owned_{false};
+     stomptalk_parse_status status_{STOMPTALK_PARSE_OK};
+@@ -29,22 +29,63 @@ private:
+     pointer begin_{nullptr}, stop_{nullptr}; // only valid during run()
+ 
+     pointer fail(stomptalk_error_code, pointer) noexcept;
+-    bool reserve(size_t, pointer) noexcept;
+-    bool append(pointer, size_t) noexcept;
+-    bool append(char, pointer) noexcept;
++    // One limit check on the successful path. Only a failed reservation needs to
++    // distinguish a frame limit from space occupied by earlier completed records.
++    bool reserve(size_t count, pointer at) noexcept {
++        if (count <= byte_left_) {
++            byte_left_ -= count;
++            return true;
++        }
++        assert(byte_left_ <= config_.byte_capacity - byte_begin_);
++        if (count > byte_left_ + byte_begin_) {
++            fail(STOMPTALK_ERROR_BYTE_LIMIT, at + byte_left_ + byte_begin_);
++        } else {
++            assert(frame_count_ && byte_begin_);
++            status_ = STOMPTALK_PARSE_OUTPUT_FULL;
++            stop_ = at;
++        }
++        return false;
++    }
++    bool append(pointer data, size_t count) noexcept {
++        if (!count) return true;
++        if (!reserve(count, data)) return false;
++        if (token_owned_) {
++            bytes_.push(data, count);
++        } else if (!token_.size) {
++            token_.data = data;
++        } else {
++            assert(token_.data + token_.size == data);
++        }
++        token_.size += count;
++        return true;
++    }
++    bool append(char value, pointer source) noexcept {
++        assert(token_owned_); // the backslash path already promoted the token
++        if (!reserve(1, source)) return false;
++        bytes_.push(value);
++        ++token_.size;
++        return true;
++    }
+     void own(stomptalk_view &) noexcept;
+     void own_metadata() noexcept;
+     void own_token() noexcept;
+-    stomptalk_view finish_token() noexcept;
++    stomptalk_view finish_token() noexcept {
++        assert(token_.size || !token_.data); // an empty owned token is awaiting an escape byte
++        const stomptalk_view result = token_;
++        token_ = {nullptr, 0};
++        token_owned_ = false;
++        return result;
++    }
+     void recycle() noexcept;
+     void publish(bool complete) noexcept;
+     bool finish_value(pointer) noexcept;
+     bool check_body(size_t, pointer) noexcept;
+ 
+     STOMPTALK_FORCE_INLINE pointer tailcall(state_type next, pointer p, pointer end) noexcept {
++        assert(status_ == STOMPTALK_PARSE_OK);
+         state_ = next;
+ #if defined(__OPTIMIZE__) && !defined(STOMPTALK_TRAMPOLINE) && !defined(__SANITIZE_ADDRESS__)
+-        if (p < end && status_ == STOMPTALK_PARSE_OK)
++        if (p < end)
+             return (this->*next)(p, end);
+ #else
+         (void)end;
+diff --git a/include/stomptalk/stackbuf.hpp b/include/stomptalk/stackbuf.hpp
+index 8197dc2..78185c1 100644
+--- a/include/stomptalk/stackbuf.hpp
++++ b/include/stomptalk/stackbuf.hpp
+@@ -1,9 +1,10 @@
+ #pragma once
+ #include "stomptalk/type.h"
++#include <cassert>
+ #include <cstring>
+ namespace stomptalk {
+-// Append-only caller-owned bytes. Failed push resets the cursor, not bytes.
+-// Resumable output_full must check capacity before calling push.
++// Parser-private storage. reserve() accounts for borrowed and copied bytes
++// before accepting input; push() only writes into that reserved space.
+ class stackbuf {
+     char *begin_, *curr_, *end_;
+ public:
+@@ -15,20 +16,19 @@ public:
+     size_t available() const noexcept { return static_cast<size_t>(end_ - curr_); }
+     void reset() noexcept { curr_ = begin_; }
+     void retain(size_t offset) noexcept {
++        assert(offset <= size());
+         const size_t count = size() - offset;
+-        if (offset && count) std::memmove(begin_, begin_ + offset, count);
++        std::memmove(begin_, begin_ + offset, count);
+         curr_ = begin_ + count;
+     }
+-    STOMPTALK_FORCE_INLINE bool push(char ch) noexcept {
+-        if (curr_ < end_) { *curr_++ = ch; return true; }
+-        curr_ = begin_;
+-        return false;
++    STOMPTALK_FORCE_INLINE void push(char ch) noexcept {
++        assert(curr_ < end_);
++        *curr_++ = ch;
+     }
+-    STOMPTALK_FORCE_INLINE bool push(const char *data, size_t size) noexcept {
+-        if (size > available()) { curr_ = begin_; return false; }
+-        if (size) std::memcpy(curr_, data, size);
++    STOMPTALK_FORCE_INLINE void push(const char *data, size_t size) noexcept {
++        assert(data && size <= available());
++        std::memcpy(curr_, data, size);
+         curr_ += size;
+-        return true;
+     }
+ };
+ }
+diff --git a/src/backend/swar.hpp b/src/backend/swar.hpp
+index 610f90e..3f282d5 100644
+--- a/src/backend/swar.hpp
++++ b/src/backend/swar.hpp
+@@ -3,6 +3,7 @@
+ #include "config.hpp"
+ #include "stomptalk/parser.h"
+ #include "../content_length.hpp"
++#include <cassert>
+ #include <cstring>
+ 
+ namespace stomptalk {
+@@ -22,10 +23,12 @@ struct header_line
+ 
+ struct scalar
+ {
++    // Valid pointers, including an empty SIMD tail. is_header handles empty views.
+     STOMPTALK_FORCE_INLINE
+     static bool equal(const char* data, const char* text, std::size_t size) noexcept
+     {
+-        return size == 0 || std::memcmp(data, text, size) == 0;
++        assert(data && text);
++        return std::memcmp(data, text, size) == 0;
+     }
+ 
+     template<std::size_t Size>
+@@ -33,7 +36,8 @@ struct scalar
+     static bool equal(const char* data, const char* text) noexcept
+     {
+         // One comparison of the entire known length; the compiler selects loads.
+-        return Size == 0 || std::memcmp(data, text, Size) == 0;
++        assert(data && text);
++        return std::memcmp(data, text, Size) == 0;
+     }
+ 
+     STOMPTALK_FORCE_INLINE
+diff --git a/src/is_header.hpp b/src/is_header.hpp
+index 3a02229..4548cdb 100644
+--- a/src/is_header.hpp
++++ b/src/is_header.hpp
+@@ -14,7 +14,9 @@ struct is_header
+     bool operator()(stomptalk_view name, const char (&text)[Size]) const noexcept
+     {
+         assert(name.data || !name.size);
+-        return name.size == Size - 1 && Backend::template equal<Size - 1>(name.data, text);
++        if (Size > 1)
++            return name.size == Size - 1 && Backend::template equal<Size - 1>(name.data, text);
++        return name.size == 0;
+     }
+ 
+     STOMPTALK_FORCE_INLINE
+@@ -22,7 +24,9 @@ struct is_header
+     {
+         assert(name.data || !name.size);
+         assert(expected.data || !expected.size);
+-        return name.size == expected.size && Backend::equal(name.data, expected.data, name.size);
++        if (name.size)
++            return name.size == expected.size && Backend::equal(name.data, expected.data, name.size);
++        return expected.size == 0;
+     }
+ };
+ 
+@@ -32,10 +36,9 @@ template<stomptalk_backend Backend>
+ STOMPTALK_FORCE_INLINE
+ bool is_content_length(stomptalk_view name, const char* wire = nullptr) noexcept
+ {
+-    assert(name.data || !name.size);
+-    return name.size == sizeof(backend::content_length_wire) - 3 &&
+-        (wire ? backend::engine<Backend>::is_content_length_wire(wire)
+-              : backend::swar::is_content_length(name.data));
++    assert(name.data && name.size == sizeof(backend::content_length_wire) - 3);
++    return wire ? backend::engine<Backend>::is_content_length_wire(wire)
++                : backend::swar::is_content_length(name.data);
+ }
+ 
+ } // namespace detail
+diff --git a/src/name_dispatch.hpp b/src/name_dispatch.hpp
+index be7e360..5a498d0 100644
+--- a/src/name_dispatch.hpp
++++ b/src/name_dispatch.hpp
+@@ -11,7 +11,7 @@ using header_detector = stomptalk_header_id (*)(stomptalk_view);
+ 
+ // Internal selection for the optional classifier, not parser scan backends.
+ uint32_t name_available_backends() noexcept;
+-header_detector select_header_detector(stomptalk_backend backend) noexcept;
++header_detector select_header_detector() noexcept;
+ 
+ #if STOMPTALK_NAMES_AVX2
+ stomptalk_header_id detect_header_avx2(stomptalk_view name) noexcept;
+diff --git a/src/names.cpp b/src/names.cpp
+index 167e93a..c50f727 100644
+--- a/src/names.cpp
++++ b/src/names.cpp
+@@ -8,53 +8,31 @@ namespace detail {
+ uint32_t name_available_backends() noexcept
+ {
+     uint32_t available = STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SWAR);
+-    const auto features = stomptalk_cpu_features();
+-    (void)features;
+-
+ #if STOMPTALK_SSE2
++    const auto features = stomptalk_cpu_features();
+     if (features & STOMPTALK_CPU_SSE2)
+         available |= STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2);
+-#endif
+ #if STOMPTALK_NAMES_AVX2
+     if (features & STOMPTALK_CPU_AVX2)
+         available |= STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2);
++#endif
+ #endif
+     return available;
+ }
+ 
+-header_detector select_header_detector(stomptalk_backend selected) noexcept
++header_detector select_header_detector() noexcept
+ {
+     const auto available = name_available_backends();
+-    if (selected == STOMPTALK_BACKEND_AUTO)
+-    {
+-#if STOMPTALK_NAMES_AVX2
+-        if (available & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2))
+-            return detect_header_avx2;
+-#endif
+-#if STOMPTALK_SSE2
+-        if (available & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2))
+-            return detect_header<backend::sse2>;
+-#endif
+-        return detect_header<backend::swar>;
+-    }
+-
+-    if (selected > STOMPTALK_BACKEND_AVX2 ||
+-        !(available & STOMPTALK_BACKEND_BIT(selected)))
+-        return nullptr;
+-
+-    switch (selected)
+-    {
++    (void)available;
+ #if STOMPTALK_NAMES_AVX2
+-    case STOMPTALK_BACKEND_AVX2:
++    if (available & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2))
+         return detect_header_avx2;
+ #endif
+ #if STOMPTALK_SSE2
+-    case STOMPTALK_BACKEND_SSE2:
++    if (available & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2))
+         return detect_header<backend::sse2>;
+ #endif
+-    default:
+-        return detect_header<backend::swar>;
+-    }
++    return detect_header<backend::swar>;
+ }
+ 
+ } // namespace detail
+@@ -63,6 +41,6 @@ header_detector select_header_detector(stomptalk_backend selected) noexcept
+ stomptalk_header_id stomptalk_detect_header(stomptalk_view name)
+ {
+     // Resolve CPU/OS/build availability once, outside candidate comparisons.
+-    static const auto detect = stomptalk::detail::select_header_detector(STOMPTALK_BACKEND_AUTO);
++    static const auto detect = stomptalk::detail::select_header_detector();
+     return detect(name);
+ }
+diff --git a/src/parser_impl.hpp b/src/parser_impl.hpp
+index 89b4cac..2748e39 100644
+--- a/src/parser_impl.hpp
++++ b/src/parser_impl.hpp
+@@ -8,7 +8,6 @@
+ #include <algorithm>
+ #include <cassert>
+ #include <cstdint>
+-#include <limits>
+ 
+ namespace stomptalk {
+ 
+@@ -19,7 +18,8 @@ parser::parser(const stomptalk_parser_config &config, stomptalk_frame_view *fram
+ 
+ void parser::reset() noexcept {
+     bytes_.reset();
+-    frame_count_ = header_used_ = header_begin_ = byte_begin_ = active_bytes_ = 0;
++    frame_count_ = header_used_ = header_begin_ = byte_begin_ = 0;
++    byte_left_ = config_.byte_capacity;
+     current_ = {};
+     key_ = token_ = {nullptr, 0};
+     active_ = begun_ = escape_ = literal_ = length_header_ = token_owned_ = false;
+@@ -46,32 +46,14 @@ parser::pointer parser::fail(stomptalk_error_code error, pointer at) noexcept {
+     return stop_ = at + 1;
+ }
+ 
+-// Reserve logical bytes, including borrowed active strings. Already completed
+-// records occupy [0, byte_begin_); reclaiming them must free this exact resource.
+-bool parser::reserve(size_t count, pointer at) noexcept {
+-    if (count > config_.byte_capacity - active_bytes_) {
+-        fail(STOMPTALK_ERROR_BYTE_LIMIT, at + (config_.byte_capacity - active_bytes_));
+-        return false;
+-    }
+-    if (count > config_.byte_capacity - byte_begin_ - active_bytes_) {
+-        assert(frame_count_ && byte_begin_);
+-        status_ = STOMPTALK_PARSE_OUTPUT_FULL;
+-        stop_ = at;
+-        return false;
+-    }
+-    active_bytes_ += count;
+-    return true;
+-}
+-
+ void parser::own(stomptalk_view &v) noexcept {
+-    if (!v.size) { v.data = nullptr; return; }
++    assert(v.size || !v.data);
++    if (!v.size) return;
+     const uintptr_t offset = reinterpret_cast<uintptr_t>(v.data) -
+                              reinterpret_cast<uintptr_t>(bytes_.data());
+     if (offset < config_.byte_capacity) return;
+     char *dest = bytes_.next();
+-    const bool ok = bytes_.push(v.data, v.size);
+-    assert(ok); // space was reserved before the source bytes were consumed
+-    (void)ok;
++    bytes_.push(v.data, v.size);
+     v.data = dest;
+ }
+ 
+@@ -88,46 +70,11 @@ void parser::own_token() noexcept {
+     if (token_owned_) return;
+     own_metadata(); // the open string must remain last in the accumulator
+     char *dest = bytes_.next();
+-    const bool ok = bytes_.push(token_.data, token_.size);
+-    assert(ok);
+-    (void)ok;
++    if (token_.size) bytes_.push(token_.data, token_.size);
+     token_.data = dest;
+     token_owned_ = true;
+ }
+ 
+-bool parser::append(pointer data, size_t count) noexcept {
+-    if (!count) return true;
+-    if (!reserve(count, data)) return false;
+-    if (token_owned_) {
+-        const bool ok = bytes_.push(data, count);
+-        assert(ok);
+-        (void)ok;
+-    } else if (!token_.size) {
+-        token_.data = data;
+-    } else {
+-        assert(token_.data + token_.size == data);
+-    }
+-    token_.size += count;
+-    return true;
+-}
+-
+-bool parser::append(char value, pointer source) noexcept {
+-    if (!reserve(1, source)) return false;
+-    own_token();
+-    const bool ok = bytes_.push(value);
+-    assert(ok);
+-    (void)ok;
+-    ++token_.size;
+-    return true;
+-}
+-
+-stomptalk_view parser::finish_token() noexcept {
+-    const stomptalk_view result = token_.size ? token_ : stomptalk_view{nullptr, 0};
+-    token_ = {nullptr, 0};
+-    token_owned_ = false;
+-    return result;
+-}
+-
+ void parser::recycle() noexcept {
+     frame_count_ = 0;
+     current_.payload = nullptr;
+@@ -137,8 +84,9 @@ void parser::recycle() noexcept {
+         header_used_ = header_begin_ = byte_begin_ = 0;
+         return;
+     }
++    assert(header_begin_ <= header_used_);
+     const size_t count = header_used_ - header_begin_;
+-    if (header_begin_ && count)
++    if (header_begin_)
+         std::memmove(headers_, headers_ + header_begin_, count * sizeof(*headers_));
+     header_used_ = count;
+     header_begin_ = 0;
+@@ -155,8 +103,10 @@ void parser::recycle() noexcept {
+             shift(headers_[i].value);
+         }
+         bytes_.retain(byte_begin_);
++        byte_left_ += byte_begin_;
+         byte_begin_ = 0;
+     }
++    assert(byte_left_ == bytes_.available());
+ }
+ 
+ void parser::publish(bool complete) noexcept {
+diff --git a/src/parser_states.hpp b/src/parser_states.hpp
+index 76196b1..87acd05 100644
+--- a/src/parser_states.hpp
++++ b/src/parser_states.hpp
+@@ -16,8 +16,8 @@ parser::pointer parser::start_state(pointer curr, pointer end) noexcept {
+         key_ = token_ = {nullptr, 0};
+         token_owned_ = escape_ = literal_ = length_header_ = begun_ = false;
+         active_ = true;
+-        active_bytes_ = 0;
+         byte_begin_ = bytes_.size();
++        byte_left_ = bytes_.available();
+         header_begin_ = header_used_;
+         return tailcall(&parser::method_state<B>, curr, end);
+     }
+diff --git a/src/stomptalk.cpp b/src/stomptalk.cpp
+index fd40296..296eccb 100644
+--- a/src/stomptalk.cpp
++++ b/src/stomptalk.cpp
+@@ -15,6 +15,8 @@ struct stomptalk_parser {
+ };
+ 
+ namespace {
++constexpr size_t memory_alignment = (std::max)(alignof(stomptalk_parser),
++    (std::max)(alignof(stomptalk_frame_view), alignof(stomptalk_header_view)));
+ stomptalk_parser_config defaults() noexcept {
+     return {64, 256, 32768, 64, UINT64_MAX, STOMPTALK_BACKEND_AUTO};
+ }
+@@ -61,8 +63,7 @@ stomptalk_error_code stomptalk_parser_get_memory_requirements(
+     const auto error = get_layout(config ? *config : defaults(), l);
+     if (error) return error;
+     r->size = l.total;
+-    r->alignment = (std::max)(alignof(stomptalk_parser),
+-        (std::max)(alignof(stomptalk_frame_view), alignof(stomptalk_header_view)));
++    r->alignment = memory_alignment;
+     return STOMPTALK_ERROR_NONE;
+ }
+ stomptalk_error_code stomptalk_parser_init(const stomptalk_parser_config *config,
+@@ -71,13 +72,11 @@ stomptalk_error_code stomptalk_parser_init(const stomptalk_parser_config *config
+     *result = nullptr;
+     if (!memory) return STOMPTALK_ERROR_ARGUMENT;
+     const auto c = config ? *config : defaults();
+-    stomptalk_memory_requirements r{};
+-    const auto error = stomptalk_parser_get_memory_requirements(&c, &r);
+-    if (error) return error;
+-    if (reinterpret_cast<uintptr_t>(memory) % r.alignment) return STOMPTALK_ERROR_ALIGNMENT;
+-    if (size < r.size) return STOMPTALK_ERROR_MEMORY;
+     layout l{};
+-    get_layout(c, l);
++    const auto error = get_layout(c, l);
++    if (error) return error;
++    if (reinterpret_cast<uintptr_t>(memory) % memory_alignment) return STOMPTALK_ERROR_ALIGNMENT;
++    if (size < l.total) return STOMPTALK_ERROR_MEMORY;
+     auto base = static_cast<char *>(memory);
+     auto frames = reinterpret_cast<stomptalk_frame_view *>(base + l.frames);
+     auto headers = reinterpret_cast<stomptalk_header_view *>(base + l.headers);
+diff --git a/test/name_backend_checks.hpp b/test/name_backend_checks.hpp
+index e0b834b..2a530c2 100644
+--- a/test/name_backend_checks.hpp
++++ b/test/name_backend_checks.hpp
+@@ -140,9 +140,6 @@ std::size_t check_header_backend()
+     check(match({nullptr, 0}, ""));
+     check(match({"a\0b", 3}, "a\0b")); // known size includes embedded NUL
+     check(!match({"a\0c", 3}, "a\0b"));
+-    check(!is_content_length<Backend>({nullptr, 0}));
+-    check(!is_content_length<Backend>({"content-length?", 15}));
+-    check(!is_content_length<Backend>({"content-lengt", 13}));
+     char storage[14 + 32];
+     auto content_length = [&](char* data)
+     {
+diff --git a/test/unit_v2.cpp b/test/unit_v2.cpp
+index c252a91..bdd6c3a 100644
+--- a/test/unit_v2.cpp
++++ b/test/unit_v2.cpp
+@@ -2,6 +2,7 @@
+ #include "stomptalk/stackbuf.hpp"
+ #include "stomptalk/antoull.hpp"
+ #include "../src/name_dispatch.hpp"
++#include "../src/headers.hpp"
+ #include "../src/backend/sse2.hpp"
+ #include "name_backend_checks.hpp"
+ #include "scan_backend_checks.hpp"
+@@ -342,20 +343,20 @@ static void names_and_accumulator() {
+                STOMPTALK_METHOD_UNSUBSCRIBE, STOMPTALK_METHOD_UNKNOWN);
+     dictionary(stomptalk_header_name, stomptalk_detect_header,
+                STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
+-    for (unsigned backend = STOMPTALK_BACKEND_SWAR; backend <= STOMPTALK_BACKEND_AVX2; ++backend)
+-    {
+-        const auto detect = stomptalk::detail::select_header_detector(backend);
+-        const bool available = (stomptalk::detail::name_available_backends() &
+-            STOMPTALK_BACKEND_BIT(backend)) != 0;
+-        CHECK(bool(detect) == available);
+-        if (detect)
+-        {
+-            CHECK(detect({nullptr, 0}) == STOMPTALK_HEADER_UNKNOWN);
+-            dictionary(stomptalk_header_name, detect,
+-                STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
+-        }
+-    }
+-    CHECK(!stomptalk::detail::select_header_detector(UINT32_MAX));
++    // Test compiled classifiers directly; production only resolves AUTO once.
++    using namespace stomptalk::detail;
++    dictionary(stomptalk_header_name, detect_header<backend::swar>,
++               STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
++#if STOMPTALK_SSE2
++    if (stomptalk_cpu_features() & STOMPTALK_CPU_SSE2)
++        dictionary(stomptalk_header_name, detect_header<backend::sse2>,
++                   STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
++#endif
++#if STOMPTALK_NAMES_AVX2
++    if (stomptalk_cpu_features() & STOMPTALK_CPU_AVX2)
++        dictionary(stomptalk_header_name, detect_header_avx2,
++                   STOMPTALK_HEADER_QUEUE_TYPE, STOMPTALK_HEADER_UNKNOWN);
++#endif
+     checks += check_name_backend<stomptalk::detail::backend::swar>();
+     checks += check_header_backend<STOMPTALK_BACKEND_SWAR>();
+ #if STOMPTALK_SSE2
+@@ -370,20 +371,22 @@ static void names_and_accumulator() {
+ #if defined(__unix__)
+     CHECK(munmap(memory, page * 2) == 0);
+ #endif
+-    context = "monotonic stackbuf and failed push";
++    context = "reserved stackbuf writes and retention";
+     char data[8]{};
+     stomptalk::stackbuf b(data, sizeof(data));
+-    CHECK(b.push("1234567", 7) && b.size() == 7);
+-    CHECK(b.push('8') && b.size() == 8);
+-    CHECK(!b.push('9') && b.size() == 0);
++    b.push("1234567", 7);
++    CHECK(b.size() == 7);
++    b.push('8');
++    CHECK(b.size() == 8);
+     CHECK(std::memcmp(data, "12345678", 8) == 0);
+-    CHECK(b.push("abc", 3));
+-    CHECK(!b.push("123456", 6) && b.size() == 0);
+-    CHECK(std::memcmp(data, "abc45678", 8) == 0);
+-    CHECK(b.push("abCDEF", 6));
++    b.reset();
++    b.push("abCDEF", 6);
+     b.retain(2);
+     CHECK(b.size() == 4 && std::memcmp(data, "CDEF", 4) == 0);
+-    CHECK(b.push("12", 2) && b.size() == 6);
++    b.push("12", 2);
++    CHECK(b.size() == 6);
++    b.retain(b.size());
++    CHECK(!b.size()); // completed records can leave an empty active prefix
+     b.reset();
+     CHECK(!b.size() && b.available() == sizeof(data));
+ }
+@@ -405,6 +408,10 @@ static void suite(stomptalk_backend backend) {
+         {"crlf", wire("SEND", {{"destination", "/q"}}, "hello", "\r\n"), {{"SEND", {{"destination", "/q"}}, "hello", true}}},
+         {"escapes-first-key-byte", wire("SEND", escaped), {{"SEND", decoded, {}, true}}},
+         {"empty-value", wire("SEND", {{"x", ""}}), {{"SEND", {{"x", ""}}, {}, true}}},
++        {"short-length-name", wire("SEND", {{"content-lengt", "not-a-number"}}, "abc"),
++            {{"SEND", {{"content-lengt", "not-a-number"}}, "abc", true}}},
++        {"long-length-name", wire("SEND", {{"content-lengthx", "not-a-number"}}, "abc"),
++            {{"SEND", {{"content-lengthx", "not-a-number"}}, "abc", true}}},
+         {"utf8-and-spaces", wire("SEND", {{" k\t", " тест \x7f"}}), {{"SEND", {{" k\t", " тест \x7f"}}, {}, true}}},
+         {"unknown-method", wire("FROB", {{"x", "y"}}), {{"FROB", {{"x", "y"}}, {}, true}}},
+         {"literal-connect", wire("CONNECT", {{"login", "a\\q:c"}}), {{"CONNECT", {{"login", "a\\q:c"}}, {}, true}}},

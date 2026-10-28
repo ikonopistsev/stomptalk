@@ -1,0 +1,133 @@
+[
+  {
+    "compiler": "clang23",
+    "opt": "Os",
+    "variant": "before",
+    "calls": [
+      "3c: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "5b: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "446: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "4a0: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "4be: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "55a: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4"
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "Os",
+    "variant": "after",
+    "calls": [
+      "3a: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "23: R_X86_64_PLT32\tstomptalk::parser::reserve(unsigned long, char const*)-0x4",
+      "446: R_X86_64_PLT32\tstomptalk::parser::reserve(unsigned long, char const*)-0x4",
+      "4bf: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "587: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4"
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O2",
+    "variant": "before",
+    "calls": [
+      "3e: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "5d: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "e4: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "4b6: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "4d4: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "56b: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4"
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O2",
+    "variant": "after",
+    "calls": []
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O3",
+    "variant": "before",
+    "calls": [
+      "3e: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "5d: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "e4: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "546: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "564: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "5fb: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4"
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O3",
+    "variant": "after",
+    "calls": []
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "Os",
+    "variant": "before",
+    "calls": [
+      "35: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "80: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "83: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "390: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "3c9: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "458: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4"
+    ]
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "Os",
+    "variant": "after",
+    "calls": [
+      "1f: R_X86_64_PLT32\tstomptalk::parser::reserve(unsigned long, char const*)-0x4",
+      "75: R_X86_64_PLT32\tstomptalk::parser::reserve(unsigned long, char const*)-0x4",
+      "39a: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "473: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "35: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4"
+    ]
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O2",
+    "variant": "before",
+    "calls": [
+      "63: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "2c6: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "328: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "350: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "38a: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "41c: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "3d: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "8a: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "c2: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4"
+    ]
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O2",
+    "variant": "after",
+    "calls": []
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O3",
+    "variant": "before",
+    "calls": [
+      "65: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "1b2: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "1fc: R_X86_64_PLT32\tstomptalk::parser::append(char, char const*)-0x4",
+      "351: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "379: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4",
+      "3bf: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "7d: R_X86_64_PLT32\tstomptalk::parser::append(char const*, unsigned long)-0x4",
+      "1ca: R_X86_64_PLT32\tstomptalk::parser::finish_token()-0x4"
+    ]
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O3",
+    "variant": "after",
+    "calls": []
+  }
+]

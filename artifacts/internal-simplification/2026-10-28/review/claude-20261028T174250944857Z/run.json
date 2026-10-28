@@ -1,0 +1,102 @@
+{
+  "status": "failed",
+  "started_utc": "2026-10-28T17:42:50.945222+00:00",
+  "source_commit": "5af4d3d11626e08d06775c0096d47b77fb90d9e9",
+  "baseline_commit": "e30e2aa8b2b49daebaf07ceea3dcbccdfe8177fe",
+  "command": [
+    "/home/meil/.local/bin/claude",
+    "--print",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--no-session-persistence",
+    "--permission-mode",
+    "dontAsk",
+    "--safe-mode",
+    "--restricted",
+    "--no-chrome",
+    "--disable-slash-commands",
+    "--tools",
+    "Read,Glob,Grep",
+    "--allowedTools",
+    "Read,Glob,Grep",
+    "--strict-mcp-config"
+  ],
+  "cwd": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/internal-simplification/2026-10-28/review/snapshot",
+  "timeout_seconds": 1200,
+  "task_sha256": "f7467fc43107410ca9d72df9ba46b959c52c69ba679a3be4ac24a6ced74a8b29",
+  "inputs_sha256": "b2529d66625d67c3f7fdd7ef0de932924ae66d3dafdef947bfbc183524ee98c8",
+  "exit_code": 1,
+  "error": "No successful final review",
+  "final_event": {
+    "duration_api_ms": 0,
+    "stop_reason": "stop_sequence",
+    "session_id": "fb526227-ad67-4425-945a-38481f130fb9",
+    "total_cost_usd": 0,
+    "usage": {
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 0,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {},
+    "permission_denials": [],
+    "terminal_reason": "api_error",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "safety_stops": 0,
+    "is_error": true,
+    "num_turns": 1,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "API Error: Can't reach the API server \u2014 check your internet or DNS (EAI_AGAIN)",
+    "type": "result",
+    "duration_ms": 179032,
+    "uuid": "400feca6-d3dd-4c7c-aaea-9fad51424ee4",
+    "queued_turn_count": 0,
+    "result_index": 0,
+    "model_usage_since_last_result": {}
+  },
+  "changed_inputs": [],
+  "finished_utc": "2026-10-28T17:45:50.301578+00:00"
+}
