@@ -1,0 +1,33 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 9K of event 'cpu_core/cycles/u'
+# Event count (approx.): 42807343153
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    27.10%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -
+    12.61%  [.] stomptalk::parser::finish_value(char const*)                                      -      -
+    11.59%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -
+    11.11%  [.] stomptalk::parser::publish(bool)                                                  -      -
+     8.45%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -
+     4.26%  [.] main                                                                              -      -
+     3.38%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -
+     2.70%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -
+     2.69%  [.] 0x000000000016465d                                                                -      -
+     2.67%  [.] stomptalk::parser::finish_token()                                                 -      -
+     1.81%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -
+     1.54%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)  -      -
+     1.47%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -
+     0.94%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -
+     0.90%  [.] stomptalk::parser::own_token()                                                    -      -
+     0.54%  [.] 0x0000000000164659                                                                -      -
+     0.54%  [.] 0x0000000000164448                                                                -      -
+
+
+#
+# (Tip: To show IPC for sampling periods use perf record -e '{cycles,instructions}:S' and then browse context)
+#

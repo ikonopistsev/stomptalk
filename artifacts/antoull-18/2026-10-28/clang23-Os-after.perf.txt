@@ -1,0 +1,30 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 6K of event 'cpu_core/cycles/u'
+# Event count (approx.): 31160061325
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    30.99%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -
+    16.42%  [.] stomptalk::parser::finish_value(char const*)                                      -      -
+    12.92%  [.] stomptalk::parser::publish(bool)                                                  -      -
+    11.38%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -
+     7.07%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -
+     5.21%  [.] main                                                                              -      -
+     3.01%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -
+     2.38%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -
+     1.71%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -
+     1.13%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)  -      -
+     0.96%  [.] stomptalk::parser::own_metadata()                                                 -      -
+     0.90%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -
+     0.79%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -
+     0.54%  [.] stomptalk::parser::run(char const*, unsigned long)                                -      -
+
+
+#
+# (Tip: To filter subset of samples with report or script add --time X-Y or --cpu A,B,C or --socket-filter ...)
+#

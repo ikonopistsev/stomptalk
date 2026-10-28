@@ -126,12 +126,12 @@ void parser::publish(bool complete) noexcept {
 bool parser::finish_value(pointer eol) noexcept {
     const stomptalk_view value = finish_token();
     if (length_header_) {
-        uint64_t length;
-        if (!antoull(length, value.data, value.size)) {
+        const auto length = antoull(value.data, value.size);
+        if (length < 0) {
             fail(STOMPTALK_ERROR_CONTENT_LENGTH, eol);
             return false;
         }
-        if (length > config_.max_body_size) {
+        if (static_cast<uint64_t>(length) > config_.max_body_size) {
             fail(STOMPTALK_ERROR_BODY_LIMIT, eol);
             return false;
         }

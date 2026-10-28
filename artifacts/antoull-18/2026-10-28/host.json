@@ -1,0 +1,35 @@
+{
+  "platform": "Linux-7.2.10-gentoo-dist-x86_64-12th_Gen_Intel-R-_Core-TM-_i7-12700K-with-glibc2.43",
+  "loadavg": [
+    6.37744140625,
+    6.24658203125,
+    4.18701171875
+  ],
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "/proc/cpuinfo": "model name\t: 12th Gen Intel(R) Core(TM) i7-12700K",
+  "/sys/fs/cgroup/cpu.stat": "usage_usec 480375103213\nuser_usec 338640469029\nsystem_usec 141734634184\nnice_usec 34844284266\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+  "/sys/devices/system/cpu/cpu4/topology/core_id": "8",
+  "/sys/devices/system/cpu/cpu4/topology/thread_siblings_list": "4-5",
+  "/sys/devices/system/cpu/cpu4/cpufreq/scaling_governor": "powersave"
+}

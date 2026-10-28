@@ -1,0 +1,39 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 8K of event 'cpu_core/cycles/u'
+# Event count (approx.): 42449822875
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    27.50%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -
+    12.37%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -
+    11.18%  [.] stomptalk::parser::publish(bool)                                                  -      -
+    10.67%  [.] stomptalk::parser::finish_value(char const*)                                      -      -
+     8.47%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -
+     4.32%  [.] main                                                                              -      -
+     3.53%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -
+     2.96%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -
+     2.42%  [.] 0x000000000016465d                                                                -      -
+     2.06%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -
+     1.98%  [.] stomptalk::parser::finish_token()                                                 -      -
+     1.64%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -
+     1.40%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)  -      -
+     0.83%  [.] stomptalk::parser::own_token()                                                    -      -
+     0.82%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -
+     0.62%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -
+     0.61%  [.] 0x00000000001640e8                                                                -      -
+     0.57%  [.] memcmp@plt                                                                        -      -
+     0.55%  [.] 0x0000000000164668                                                                -      -
+     0.55%  [.] 0x0000000000164663                                                                -      -
+     0.53%  [.] 0x0000000000164448                                                                -      -
+     0.53%  [.] stomptalk::parser::own_metadata()                                                 -      -
+     0.51%  [.] 0x0000000000164649                                                                -      -
+
+
+#
+# (Tip: Create an archive with symtabs to analyse on other machine: perf archive)
+#

@@ -81,6 +81,9 @@ STOMPTALK_EXPORT void stomptalk_parser_reset(stomptalk_parser *);
  * until the result is processed. Payload is never retained between calls.
  * BEGIN starts publication; COMPLETE requires the terminal NUL. All metadata
  * is available on continuations. frame_count counts records.
+ * The first decoded content-length must contain 1..18 decimal digits, including
+ * leading zeroes; other values produce STOMPTALK_ERROR_CONTENT_LENGTH.
+ * max_body_size applies separately to the parsed length.
  * Do not resubmit consumed bytes. NULL/0 is empty input, not EOF.
  * Error is sticky until reset. The current bad record is not published.
  * error_offset is its detection position in this input (possibly size).

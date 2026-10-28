@@ -175,45 +175,42 @@ static void variants(const case_data &c, stomptalk_parser_config config, bool al
 
 static void numeric_values()
 {
-    context = "antoull full uint64 range, invalid digits and safe tails";
+    context = "antoull 1..18 digits, invalid digits and safe tails";
     auto valid = [&](uint64_t value, const std::string &digits)
     {
-        uint64_t result = 73;
-        CHECK(stomptalk::antoull(result, digits.data(), digits.size()));
-        CHECK(result == value);
-        if (digits.size() <= 18)
-            CHECK(stomptalk::antoull(digits.data(), digits.size()) == int64_t(value));
+        CHECK(stomptalk::antoull(digits.data(), digits.size()) == int64_t(value));
     };
     for (uint64_t value : {UINT64_C(0), UINT64_C(1), UINT64_C(9), UINT64_C(10),
-            UINT64_C(999999999999999999), UINT64_C(1000000000000000000),
-            UINT64_C(9223372036854775808), UINT64_MAX})
+            UINT64_C(1000000000000), UINT64_C(1099511627776),
+            UINT64_C(999999999999999999)})
     {
         const auto digits = std::to_string(value);
         valid(value, digits);
-        valid(value, std::string(35, '0') + digits);
+        valid(value, std::string(18 - digits.size(), '0') + digits);
     }
-    valid(42, std::string(4096, '0') + "42");
     uint64_t random = 1806;
     for (size_t i = 0; i < 10000; ++i)
     {
         random ^= random << 13;
         random ^= random >> 7;
         random ^= random << 17;
-        valid(random, std::to_string(random));
+        const auto value = random % UINT64_C(1000000000000000000);
+        valid(value, std::to_string(value));
     }
     auto invalid = [&](const std::string &digits)
     {
-        uint64_t result = 73;
-        CHECK(!stomptalk::antoull(result, digits.data(), digits.size()));
-        CHECK(result == 73);
+        CHECK(stomptalk::antoull(digits.data(), digits.size()) < 0);
     };
     for (const char *digits : {"", "+1", "-1", " 1", "1 ", "1.0",
+            "1000000000000000000", "18446744073709551615",
             "18446744073709551616", "99999999999999999999", "100000000000000000000"})
         invalid(digits);
-    invalid(std::string(4096, '0') + "18446744073709551616");
-    for (size_t size = 1; size <= 20; ++size)
+    CHECK(stomptalk::antoull(nullptr, 0) < 0);
+    invalid(std::string(19, '0'));
+    invalid(std::string(4096, '0') + "42");
+    for (size_t size = 1; size <= 18; ++size)
     {
-        auto digits = size == 20 ? std::to_string(UINT64_MAX) : std::string(size, '9');
+        auto digits = std::string(size, '9');
         for (size_t at = 0; at < size; ++at)
         {
             const auto saved = digits[at];
@@ -233,14 +230,14 @@ static void numeric_values()
     CHECK(mprotect(memory + page, page, PROT_NONE) == 0);
     for (size_t size = 1; size <= 20; ++size)
     {
-        const auto digits = size == 20 ? std::to_string(UINT64_MAX) : std::string(size, '9');
+        const auto digits = std::string(size, '9');
         auto data = memory + page - size;
         std::memcpy(data, digits.data(), size);
-        uint64_t result = 0;
-        CHECK(stomptalk::antoull(result, data, size));
-        CHECK(result == std::stoull(digits));
+        const auto result = stomptalk::antoull(data, size);
+        if (size <= 18) CHECK(result == std::stoll(digits));
+        else CHECK(result < 0);
         data[size - 1] = 'x';
-        CHECK(!stomptalk::antoull(result, data, size));
+        CHECK(stomptalk::antoull(data, size) < 0);
     }
     CHECK(munmap(memory, page * 2) == 0);
 #endif
@@ -422,8 +419,15 @@ static void suite(stomptalk_backend backend) {
             {{"SEND", {{"x", "1"}, {"y", "2"}, {"x", "3"}}, {}, true}}},
         {"duplicate-length-ignored", wire("SEND", {{"content-length", "3"}, {"content-length", "bad"}}, "abc"),
             {{"SEND", {{"content-length", "3"}, {"content-length", "bad"}}, "abc", true}}},
+        {"length-padded-18", wire("SEND", {{"content-length", std::string(17, '0') + "3"}}, "abc"),
+            {{"SEND", {{"content-length", std::string(17, '0') + "3"}}, "abc", true}}},
         {"long-zero-prefix", wire("SEND", {{"content-length", std::string(40, '0') + "3"}}, "abc"),
-            {{"SEND", {{"content-length", std::string(40, '0') + "3"}}, "abc", true}}},
+            {}, STOMPTALK_ERROR_CONTENT_LENGTH},
+        {"length-zero-19", wire("SEND", {{"content-length", std::string(19, '0')}}),
+            {}, STOMPTALK_ERROR_CONTENT_LENGTH},
+        {"empty-length", wire("SEND", {{"content-length", ""}}), {}, STOMPTALK_ERROR_CONTENT_LENGTH},
+        {"length-19", wire("SEND", {{"content-length", "1000000000000000000"}}),
+            {}, STOMPTALK_ERROR_CONTENT_LENGTH},
         {"bad-method", "SEnD\n\n", {}, STOMPTALK_ERROR_METHOD},
         {"bad-cr", "SEND\rX", {}, STOMPTALK_ERROR_EOL},
         {"bad-heartbeat-cr", "\rX", {}, STOMPTALK_ERROR_EOL},
@@ -442,10 +446,30 @@ static void suite(stomptalk_backend backend) {
         {"pending-cr", "\r", {}, 0, STOMPTALK_PARSE_NEED_INPUT},
         {"pending-body", wire("SEND", length, "a", "\n", false), {{"SEND", length, "a", false}}, 0, STOMPTALK_PARSE_NEED_INPUT},
         {"pending-nul", wire("SEND", length, "abc", "\n", false), {{"SEND", length, "abc", false}}, 0, STOMPTALK_PARSE_NEED_INPUT},
-        {"uint64-max-incomplete", wire("SEND", {{"content-length", "18446744073709551615"}}, "", "\n", false),
-            {}, 0, STOMPTALK_PARSE_NEED_INPUT}
+        {"length-20", wire("SEND", {{"content-length", "18446744073709551615"}}, "", "\n", false),
+            {}, STOMPTALK_ERROR_CONTENT_LENGTH}
     };
     for (const auto &c : cases) variants(c, config);
+    for (uint64_t size : {UINT64_C(1000000000000), UINT64_C(1099511627776),
+            UINT64_C(999999999999999999)}) {
+        const headers h{{"content-length", std::to_string(size)}};
+        const auto input = wire("SEND", h, "a", "\n", false);
+        variants({"large-body-prefix", input, {{"SEND", h, "a", false}},
+            0, STOMPTALK_PARSE_NEED_INPUT}, config);
+        context = "large content-length without allocating its body";
+        instance parser(config);
+        const auto first = stomptalk_parser_execute(parser.p, input.data(), input.size());
+        CHECK(first.status == STOMPTALK_PARSE_NEED_INPUT && first.frame_count == 1);
+        CHECK(first.frames[0].parsed.content_length == size);
+        CHECK(first.frames[0].parsed.payload_offset == 0 && first.frames[0].parsed.payload_size == 1);
+        const char suffix[] = "bc";
+        const auto next = stomptalk_parser_execute(parser.p, suffix, 2);
+        CHECK(next.status == STOMPTALK_PARSE_NEED_INPUT && next.frame_count == 1);
+        CHECK(next.frames[0].parsed.content_length == size);
+        CHECK(next.frames[0].parsed.payload_offset == 1 && next.frames[0].parsed.payload_size == 2);
+        CHECK(next.frames[0].parsed.flags == STOMPTALK_FRAME_HAS_CONTENT_LENGTH);
+        CHECK(next.frames[0].payload == reinterpret_cast<const unsigned char *>(suffix));
+    }
     for (size_t n : {7u, 8u, 9u, 15u, 16u, 17u, 24u, 31u, 32u, 33u, 63u, 64u, 65u, 4096u}) {
         const headers h{{std::string(n, 'k'), std::string(n, 'v')}};
         variants({"long-fields", wire("SEND", h), {{"SEND", h, {}, true}}}, config, n < 100);
@@ -478,6 +502,9 @@ static void suite(stomptalk_backend backend) {
     small = config; small.max_body_size = 2;
     variants({"body-limit-known", wire("SEND", length, "abc"), {}, STOMPTALK_ERROR_BODY_LIMIT}, small);
     variants({"body-limit-unknown", wire("SEND", {}, "abc"), {}, STOMPTALK_ERROR_BODY_LIMIT}, small);
+    small = config; small.max_body_size = UINT64_C(999999999999);
+    variants({"terabyte-body-limit", wire("SEND", {{"content-length", "1000000000000"}}),
+        {}, STOMPTALK_ERROR_BODY_LIMIT}, small);
     small = config; small.byte_capacity = 10;
     variants({"byte-output-full", wire("SEND", {{"k", "a\\nb"}}) + wire(),
         {{"SEND", {{"k", "a\nb"}}, {}, true}, {"SEND", {}, {}, true}}}, small);

@@ -201,9 +201,11 @@ forcing the entire state tree inline.
 [File-by-file rationale and measurements](artifacts/internal-simplification/2026-10-28/README.md).
 
 `include/stomptalk/antoull.hpp` restores the original length-dispatched template
-converter for `content-length`. Its checked overload also accepts 19/20-digit
-values through `UINT64_MAX` and leading zeroes, without allocating or changing
-the error contract. Invalid digits and overflow are checked at runtime.
+converter for `content-length`: 1..18 decimal digits, with no sign or whitespace.
+Leading zeroes count towards the 18-digit limit. Invalid digits, empty values
+and longer values return `STOMPTALK_ERROR_CONTENT_LENGTH`. The configured
+`max_body_size` is checked separately. A 1 TB length has 13 digits and is supported;
+the parser streams body fragments without allocating memory for the declared size.
 
 `stomptalk_detect_header` is an optional client utility, implemented separately
 from the parser. Name classifiers require readable input for nonzero size;

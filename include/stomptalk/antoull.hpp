@@ -41,10 +41,11 @@ struct antout<T, 1>
 } // namespace detail
 
 // The original 1.8.0 converter: 1..18 digits, a negative result on error.
+// An empty value may be NULL/0; the size switch rejects it without reading.
 static inline
 std::int64_t antoull(const char *ptr, std::size_t n) noexcept
 {
-    assert(ptr);
+    assert(ptr || !n);
 
     using namespace detail;
     switch (n)
@@ -70,46 +71,6 @@ std::int64_t antoull(const char *ptr, std::size_t n) noexcept
     default:;
     }
     return std::numeric_limits<std::int64_t>::min();
-}
-
-// Full uint64 range for v2. Keep the unrolled 18-digit converter and handle
-// only the extra one/two digits here. The output is unchanged on failure.
-static inline
-bool antoull(std::uint64_t &value, const char *ptr, std::size_t n) noexcept
-{
-    assert(ptr || !n);
-    while (n > 20 && *ptr == '0')
-    {
-        ++ptr;
-        --n;
-    }
-    if (!n || n > 20)
-        return false;
-    if (n <= 18)
-    {
-        const auto result = antoull(ptr, n);
-        if (result < 0)
-            return false;
-        value = static_cast<std::uint64_t>(result);
-        return true;
-    }
-
-    std::uint64_t prefix = 0;
-    for (std::size_t i = 0; i < n - 18; ++i)
-    {
-        const auto digit = static_cast<unsigned char>(ptr[i]) - unsigned('0');
-        if (digit > 9)
-            return false;
-        prefix = prefix * 10 + digit;
-    }
-    const auto suffix = detail::antout<std::int64_t, 18>::conv(ptr + n - 18);
-    constexpr auto base = UINT64_C(1000000000000000000);
-    constexpr auto limit = UINT64_MAX;
-    if (suffix < 0 || prefix > limit / base ||
-        (prefix == limit / base && static_cast<std::uint64_t>(suffix) > limit % base))
-        return false;
-    value = prefix * base + static_cast<std::uint64_t>(suffix);
-    return true;
 }
 
 } // namespace stomptalk
