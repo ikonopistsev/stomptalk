@@ -1,0 +1,1 @@
+assert_contract: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/source/src/methods.hpp:200: stomptalk_method_id stomptalk::detail::(anonymous namespace)::detect_method(stomptalk_view) [Backend = stomptalk::detail::backend::swar]: Assertion `name.data || !name.size' failed.

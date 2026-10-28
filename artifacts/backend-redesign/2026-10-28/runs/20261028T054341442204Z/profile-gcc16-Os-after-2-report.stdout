@@ -1,0 +1,30 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu_core/cycles/u'
+# Event count (approx.): 5239142483
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    21.37%  [.] char const* stomptalk::parser::hdrline_hdr_key<2u>(char const*, char const*)      -      -            
+    18.51%  [.] char const* stomptalk::parser::hdrline_val<2u>(char const*, char const*)          -      -            
+    10.95%  [.] char const* stomptalk::parser::start_state<2u>(char const*, char const*)          -      -            
+     9.12%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     5.46%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     5.28%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     4.10%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     3.78%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     3.54%  [.] main                                                                              -      -            
+     2.43%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     2.43%  [.] 0x000000000016465d                                                                -      -            
+     2.17%  [.] char const* stomptalk::parser::method_state<2u>(char const*, char const*)         -      -            
+     1.62%  [.] char const* stomptalk::parser::hdrline_done<2u>(char const*, char const*)         -      -            
+     1.26%  [.] char const* stomptalk::parser::hdrline_almost_done<2u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: To trace only single function with Processor Trace use perf record --filter 'filter func @ program' -e intel_pt//u ./program ; perf script --insn-trace)
+#

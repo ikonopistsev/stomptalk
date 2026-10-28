@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 704  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3283356469
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    22.34%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    17.63%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+     9.81%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     9.74%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     8.51%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+     5.78%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     5.30%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     5.01%  [.] main                                                                              -      -            
+     3.29%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     3.15%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     3.01%  [.] char const* stomptalk::parser::body_read_no_length<4u>(char const*, char const*)  -      -            
+     1.72%  [.] char const* stomptalk::parser::done<4u>(char const*, char const*)                 -      -            
+     1.15%  [.] stomptalk::parser::own_metadata()                                                 -      -            
+
+
+#
+# (Tip: To filter subset of samples with report or script add --time X-Y or --cpu A,B,C or --socket-filter ...)
+#

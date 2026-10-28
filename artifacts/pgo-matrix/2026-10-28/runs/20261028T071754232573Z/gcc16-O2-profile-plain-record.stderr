@@ -1,0 +1,2 @@
+[ perf record: Woken up 2 times to write data ]
+[ perf record: Captured and wrote 0.273 MB /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/gcc16-O2-profile-plain.data (5890 samples) ]

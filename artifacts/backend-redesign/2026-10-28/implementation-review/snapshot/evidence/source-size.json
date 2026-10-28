@@ -1,0 +1,13 @@
+{
+  "before": {
+    "files": 25,
+    "lines": 2719,
+    "bytes": 86386
+  },
+  "after": {
+    "files": 23,
+    "lines": 2726,
+    "bytes": 84621
+  },
+  "note": "Active src/include only; excludes historical _ files. Generated name dictionaries included."
+}

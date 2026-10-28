@@ -1,0 +1,70 @@
+#include "name_dispatch.hpp"
+#include "backend/sse2.hpp"
+#include "headers.hpp"
+
+namespace stomptalk {
+namespace detail {
+
+uint32_t name_available_backends() noexcept
+{
+    uint32_t available = STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SWAR);
+    const auto features = stomptalk_cpu_features();
+    (void)features;
+
+#if STOMPTALK_SSE2
+    if (features & STOMPTALK_CPU_SSE2)
+        available |= STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2);
+#endif
+#if STOMPTALK_NAMES_AVX2
+    if (features & STOMPTALK_CPU_AVX2)
+        available |= STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2);
+#endif
+    return available;
+}
+
+header_detector select_header_detector(stomptalk_backend selected) noexcept
+{
+    const auto available = name_available_backends();
+    if (selected == STOMPTALK_BACKEND_AUTO)
+    {
+#if STOMPTALK_NAMES_AVX2
+        if (available & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2))
+            return detect_header_avx2;
+#endif
+#if STOMPTALK_SSE2
+        if (available & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2))
+            return detect_header<backend::sse2>;
+#endif
+        return detect_header<backend::swar>;
+    }
+
+    if (selected > STOMPTALK_BACKEND_AVX2 ||
+        !(available & STOMPTALK_BACKEND_BIT(selected)))
+        return nullptr;
+
+    switch (selected)
+    {
+#if STOMPTALK_NAMES_AVX2
+    case STOMPTALK_BACKEND_AVX2:
+        return detect_header_avx2;
+#endif
+#if STOMPTALK_SSE2
+    case STOMPTALK_BACKEND_SSE2:
+        return detect_header<backend::sse2>;
+#endif
+    default:
+        return detect_header<backend::swar>;
+    }
+}
+
+} // namespace detail
+} // namespace stomptalk
+
+stomptalk_header_id stomptalk_detect_header(stomptalk_view name)
+{
+    if (!name.data)
+        return STOMPTALK_HEADER_UNKNOWN;
+    // Resolve CPU/OS/build availability once, outside candidate comparisons.
+    static const auto detect = stomptalk::detail::select_header_detector(STOMPTALK_BACKEND_AUTO);
+    return detect(name);
+}

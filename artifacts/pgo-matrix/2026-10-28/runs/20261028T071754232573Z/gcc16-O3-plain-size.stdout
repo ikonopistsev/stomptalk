@@ -1,0 +1,34 @@
+/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/plain/probe  :
+section               size    addr
+.note.gnu.build-id      36     848
+.interp                 28     884
+.gnu.hash               64     912
+.dynsym               1224     976
+.dynstr               1741    2200
+.gnu.version           102    3942
+.gnu.version_r         256    4048
+.rela.dyn              408    4304
+.rela.plt              864    4712
+.init                   27    8192
+.plt                   592    8224
+.plt.got                16    8816
+.plt.sec               576    8832
+.text                57653    9408
+.fini                   13   67064
+.rodata               2164   69632
+.eh_frame_hdr          716   71796
+.eh_frame             5392   72512
+.gcc_except_table      186   77904
+.note.gnu.property      80   78096
+.note.ABI-tag           32   78176
+.init_array             16   84688
+.fini_array              8   84704
+.data.rel.ro           400   84712
+.dynamic               544   85112
+.got                   360   85656
+.data                   24   86016
+.bss                   320   86080
+.comment                81       0
+Total                73923
+
+

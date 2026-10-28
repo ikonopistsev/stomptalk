@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 819  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3874596582
+#
+# Overhead  Symbol                                                                                             IPC   [IPC Coverage]
+# ........  .................................................................................................  ....................
+#
+    19.45%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)                   -      -            
+    16.01%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)                       -      -            
+    13.00%  [.] stomptalk::parser::publish(bool)                                                               -      -            
+    10.93%  [.] stomptalk::parser::append(char const*, unsigned long)                                          -      -            
+     9.24%  [.] stomptalk::parser::finish_value(char const*)                                                   -      -            
+     5.41%  [.] stomptalk::parser::reserve(unsigned long, char const*)                                         -      -            
+     5.29%  [.] main                                                                                           -      -            
+     5.04%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)                      -      -            
+     2.71%  [.] stomptalk::parser::own(stomptalk_view&)                                                        -      -            
+     2.59%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)                       -      -            
+     1.96%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)                      -      -            
+     1.11%  [.] stomptalk::parser::append(char, char const*)                                                   -      -            
+     1.00%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)               -      -            
+
+
+#
+# (Tip: When collecting LBR backtraces use --stitch-lbr to handle more than 32 deep entries: perf record --call-graph lbr ; perf report --stitch-lbr)
+#

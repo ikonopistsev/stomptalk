@@ -1,0 +1,106 @@
+[
+  {
+    "opt": "O2",
+    "variant": "plain",
+    "functions": [
+      {
+        "percent": 40.02,
+        "symbol": "char const* stomptalk::parser::hdrline<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 23.48,
+        "symbol": "stomptalk::parser::finish_value(char const*)"
+      },
+      {
+        "percent": 7.78,
+        "symbol": "char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 6.8,
+        "symbol": "char const* stomptalk::parser::method_state<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 5.07,
+        "symbol": "main"
+      }
+    ]
+  },
+  {
+    "opt": "O2",
+    "variant": "pgo",
+    "functions": [
+      {
+        "percent": 89.14,
+        "symbol": "char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 5.5,
+        "symbol": "main"
+      },
+      {
+        "percent": 2.2,
+        "symbol": "stomptalk_parser_execute"
+      },
+      {
+        "percent": 0.65,
+        "symbol": "char const* stomptalk::parser::start_state<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 0.56,
+        "symbol": "memcpy@plt"
+      }
+    ]
+  },
+  {
+    "opt": "O3",
+    "variant": "plain",
+    "functions": [
+      {
+        "percent": 40.98,
+        "symbol": "char const* stomptalk::parser::hdrline<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 23.29,
+        "symbol": "stomptalk::parser::finish_value(char const*)"
+      },
+      {
+        "percent": 7.27,
+        "symbol": "char const* stomptalk::parser::method_state<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 6.89,
+        "symbol": "char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 5.83,
+        "symbol": "main"
+      }
+    ]
+  },
+  {
+    "opt": "O3",
+    "variant": "pgo",
+    "functions": [
+      {
+        "percent": 90.05,
+        "symbol": "char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 4.25,
+        "symbol": "main"
+      },
+      {
+        "percent": 2.0,
+        "symbol": "stomptalk_parser_execute"
+      },
+      {
+        "percent": 0.87,
+        "symbol": "char const* stomptalk::parser::start_state<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 0.57,
+        "symbol": "memcpy@plt"
+      }
+    ]
+  }
+]

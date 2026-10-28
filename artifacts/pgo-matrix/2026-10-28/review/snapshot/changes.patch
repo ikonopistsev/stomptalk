@@ -1,0 +1,644 @@
+--- before/CMakeLists.txt
++++ CMakeLists.txt
+@@ -9,6 +9,11 @@
+ option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
+ option(STOMPTALK_BUILD_TESTS "Build tests" OFF)
+ option(STOMPTALK_BUILD_FUZZ "Build OSS-Fuzz targets (requires Clang + libFuzzer)" OFF)
++option(STOMPTALK_EXPERIMENT_HEADER_LINE "Use the experimental one-pass header state chain" OFF)
++if (STOMPTALK_EXPERIMENT_HEADER_LINE)
++    add_definitions(-DSTOMPTALK_EXPERIMENT_HEADER_LINE)
++endif()
++
+ option(STOMPTALK_BUILD_SSE2 "Build SSE2 (required for the AVX2 tail)" ON)
+ option(STOMPTALK_BUILD_AVX2 "Build optional AVX2 implementations" ON)
+ option(STOMPTALK_BUILD_AVX2_NAMES "Build the optional AVX2 name classifier" ON)
+--- before/include/stomptalk/parser.h
++++ include/stomptalk/parser.h
+@@ -87,6 +87,9 @@
+  * A repeated call after an error returns consumed=0 and error_offset=0. */
+ STOMPTALK_EXPORT stomptalk_parse_result stomptalk_parser_execute(
+     stomptalk_parser *, const char *, size_t);
++/* Name classifiers require a readable [data, data + size) for nonzero size.
++ * NULL/0 is valid and returns UNKNOWN. Invalid views violate a precondition
++ * (asserted in debug builds); UNKNOWN denotes an unrecognized name. */
+ STOMPTALK_EXPORT stomptalk_method_id stomptalk_detect_method(stomptalk_view);
+ STOMPTALK_EXPORT stomptalk_view stomptalk_method_name(stomptalk_method_id);
+ STOMPTALK_EXPORT stomptalk_header_id stomptalk_detect_header(stomptalk_view);
+--- before/include/stomptalk/parser.hpp
++++ include/stomptalk/parser.hpp
+@@ -57,6 +57,7 @@
+     template<stomptalk_backend B> pointer start_cr(pointer, pointer) noexcept;
+     template<stomptalk_backend B> pointer method_state(pointer, pointer) noexcept;
+     template<stomptalk_backend B> pointer hdrline_done(pointer, pointer) noexcept;
++    template<stomptalk_backend B> pointer hdrline(pointer, pointer) noexcept;
+     template<stomptalk_backend B> pointer hdrline_hdr_key(pointer, pointer) noexcept;
+     template<stomptalk_backend B> pointer hdrline_val(pointer, pointer) noexcept;
+     template<stomptalk_backend B> pointer hdrline_almost_done(pointer, pointer) noexcept;
+--- before/src/backend/avx2.hpp
++++ src/backend/avx2.hpp
+@@ -55,7 +55,7 @@
+             equal<Size - 32>(data + 32, text + 32);
+     }
+ 
+-    // content-length is shorter than a YMM word; reuse the safe SSE2 comparison.
++    // The 16-byte content-length wire check is inherited from SSE2.
+     STOMPTALK_FORCE_INLINE
+     static const char* scan_header(const char* p, const char* end, bool key, bool literal) noexcept
+     {
+@@ -76,6 +76,36 @@
+         }
+         return sse2::scan_header(p, end, key, literal);
+     }
++
++    STOMPTALK_FORCE_INLINE
++    static header_line scan_header_line(const char* p, const char* end, bool key, bool literal) noexcept
++    {
++        const char* separator = nullptr;
++        while (end - p >= 32)
++        {
++            const auto word = load(p);
++            auto colons = mask(_mm256_cmpeq_epi8(word, _mm256_set1_epi8(':')));
++            auto events = _mm256_or_si256(_mm256_cmpeq_epi8(word, _mm256_setzero_si256()),
++                _mm256_or_si256(_mm256_cmpeq_epi8(word, _mm256_set1_epi8('\n')),
++                                 _mm256_cmpeq_epi8(word, _mm256_set1_epi8('\r'))));
++            if (!literal)
++                events = _mm256_or_si256(events, _mm256_cmpeq_epi8(word, _mm256_set1_epi8('\\')));
++            auto stops = mask(events);
++            if (key && colons && (!stops || __builtin_ctz(colons) < __builtin_ctz(stops)))
++            {
++                separator = p + __builtin_ctz(colons);
++                key = false;
++                colons &= colons - 1;
++            }
++            if (!literal)
++                stops |= colons;
++            if (stops)
++                return {separator, p + __builtin_ctz(stops)};
++            p += 32;
++        }
++        const auto tail = sse2::scan_header_line(p, end, key, literal);
++        return {separator ? separator : tail.separator, tail.stop};
++    }
+ };
+ 
+ template<> struct engine<STOMPTALK_BACKEND_AVX2> : avx2 {};
+--- before/src/backend/sse2.hpp
++++ src/backend/sse2.hpp
+@@ -56,14 +56,10 @@
+     }
+ 
+     STOMPTALK_FORCE_INLINE
+-    static bool is_content_length(const char* data) noexcept
++    static bool is_content_length_wire(const char* data) noexcept
+     {
+-        // Exactly 14 input bytes: two overlapping 8-byte loads, never load16(data).
+-        constexpr auto size = sizeof(content_length) - 1;
+-        const auto first = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(data));
+-        const auto last = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(data + size - 8));
+-        const auto expected = _mm_load_si128(reinterpret_cast<const __m128i*>(content_length_sse2));
+-        return mask(_mm_cmpeq_epi8(_mm_unpacklo_epi64(first, last), expected)) == 0xffff;
++        const auto expected = _mm_load_si128(reinterpret_cast<const __m128i*>(content_length_wire));
++        return mask(_mm_cmpeq_epi8(load(data), expected)) == 0xffff;
+     }
+ 
+     STOMPTALK_FORCE_INLINE
+@@ -86,6 +82,36 @@
+         }
+         return swar::scan_header(p, end, key, literal);
+     }
++
++    STOMPTALK_FORCE_INLINE
++    static header_line scan_header_line(const char* p, const char* end, bool key, bool literal) noexcept
++    {
++        const char* separator = nullptr;
++        while (end - p >= 16)
++        {
++            const auto word = load(p);
++            auto colons = mask(_mm_cmpeq_epi8(word, _mm_set1_epi8(':')));
++            auto events = _mm_or_si128(_mm_cmpeq_epi8(word, _mm_setzero_si128()),
++                _mm_or_si128(_mm_cmpeq_epi8(word, _mm_set1_epi8('\n')),
++                                 _mm_cmpeq_epi8(word, _mm_set1_epi8('\r'))));
++            if (!literal)
++                events = _mm_or_si128(events, _mm_cmpeq_epi8(word, _mm_set1_epi8('\\')));
++            auto stops = mask(events);
++            if (key && colons && (!stops || __builtin_ctz(colons) < __builtin_ctz(stops)))
++            {
++                separator = p + __builtin_ctz(colons);
++                key = false;
++                colons &= colons - 1;
++            }
++            if (!literal)
++                stops |= colons;
++            if (stops)
++                return {separator, p + __builtin_ctz(stops)};
++            p += 16;
++        }
++        const auto tail = swar::scan_header_line(p, end, key, literal);
++        return {separator ? separator : tail.separator, tail.stop};
++    }
+ };
+ 
+ template<> struct engine<STOMPTALK_BACKEND_SSE2> : sse2 {};
+--- before/src/backend/swar.hpp
++++ src/backend/swar.hpp
+@@ -11,6 +11,14 @@
+ 
+ template<stomptalk_backend Backend>
+ struct engine;
++
++// A separator found in this range, and its first line ending / special byte.
++// stop == end means more input is needed. No pointer is retained by the scanner.
++struct header_line
++{
++    const char* separator;
++    const char* stop;
++};
+ 
+ struct scalar
+ {
+@@ -31,7 +39,14 @@
+     STOMPTALK_FORCE_INLINE
+     static bool is_content_length(const char* data) noexcept
+     {
+-        return equal<sizeof(content_length) - 1>(data, content_length);
++        // Omit LF, colon and the trailing NUL from the shared wire constant.
++        return equal<sizeof(content_length_wire) - 3>(data, content_length_wire + 1);
++    }
++
++    STOMPTALK_FORCE_INLINE
++    static bool is_content_length_wire(const char* data) noexcept
++    {
++        return equal<16>(data, content_length_wire);
+     }
+ 
+     STOMPTALK_FORCE_INLINE
+@@ -46,6 +61,26 @@
+             ++p;
+         }
+         return p;
++    }
++
++    STOMPTALK_FORCE_INLINE
++    static header_line scan_header_line(const char* p, const char* end, bool key, bool literal) noexcept
++    {
++        const char* separator = nullptr;
++        while (p < end)
++        {
++            const auto c = static_cast<unsigned char>(*p);
++            if (c == ':' && key)
++            {
++                separator = p;
++                key = false;
++            }
++            else if (c == 0 || c == '\n' || c == '\r' ||
++                     (c == ':' && !literal) || (c == '\\' && !literal))
++                return {separator, p};
++            ++p;
++        }
++        return {separator, p};
+     }
+ };
+ 
+@@ -91,6 +126,44 @@
+         }
+         return scalar::scan_header(p, end, key, literal);
+     }
++
++    STOMPTALK_FORCE_INLINE
++    static uint64_t exact_zero_mask(uint64_t word) noexcept
++    {
++        // Unlike zero_mask, every marked byte is exact: needed after consuming ':'.
++        constexpr auto low = UINT64_C(0x7f7f7f7f7f7f7f7f);
++        return ~(((word & low) + low) | word | low) & UINT64_C(0x8080808080808080);
++    }
++
++    STOMPTALK_FORCE_INLINE
++    static header_line scan_header_line(const char* p, const char* end, bool key, bool literal) noexcept
++    {
++        const char* separator = nullptr;
++#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++        while (end - p >= 8)
++        {
++            const auto word = load(p);
++            auto colons = exact_zero_mask(word ^ UINT64_C(0x3a3a3a3a3a3a3a3a));
++            auto stops = exact_zero_mask(word) | exact_zero_mask(word ^ UINT64_C(0x0a0a0a0a0a0a0a0a)) |
++                exact_zero_mask(word ^ UINT64_C(0x0d0d0d0d0d0d0d0d));
++            if (!literal)
++                stops |= exact_zero_mask(word ^ UINT64_C(0x5c5c5c5c5c5c5c5c));
++            if (key && colons && (!stops || __builtin_ctzll(colons) < __builtin_ctzll(stops)))
++            {
++                separator = p + (__builtin_ctzll(colons) >> 3);
++                key = false;
++                colons &= colons - 1;
++            }
++            if (!literal)
++                stops |= colons;
++            if (stops)
++                return {separator, p + (__builtin_ctzll(stops) >> 3)};
++            p += 8;
++        }
++#endif
++        const auto tail = scalar::scan_header_line(p, end, key, literal);
++        return {separator ? separator : tail.separator, tail.stop};
++    }
+ };
+ 
+ template<> struct engine<STOMPTALK_BACKEND_SCALAR> : scalar {};
+--- before/src/content_length.hpp
++++ src/content_length.hpp
+@@ -7,14 +7,8 @@
+ namespace detail {
+ namespace backend {
+ 
+-constexpr char content_length[] = "content-length";
+-#if STOMPTALK_SSE2
+-// First eight + last eight bytes; matches two overlapping input loads.
+-alignas(16) constexpr char content_length_sse2[16] = {
+-    'c', 'o', 'n', 't', 'e', 'n', 't', '-',
+-    't', '-', 'l', 'e', 'n', 'g', 't', 'h'
+-};
+-#endif
++// The first 16 bytes are the complete wire spelling, excluding the trailing NUL.
++alignas(16) constexpr char content_length_wire[] = "\ncontent-length:";
+ 
+ } // namespace backend
+ } // namespace detail
+--- before/src/headers.hpp
++++ src/headers.hpp
+@@ -624,9 +624,10 @@
+         return headers_22::find<Backend>(name.data);
+     case headers_25::size:
+         return headers_25::find<Backend>(name.data);
+-    default:
+-        return STOMPTALK_HEADER_UNKNOWN;
+-    }
++    default:;
++    }
++
++    return STOMPTALK_HEADER_UNKNOWN;
+ }
+ 
+ inline stomptalk_view header_name(stomptalk_header_id id) noexcept
+@@ -729,9 +730,10 @@
+         return header::queue_name::text();
+     case STOMPTALK_HEADER_QUEUE_TYPE:
+         return header::queue_type::text();
+-    default:
+-        return {nullptr, 0};
+-    }
++    default:;
++    }
++
++    return {nullptr, 0};
+ }
+ 
+ } // namespace
+--- before/src/is_header.hpp
++++ src/is_header.hpp
+@@ -26,13 +26,16 @@
+     }
+ };
+ 
++// wire, when non-null, points to 16 readable bytes: LF + name + colon.
++// Fragmented/decoded names use the plain 14-byte comparison.
+ template<stomptalk_backend Backend>
+ STOMPTALK_FORCE_INLINE
+-bool is_content_length(stomptalk_view name) noexcept
++bool is_content_length(stomptalk_view name, const char* wire = nullptr) noexcept
+ {
+     assert(name.data || !name.size);
+-    return name.size == sizeof(backend::content_length) - 1 &&
+-        backend::engine<Backend>::is_content_length(name.data);
++    return name.size == sizeof(backend::content_length_wire) - 3 &&
++        (wire ? backend::engine<Backend>::is_content_length_wire(wire)
++              : backend::swar::is_content_length(name.data));
+ }
+ 
+ } // namespace detail
+--- before/src/methods.hpp
++++ src/methods.hpp
+@@ -217,9 +217,10 @@
+         return methods_10::find<Backend>(name.data);
+     case methods_11::size:
+         return methods_11::find<Backend>(name.data);
+-    default:
+-        return STOMPTALK_METHOD_UNKNOWN;
+-    }
++    default:;
++    }
++
++    return STOMPTALK_METHOD_UNKNOWN;
+ }
+ 
+ inline stomptalk_view method_name(stomptalk_method_id id) noexcept
+@@ -256,9 +257,10 @@
+         return method::subscribe::text();
+     case STOMPTALK_METHOD_UNSUBSCRIBE:
+         return method::unsubscribe::text();
+-    default:
+-        return {nullptr, 0};
+-    }
++    default:;
++    }
++
++    return {nullptr, 0};
+ }
+ 
+ } // namespace
+--- before/src/names.cpp
++++ src/names.cpp
+@@ -62,8 +62,6 @@
+ 
+ stomptalk_header_id stomptalk_detect_header(stomptalk_view name)
+ {
+-    if (!name.data)
+-        return STOMPTALK_HEADER_UNKNOWN;
+     // Resolve CPU/OS/build availability once, outside candidate comparisons.
+     static const auto detect = stomptalk::detail::select_header_detector(STOMPTALK_BACKEND_AUTO);
+     return detect(name);
+--- before/src/parser_states.hpp
++++ src/parser_states.hpp
+@@ -62,13 +62,20 @@
+         status_ = STOMPTALK_PARSE_OUTPUT_FULL;
+         return curr;
+     }
++#if defined(STOMPTALK_EXPERIMENT_HEADER_LINE)
++    return tailcall(&parser::hdrline<B>, curr, end);
++#else
+     // The first byte goes through exactly the same decoder as all others.
+     return tailcall(&parser::hdrline_hdr_key<B>, curr, end);
+-}
+-
+-template<stomptalk_backend B>
+-STOMPTALK_STATE_TARGET
+-parser::pointer parser::hdrline_hdr_key(pointer curr, pointer end) noexcept {
++#endif
++}
++
++
++// Alternative state chain: one scan supplies both key/value ranges. Existing
++// views and state keep progress across execute; no cursor or mask cache is added.
++template<stomptalk_backend B>
++STOMPTALK_STATE_TARGET
++parser::pointer parser::hdrline(pointer curr, pointer end) noexcept {
+     while (curr < end) {
+         if (escape_) {
+             char ch = *curr;
+@@ -84,8 +91,18 @@
+             ++curr;
+             continue;
+         }
+-        const pointer p = detail::backend::engine<B>::scan_header(curr, end, true, literal_);
+-        // Copy/borrow the entire clean range, including all preceding SIMD blocks.
++        const auto line = detail::backend::engine<B>::scan_header_line(curr, end, !key_.size, literal_);
++        if (line.separator) {
++            if (!append(curr, static_cast<size_t>(line.separator - curr))) return stop_;
++            if (!token_.size) return fail(STOMPTALK_ERROR_HEADER, line.separator);
++            key_ = finish_token();
++            length_header_ = !(current_.parsed.flags & STOMPTALK_FRAME_HAS_CONTENT_LENGTH) &&
++                key_.size == sizeof(detail::backend::content_length_wire) - 3 &&
++                detail::is_content_length<B>(key_,
++                    curr > begin_ && line.separator - curr == static_cast<ptrdiff_t>(key_.size) ? curr - 1 : nullptr);
++            curr = line.separator + 1;
++        }
++        const pointer p = line.stop;
+         if (!append(curr, static_cast<size_t>(p - curr))) return stop_;
+         if (p == end) return p;
+         if (*p == '\\' && !literal_) {
+@@ -94,18 +111,17 @@
+             curr = p + 1;
+             continue;
+         }
+-        if (*p != ':' || !token_.size) return fail(STOMPTALK_ERROR_HEADER, p);
+-        key_ = finish_token();
+-        length_header_ = !(current_.parsed.flags & STOMPTALK_FRAME_HAS_CONTENT_LENGTH) &&
+-            detail::is_content_length<B>(key_);
+-        return tailcall(&parser::hdrline_val<B>, p + 1, end);
+-    }
+-    return curr;
+-}
+-
+-template<stomptalk_backend B>
+-STOMPTALK_STATE_TARGET
+-parser::pointer parser::hdrline_val(pointer curr, pointer end) noexcept {
++        if (!key_.size || (*p != '\r' && *p != '\n')) return fail(STOMPTALK_ERROR_HEADER, p);
++        if (!finish_value(p)) return stop_;
++        return *p == '\n' ? tailcall(&parser::hdrline_done<B>, p + 1, end)
++                          : tailcall(&parser::hdrline_almost_done<B>, p + 1, end);
++    }
++    return curr;
++}
++
++template<stomptalk_backend B>
++STOMPTALK_STATE_TARGET
++parser::pointer parser::hdrline_hdr_key(pointer curr, pointer end) noexcept {
+     while (curr < end) {
+         if (escape_) {
+             char ch = *curr;
+@@ -121,6 +137,45 @@
+             ++curr;
+             continue;
+         }
++        const pointer p = detail::backend::engine<B>::scan_header(curr, end, true, literal_);
++        // Copy/borrow the entire clean range, including all preceding SIMD blocks.
++        if (!append(curr, static_cast<size_t>(p - curr))) return stop_;
++        if (p == end) return p;
++        if (*p == '\\' && !literal_) {
++            own_token();
++            escape_ = true;
++            curr = p + 1;
++            continue;
++        }
++        if (*p != ':' || !token_.size) return fail(STOMPTALK_ERROR_HEADER, p);
++        key_ = finish_token();
++        length_header_ = !(current_.parsed.flags & STOMPTALK_FRAME_HAS_CONTENT_LENGTH) &&
++            key_.size == sizeof(detail::backend::content_length_wire) - 3 &&
++            detail::is_content_length<B>(key_,
++                curr > begin_ && p - curr == static_cast<ptrdiff_t>(key_.size) ? curr - 1 : nullptr);
++        return tailcall(&parser::hdrline_val<B>, p + 1, end);
++    }
++    return curr;
++}
++
++template<stomptalk_backend B>
++STOMPTALK_STATE_TARGET
++parser::pointer parser::hdrline_val(pointer curr, pointer end) noexcept {
++    while (curr < end) {
++        if (escape_) {
++            char ch = *curr;
++            switch (ch) {
++            case 'n': ch = '\n'; break;
++            case 'r': ch = '\r'; break;
++            case 'c': ch = ':'; break;
++            case '\\': break;
++            default: return fail(STOMPTALK_ERROR_ESCAPE, curr);
++            }
++            if (!append(ch, curr)) return stop_;
++            escape_ = false;
++            ++curr;
++            continue;
++        }
+         const pointer p = detail::backend::engine<B>::scan_header(curr, end, false, literal_);
+         if (!append(curr, static_cast<size_t>(p - curr))) return stop_;
+         if (p == end) return p;
+--- before/src/stomptalk.cpp
++++ src/stomptalk.cpp
+@@ -101,7 +101,6 @@
+     return p->impl.run(data, size);
+ }
+ stomptalk_method_id stomptalk_detect_method(stomptalk_view v) {
+-    if (!v.data) return STOMPTALK_METHOD_UNKNOWN;
+     return stomptalk::detail::detect_method(v);
+ }
+ stomptalk_view stomptalk_method_name(stomptalk_method_id id) {
+--- before/stomptalkgen.js
++++ stomptalkgen.js
+@@ -87,7 +87,7 @@
+ `;
+     for (const length of lengths)
+         classifiers += `    case ${kind}s_${length}::size:\n        return ${kind}s_${length}::find<Backend>(name.data);\n`;
+-    classifiers += `    default:\n        return STOMPTALK_${upper}_UNKNOWN;\n    }\n}\n\n`;
++    classifiers += `    default:;\n    }\n\n    return STOMPTALK_${upper}_UNKNOWN;\n}\n\n`;
+ 
+     classifiers += `inline stomptalk_view ${kind}_name(stomptalk_${kind}_id id) noexcept
+ {
+@@ -96,18 +96,15 @@
+ `;
+     for (const entry of entries)
+         classifiers += `    case STOMPTALK_${upper}_${entry.name}:\n        return ${kind}::${entry.name.toLowerCase()}::text();\n`;
+-    classifiers += '    default:\n        return {nullptr, 0};\n    }\n}\n\n';
++    classifiers += '    default:;\n    }\n\n    return {nullptr, 0};\n}\n\n';
+     classifiers += '} // namespace\n} // namespace detail\n} // namespace stomptalk\n';
+     fs.writeFileSync(new URL(`./src/${kind}s.hpp`, import.meta.url), classifiers);
+ }
+ 
+ const length = dictionary.headers.find(entry => entry.name === 'CONTENT_LENGTH');
+ const lengthBytes = Buffer.from(length.wire);
+-if (lengthBytes.length < 8 || lengthBytes.length > 16)
+-    throw new Error('content-length must fit two overlapping eight-byte words');
+-const packedLength = Buffer.concat([lengthBytes.subarray(0, 8), lengthBytes.subarray(-8)]);
+-const packedRows = [packedLength.subarray(0, 8), packedLength.subarray(8)]
+-    .map(row => [...row].map(byte => `'${String.fromCharCode(byte)}'`).join(', '));
++if (lengthBytes.length !== 14)
++    throw new Error('content-length wire comparison requires a 14-byte name');
+ const contentLength = `/* Generated by stomptalkgen.js; edit protocol/names.json. */
+ #pragma once
+ 
+@@ -117,13 +114,8 @@
+ namespace detail {
+ namespace backend {
+ 
+-constexpr char content_length[] = ${JSON.stringify(length.wire)};
+-#if STOMPTALK_SSE2
+-// First eight + last eight bytes; matches two overlapping input loads.
+-alignas(16) constexpr char content_length_sse2[16] = {
+-    ${packedRows.join(',\n    ')}
+-};
+-#endif
++// The first 16 bytes are the complete wire spelling, excluding the trailing NUL.
++alignas(16) constexpr char content_length_wire[] = "\\n${length.wire}:";
+ 
+ } // namespace backend
+ } // namespace detail
+--- before/test/name_backend_checks.hpp
++++ test/name_backend_checks.hpp
+@@ -113,6 +113,17 @@
+ };
+ 
+ template<stomptalk_backend Backend>
++struct wire_length_matcher
++{
++    template<std::size_t Size>
++    static bool equal(const char* data, const char*)
++    {
++        static_assert(Size == 16, "LF + content-length + colon");
++        return stomptalk::detail::is_content_length<Backend>({data + 1, 14}, data);
++    }
++};
++
++template<stomptalk_backend Backend>
+ std::size_t check_header_backend()
+ {
+     using namespace stomptalk::detail;
+@@ -150,6 +161,20 @@
+     };
+     for (std::size_t offset = 0; offset < 32; ++offset)
+         content_length(storage + offset);
++    auto wire_length = [&](char* data)
++    {
++        std::memcpy(data, "\ncontent-length:", 16);
++        check(wire_length_matcher<Backend>::template equal<16>(data, data));
++        for (std::size_t at = 0; at < 16; ++at)
++        {
++            data[at] ^= 1;
++            check(!wire_length_matcher<Backend>::template equal<16>(data, data));
++            data[at] ^= 1;
++        }
++    };
++    char wire_storage[16 + 32];
++    for (std::size_t offset = 0; offset < 32; ++offset)
++        wire_length(wire_storage + offset);
+ #if defined(__unix__)
+     const auto page_size = static_cast<std::size_t>(sysconf(_SC_PAGESIZE));
+     auto mapping = static_cast<char*>(mmap(nullptr, page_size * 3, PROT_NONE,
+@@ -159,6 +184,8 @@
+     check(mprotect(page, page_size, PROT_READ | PROT_WRITE) == 0);
+     content_length(page);
+     content_length(page + page_size - 14);
++    wire_length(page);
++    wire_length(page + page_size - 16);
+     checks += check_name_size<header_matcher<Backend>, 97>(page, page_size);
+     checks += check_name_size<header_matcher<Backend>, 128>(page, page_size);
+     checks += check_name_size<header_matcher<Backend>, 257>(page, page_size);
+--- before/test/scan_backend_checks.hpp
++++ test/scan_backend_checks.hpp
+@@ -23,6 +23,12 @@
+         scan_check((stomptalk::detail::backend::scalar::scan_header(data, data + size, false, literal) ==
+             Backend::scan_header(data, data + size, false, literal)));
+         checks += 2;
++        for (bool key : {false, true}) {
++            const auto expected = stomptalk::detail::backend::scalar::scan_header_line(data, data + size, key, literal);
++            const auto actual = Backend::scan_header_line(data, data + size, key, literal);
++            scan_check(expected.separator == actual.separator && expected.stop == actual.stop);
++            ++checks;
++        }
+     }
+     return checks;
+ }
+--- before/test/unit_v2.cpp
++++ test/unit_v2.cpp
+@@ -298,14 +298,11 @@
+     CHECK(stomptalk_detect_method({"SEND", 4}) == STOMPTALK_METHOD_SEND);
+     CHECK(stomptalk_detect_method({"SUBSCRIBX", 9}) == STOMPTALK_METHOD_UNKNOWN);
+     CHECK(stomptalk_detect_method({"RUBSCRIBD", 9}) == STOMPTALK_METHOD_UNKNOWN);
+-    CHECK(stomptalk_detect_method({nullptr, 99}) == STOMPTALK_METHOD_UNKNOWN);
+-    CHECK(stomptalk_detect_method({nullptr, 4}) == STOMPTALK_METHOD_UNKNOWN);
+     CHECK(stomptalk_detect_method({nullptr, 0}) == STOMPTALK_METHOD_UNKNOWN);
+     CHECK(!stomptalk_method_name(STOMPTALK_METHOD_UNKNOWN).size);
+     CHECK(stomptalk_detect_header({"content-length", 14}) == STOMPTALK_HEADER_CONTENT_LENGTH);
+     CHECK(text(stomptalk_header_name(STOMPTALK_HEADER_MAX_LENGTH)) == "x-max-length");
+     CHECK(stomptalk_detect_header({"Content-length", 14}) == STOMPTALK_HEADER_UNKNOWN);
+-    CHECK(stomptalk_detect_header({nullptr, 14}) == STOMPTALK_HEADER_UNKNOWN);
+     CHECK(stomptalk_detect_header({nullptr, 0}) == STOMPTALK_HEADER_UNKNOWN);
+ }
+ 
+@@ -446,6 +443,19 @@
+         const headers h{{std::string(n, 'k'), std::string(n, 'v')}};
+         variants({"long-fields", wire("SEND", h), {{"SEND", h, {}, true}}}, config, n < 100);
+     }
++    for (size_t n : {1u, 7u, 8u, 15u, 16u, 31u, 32u, 33u}) {
++        const auto k = std::string(n, 'k');
++        for (const char *nl : {"\n", "\r\n"}) {
++            const headers h{{k, ";\x0b"}, {"z", ""}};
++            variants({"line-mask-neighbours", wire("SEND", h, "", nl), {{"SEND", h, {}, true}}}, config);
++            const headers literal{{k, ":\\bad:;"}};
++            variants({"line-literal-colons", wire("CONNECT", literal, "", nl), {{"CONNECT", literal, {}, true}}}, config);
++            const headers encoded{{k + "\\c", "\\c;\\n"}};
++            const headers decoded_line{{k + ":", ":;\n"}};
++            variants({"line-escapes", wire("SEND", encoded, "", nl), {{"SEND", decoded_line, {}, true}}}, config);
++            variants({"line-extra-colon", wire("SEND", {{k, ":;"}}, "", nl), {}, STOMPTALK_ERROR_HEADER}, config);
++        }
++    }
+     for (size_t n : {63u, 64u, 65u}) {
+         headers h(n, {"x", "v"});
+         case_data c{"header-limit", wire("SEND", h), {}};

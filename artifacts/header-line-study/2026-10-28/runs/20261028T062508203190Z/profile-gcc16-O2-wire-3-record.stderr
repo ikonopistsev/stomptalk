@@ -1,0 +1,2 @@
+[ perf record: Woken up 2 times to write data ]
+[ perf record: Captured and wrote 0.265 MB /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/profile-gcc16-O2-wire-3.data (5708 samples) ]

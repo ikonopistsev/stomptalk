@@ -1,0 +1,36 @@
+{
+  "build": [
+    "/usr/lib/llvm/23/bin/clang++",
+    "-std=c++14",
+    "-O0",
+    "-g",
+    "-DSTOMPTALK_STATIC",
+    "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/source/include",
+    "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/validation/assert_contract.cpp",
+    "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/debug/libstomptalk.a",
+    "-o",
+    "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/validation/assert_contract"
+  ],
+  "build_exit": 0,
+  "default_stack_limit": [
+    8388608,
+    -1
+  ],
+  "cases": [
+    {
+      "name": "empty",
+      "returncode": 0,
+      "expected": 0
+    },
+    {
+      "name": "method",
+      "returncode": -6,
+      "expected": -6
+    },
+    {
+      "name": "header",
+      "returncode": -6,
+      "expected": -6
+    }
+  ]
+}

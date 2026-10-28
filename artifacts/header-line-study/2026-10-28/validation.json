@@ -1,0 +1,47 @@
+{
+  "source_run": "runs/20261028T062508203190Z",
+  "commands": [
+    {
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-debug-assert",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DSTOMPTALK_EXPERIMENT_HEADER_LINE=ON",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.32999968412332237,
+      "log": "runs/20261028T062508203190Z/debug-assert-0.log"
+    },
+    {
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-debug-assert",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 1.1319172959774733,
+      "log": "runs/20261028T062508203190Z/debug-assert-1.log"
+    },
+    {
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-debug-assert",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.9338252460584044,
+      "log": "runs/20261028T062508203190Z/debug-assert-2.log"
+    }
+  ]
+}

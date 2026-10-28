@@ -1,0 +1,92 @@
+[
+  {
+    "compiler": "gcc16",
+    "opt": "Os",
+    "identical_except_rip_displacements": true,
+    "sizes_before_after": [
+      {
+        ".text": 29835,
+        ".rodata": 2380
+      },
+      {
+        ".text": 29835,
+        ".rodata": 2380
+      }
+    ]
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O2",
+    "identical_except_rip_displacements": true,
+    "sizes_before_after": [
+      {
+        ".text": 47685,
+        ".rodata": 2100
+      },
+      {
+        ".text": 47685,
+        ".rodata": 2080
+      }
+    ]
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O3",
+    "identical_except_rip_displacements": true,
+    "sizes_before_after": [
+      {
+        ".text": 65943,
+        ".rodata": 2260
+      },
+      {
+        ".text": 65943,
+        ".rodata": 2228
+      }
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "Os",
+    "identical_except_rip_displacements": true,
+    "sizes_before_after": [
+      {
+        ".text": 31496,
+        ".rodata": 2388
+      },
+      {
+        ".text": 31496,
+        ".rodata": 2388
+      }
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O2",
+    "identical_except_rip_displacements": true,
+    "sizes_before_after": [
+      {
+        ".text": 45424,
+        ".rodata": 2996
+      },
+      {
+        ".text": 45424,
+        ".rodata": 2996
+      }
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O3",
+    "identical_except_rip_displacements": true,
+    "sizes_before_after": [
+      {
+        ".text": 47626,
+        ".rodata": 3028
+      },
+      {
+        ".text": 47626,
+        ".rodata": 3028
+      }
+    ]
+  }
+]

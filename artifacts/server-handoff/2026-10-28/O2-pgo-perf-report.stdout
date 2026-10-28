@@ -1,0 +1,21 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 4K of event 'cpu_core/cycles/u'
+# Event count (approx.): 20804735699
+#
+# Overhead  Symbol                                                                         IPC   [IPC Coverage]
+# ........  .............................................................................  ....................
+#
+    89.14%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)  -      -            
+     5.50%  [.] main                                                                       -      -            
+     2.20%  [.] stomptalk_parser_execute                                                   -      -            
+     0.65%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)   -      -            
+     0.56%  [.] memcpy@plt                                                                 -      -            
+
+
+#
+# (Tip: Use --symfs <dir> if your symbol files are in non-standard locations)
+#

@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 669  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3140507436
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    21.42%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    20.80%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+    10.85%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     9.49%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     7.38%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+     5.42%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     5.37%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     4.98%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     4.74%  [.] main                                                                              -      -            
+     2.72%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     1.66%  [.] char const* stomptalk::parser::done<4u>(char const*, char const*)                 -      -            
+     1.51%  [.] char const* stomptalk::parser::body_read_no_length<4u>(char const*, char const*)  -      -            
+     1.21%  [.] stomptalk::parser::own_metadata()                                                 -      -            
+
+
+#
+# (Tip: To not accumulate CPU time of children symbols add --no-children)
+#

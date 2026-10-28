@@ -1,0 +1,34 @@
+/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe  :
+section               size    addr
+.note.gnu.build-id      36     848
+.interp                 28     884
+.gnu.hash               64     912
+.dynsym               1200     976
+.dynstr               1663    2176
+.gnu.version           100    3840
+.gnu.version_r         256    3944
+.rela.dyn              408    4200
+.rela.plt              840    4608
+.init                   27    8192
+.plt                   576    8224
+.plt.got                16    8800
+.plt.sec               560    8816
+.text                47685    9376
+.fini                   13   57064
+.rodata               2100   57344
+.eh_frame_hdr          764   59444
+.eh_frame             4120   60208
+.gcc_except_table      172   64328
+.note.gnu.property      80   64504
+.note.ABI-tag           32   64584
+.init_array             16   68312
+.fini_array              8   68328
+.data.rel.ro           400   68336
+.dynamic               544   68736
+.got                   352   69280
+.data                   24   69632
+.bss                   320   69696
+.comment                81       0
+Total                62485
+
+

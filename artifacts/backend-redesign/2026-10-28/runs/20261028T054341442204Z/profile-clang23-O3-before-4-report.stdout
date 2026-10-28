@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 673  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3127418747
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    22.73%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+    17.38%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    14.58%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     8.69%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     7.97%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     5.64%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     5.32%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     4.96%  [.] main                                                                              -      -            
+     2.56%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+     2.35%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     1.21%  [.] char const* stomptalk::parser::done<4u>(char const*, char const*)                 -      -            
+     1.04%  [.] stomptalk::parser::own_metadata()                                                 -      -            
+     1.03%  [.] memcpy@plt                                                                        -      -            
+
+
+#
+# (Tip: To show assembler sample context control flow use perf record -b / perf report --samples 10 and then browse context)
+#

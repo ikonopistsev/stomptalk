@@ -1,0 +1,102 @@
+--- before
+
++++ after
+
+@@ -1572,5 +1572,5 @@
+
+     3c73:	cmp    $0x6c,%eax
+     3c76:	ja     399e <__cpu_indicator_init+0x76e>
+-    3c7c:	lea    0xa985(%rip),%rdx        # e608 <stomptalk::detail::backend::content_length+0x10>
++    3c7c:	lea    0xa971(%rip),%rdx        # e5f4 <stomptalk::detail::backend::content_length_wire+0x14>
+     3c83:	movslq (%rdx,%rax,4),%rax
+     3c87:	add    %rdx,%rax
+@@ -1582,5 +1582,5 @@
+
+     3c9b:	cmp    $0xa,%esi
+     3c9e:	ja     3a20 <__cpu_indicator_init+0x7f0>
+-    3ca4:	lea    0xab11(%rip),%rcx        # e7bc <stomptalk::detail::backend::content_length+0x1c4>
++    3ca4:	lea    0xaafd(%rip),%rcx        # e7a8 <stomptalk::detail::backend::content_length_wire+0x1c8>
+     3cab:	movslq (%rcx,%rsi,4),%rdx
+     3caf:	add    %rcx,%rdx
+@@ -1899,5 +1899,5 @@
+
+     43f6:	cmp    $0x12,%eax
+     43f9:	ja     399e <__cpu_indicator_init+0x76e>
+-    43ff:	lea    0xa3e2(%rip),%rdx        # e7e8 <stomptalk::detail::backend::content_length+0x1f0>
++    43ff:	lea    0xa3ce(%rip),%rdx        # e7d4 <stomptalk::detail::backend::content_length_wire+0x1f4>
+     4406:	movslq (%rdx,%rax,4),%rax
+     440a:	add    %rdx,%rax
+@@ -4568,9 +4568,9 @@
+
+     7514:	test   %rdi,%rdi
+     7517:	je     753f <stomptalk_parser_config_default+0x2f>
+-    7519:	movdqa 0x708f(%rip),%xmm0        # e5b0 <stomptalk::detail::backend::content_length+0x98>
++    7519:	movdqa 0x706f(%rip),%xmm0        # e590 <stomptalk::detail::backend::content_length_wire+0x90>
+     7521:	movq   $0xffffffffffffffff,0x20(%rdi)
+     7529:	movl   $0x0,0x28(%rdi)
+     7530:	movups %xmm0,(%rdi)
+-    7533:	movdqa 0x7085(%rip),%xmm0        # e5c0 <stomptalk::detail::backend::content_length+0xa8>
++    7533:	movdqa 0x7065(%rip),%xmm0        # e5a0 <stomptalk::detail::backend::content_length_wire+0xa0>
+     753b:	movups %xmm0,0x10(%rdi)
+     753f:	ret
+@@ -5443,9 +5443,9 @@
+
+     84e9:	jmp    8535 <stomptalk_parser_init+0x275>
+     84eb:	nopl   0x0(%rax,%rax,1)
+-    84f0:	movdqa 0x60b8(%rip),%xmm0        # e5b0 <stomptalk::detail::backend::content_length+0x98>
++    84f0:	movdqa 0x6098(%rip),%xmm0        # e590 <stomptalk::detail::backend::content_length_wire+0x90>
+     84f8:	movl   $0x0,0x78(%rsp)
+     8500:	movq   $0xffffffffffffffff,0x70(%rsp)
+     8509:	movaps %xmm0,0x50(%rsp)
+-    850e:	movdqa 0x60aa(%rip),%xmm0        # e5c0 <stomptalk::detail::backend::content_length+0xa8>
++    850e:	movdqa 0x608a(%rip),%xmm0        # e5a0 <stomptalk::detail::backend::content_length_wire+0xa0>
+     8516:	movaps %xmm0,0x60(%rsp)
+     851b:	jmp    833e <stomptalk_parser_init+0x7e>
+@@ -6172,5 +6172,5 @@
+
+     91f5:	cmp    $0x8,%rdx
+     91f9:	ja     9126 <char const* stomptalk::parser::method_state<1u>(char const*, char const*)+0x106>
+-    91ff:	lea    0x5322(%rip),%r9        # e528 <stomptalk::detail::backend::content_length+0x10>
++    91ff:	lea    0x530e(%rip),%r9        # e514 <stomptalk::detail::backend::content_length_wire+0x14>
+     9206:	movslq (%r9,%rdx,4),%rdx
+     920a:	add    %r9,%rdx
+@@ -7305,5 +7305,5 @@
+
+     a640:	jmp    a569 <char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)+0x4b9>
+     a645:	movdqu -0x1(%rbp),%xmm0
+-    a64a:	pcmpeqb 0x3f4e(%rip),%xmm0        # e5a0 <stomptalk::detail::backend::content_length+0x88>
++    a64a:	pcmpeqb 0x3f2e(%rip),%xmm0        # e580 <stomptalk::detail::backend::content_length_wire+0x80>
+     a652:	pmovmskb %xmm0,%eax
+     a656:	cmp    $0xffff,%eax
+@@ -7520,5 +7520,5 @@
+
+     aa35:	cmp    $0x8,%rdx
+     aa39:	ja     a966 <char const* stomptalk::parser::method_state<3u>(char const*, char const*)+0x106>
+-    aa3f:	lea    0x3b06(%rip),%r9        # e54c <stomptalk::detail::backend::content_length+0x34>
++    aa3f:	lea    0x3af2(%rip),%r9        # e538 <stomptalk::detail::backend::content_length_wire+0x38>
+     aa46:	movslq (%r9,%rdx,4),%rdx
+     aa4a:	add    %r9,%rdx
+@@ -8770,5 +8770,5 @@
+
+     c0f5:	cmp    $0x8,%rdx
+     c0f9:	ja     c026 <char const* stomptalk::parser::method_state<2u>(char const*, char const*)+0x106>
+-    c0ff:	lea    0x246a(%rip),%r9        # e570 <stomptalk::detail::backend::content_length+0x58>
++    c0ff:	lea    0x2456(%rip),%r9        # e55c <stomptalk::detail::backend::content_length_wire+0x5c>
+     c106:	movslq (%r9,%rdx,4),%rdx
+     c10a:	add    %r9,%rdx
+@@ -9898,5 +9898,5 @@
+
+     d3c7:	je     d38e <char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)+0x4be>
+     d3c9:	jmp    d036 <char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)+0x166>
+-    d3ce:	vmovdqa 0x11ca(%rip),%xmm0        # e5a0 <stomptalk::detail::backend::content_length+0x88>
++    d3ce:	vmovdqa 0x11aa(%rip),%xmm0        # e580 <stomptalk::detail::backend::content_length_wire+0x80>
+     d3d6:	vpcmpeqb -0x1(%r12),%xmm0,%xmm0
+     d3dd:	vpmovmskb %xmm0,%eax
+@@ -10073,5 +10073,5 @@
+
+     d663:	mov    %rdx,0xa8(%r12)
+     d66b:	ja     d6a0 <char const* stomptalk::parser::method_state<4u>(char const*, char const*)+0x120>
+-    d66d:	lea    0xf5c(%rip),%rdx        # e5d0 <stomptalk::detail::backend::content_length+0xb8>
++    d66d:	lea    0xf3c(%rip),%rdx        # e5b0 <stomptalk::detail::backend::content_length_wire+0xb0>
+     d674:	movzbl 0xf(%rsp),%r8d
+     d67a:	movslq (%rdx,%rax,4),%rax

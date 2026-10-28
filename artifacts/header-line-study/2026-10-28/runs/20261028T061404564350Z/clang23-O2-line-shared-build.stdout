@@ -1,0 +1,16 @@
+[1/16] Building CXX object CMakeFiles/stomptalk.dir/src/names.cpp.o
+[2/16] Building CXX object CMakeFiles/stomptalk.dir/src/names_avx2.cpp.o
+[3/16] Building CXX object CMakeFiles/stomptalk.dir/src/parser_avx2.cpp.o
+[4/16] Building CXX object CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o
+[5/16] Linking CXX shared library libstomptalk.so.2.0.0
+[6/16] Building CXX object CMakeFiles/stomptalk_test_impl.dir/src/names.cpp.o
+[7/16] Creating library symlink libstomptalk.so.2 libstomptalk.so
+[8/16] Building CXX object CMakeFiles/stomptalk_test_impl.dir/src/stomptalk.cpp.o
+[9/16] Building CXX object CMakeFiles/stomptalk_test_impl.dir/src/parser_avx2.cpp.o
+[10/16] Building C object CMakeFiles/purestomp.dir/test/purestomp.c.o
+[11/16] Building CXX object CMakeFiles/stomptalk_test_impl.dir/src/names_avx2.cpp.o
+[12/16] Linking CXX static library libstomptalk_test_impl.a
+[13/16] Linking C executable purestomp
+[14/16] Building CXX object CMakeFiles/stomptalk_unit_test.dir/test/unit_backend_avx2.cpp.o
+[15/16] Building CXX object CMakeFiles/stomptalk_unit_test.dir/test/unit_v2.cpp.o
+[16/16] Linking CXX executable stomptalk_unit_test

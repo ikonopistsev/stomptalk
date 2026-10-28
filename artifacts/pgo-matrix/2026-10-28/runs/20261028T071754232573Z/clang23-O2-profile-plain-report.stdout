@@ -1,0 +1,26 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 5K of event 'cpu_core/cycles/u'
+# Event count (approx.): 25149952952
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    39.56%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -            
+    24.83%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     7.28%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     6.85%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -            
+     4.90%  [.] main                                                                              -      -            
+     3.62%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     2.66%  [.] stomptalk::parser::own_metadata()                                                 -      -            
+     2.60%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     2.41%  [.] char const* stomptalk::parser::done<3u>(char const*, char const*)                 -      -            
+     1.03%  [.] char const* stomptalk::parser::body_read<3u>(char const*, char const*)            -      -            
+
+
+#
+# (Tip: To analyze particular parallelism levels, try: perf report --latency --parallelism=32-64)
+#

@@ -1,0 +1,2 @@
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.041 MB /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/runs/20261028T054341442204Z/profile-clang23-Os-after-2.data (820 samples) ]

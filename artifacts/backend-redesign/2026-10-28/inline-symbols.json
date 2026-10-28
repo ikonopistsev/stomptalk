@@ -1,0 +1,32 @@
+[
+  {
+    "compiler": "gcc16",
+    "opt": "Os",
+    "out_of_line_backend_helpers": []
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O2",
+    "out_of_line_backend_helpers": []
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O3",
+    "out_of_line_backend_helpers": []
+  },
+  {
+    "compiler": "clang23",
+    "opt": "Os",
+    "out_of_line_backend_helpers": []
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O2",
+    "out_of_line_backend_helpers": []
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O3",
+    "out_of_line_backend_helpers": []
+  }
+]

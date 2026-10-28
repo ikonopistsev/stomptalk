@@ -1,0 +1,521 @@
+{
+  "chain": "line",
+  "cpu": 4,
+  "backend": 3,
+  "matrix": [
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "plain": {
+        "samples": [
+          0.598033215,
+          0.589802721,
+          0.592484767,
+          0.666548299,
+          0.589738014
+        ],
+        "median": 0.592484767,
+        "spread_percent": 12.964094484474735
+      },
+      "pgo": {
+        "samples": [
+          0.476113988,
+          0.481784489,
+          0.480330222,
+          0.541523776,
+          0.484413476
+        ],
+        "median": 0.481784489,
+        "spread_percent": 13.57656576610959
+      }
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "plain": {
+        "samples": [
+          0.571545438,
+          0.563101815,
+          0.570632914,
+          0.5680288,
+          0.568642996
+        ],
+        "median": 0.568642996,
+        "spread_percent": 1.4848724172099028
+      },
+      "pgo": {
+        "samples": [
+          0.408993689,
+          0.408905207,
+          0.411678715,
+          0.412073706,
+          0.409007931
+        ],
+        "median": 0.409007931,
+        "spread_percent": 0.7746791100732937
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "plain": {
+        "samples": [
+          0.528305995,
+          0.522381057,
+          0.518034252,
+          0.522370432,
+          0.517912904
+        ],
+        "median": 0.522370432,
+        "spread_percent": 1.9896017008864633
+      },
+      "pgo": {
+        "samples": [
+          0.448181057,
+          0.444987417,
+          0.442481302,
+          0.44270264,
+          0.443884823
+        ],
+        "median": 0.443884823,
+        "spread_percent": 1.2840616990412337
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "plain": {
+        "samples": [
+          0.517006817,
+          0.529057291,
+          0.51582262,
+          0.515920608,
+          0.522928584
+        ],
+        "median": 0.517006817,
+        "spread_percent": 2.5598639253532274
+      },
+      "pgo": {
+        "samples": [
+          0.439851632,
+          0.439949253,
+          0.438583889,
+          0.436807012,
+          0.442886179
+        ],
+        "median": 0.439851632,
+        "spread_percent": 1.3820949060386791
+      }
+    }
+  ],
+  "defaults": [
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "variant": "pgo",
+      "repeat": 0,
+      "real": 4.81,
+      "user": 4.81,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "variant": "plain",
+      "repeat": 0,
+      "real": 5.51,
+      "user": 5.49,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "variant": "plain",
+      "repeat": 1,
+      "real": 5.46,
+      "user": 5.45,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "variant": "pgo",
+      "repeat": 1,
+      "real": 4.78,
+      "user": 4.77,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "variant": "pgo",
+      "repeat": 2,
+      "real": 4.78,
+      "user": 4.77,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "variant": "plain",
+      "repeat": 2,
+      "real": 5.47,
+      "user": 5.46,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "variant": "pgo",
+      "repeat": 0,
+      "real": 4.11,
+      "user": 4.1,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "variant": "plain",
+      "repeat": 0,
+      "real": 5.58,
+      "user": 5.57,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "variant": "plain",
+      "repeat": 1,
+      "real": 5.59,
+      "user": 5.57,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "variant": "pgo",
+      "repeat": 1,
+      "real": 4.07,
+      "user": 4.06,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "variant": "pgo",
+      "repeat": 2,
+      "real": 4.09,
+      "user": 4.08,
+      "sys": 0.0
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "variant": "plain",
+      "repeat": 2,
+      "real": 5.61,
+      "user": 5.6,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "variant": "pgo",
+      "repeat": 0,
+      "real": 4.42,
+      "user": 4.41,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "variant": "plain",
+      "repeat": 0,
+      "real": 5.26,
+      "user": 5.25,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "variant": "plain",
+      "repeat": 1,
+      "real": 5.22,
+      "user": 5.21,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "variant": "pgo",
+      "repeat": 1,
+      "real": 4.45,
+      "user": 4.44,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "variant": "pgo",
+      "repeat": 2,
+      "real": 4.43,
+      "user": 4.41,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "variant": "plain",
+      "repeat": 2,
+      "real": 5.19,
+      "user": 5.17,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "variant": "pgo",
+      "repeat": 0,
+      "real": 4.45,
+      "user": 4.44,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "variant": "plain",
+      "repeat": 0,
+      "real": 5.03,
+      "user": 5.02,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "variant": "plain",
+      "repeat": 1,
+      "real": 4.98,
+      "user": 4.97,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "variant": "pgo",
+      "repeat": 1,
+      "real": 4.51,
+      "user": 4.5,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "variant": "pgo",
+      "repeat": 2,
+      "real": 4.47,
+      "user": 4.46,
+      "sys": 0.0
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "variant": "plain",
+      "repeat": 2,
+      "real": 5.02,
+      "user": 5.01,
+      "sys": 0.0
+    }
+  ],
+  "sizes": [
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "variant": "plain",
+      "output": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O2/plain/probe  :\nsection               size    addr\n.note.gnu.build-id      36     848\n.interp                 28     884\n.gnu.hash               64     912\n.dynsym               1200     976\n.dynstr               1663    2176\n.gnu.version           100    3840\n.gnu.version_r         256    3944\n.rela.dyn              408    4200\n.rela.plt              840    4608\n.init                   27    8192\n.plt                   576    8224\n.plt.got                16    8800\n.plt.sec               560    8816\n.text                45669    9376\n.fini                   13   55048\n.rodata               2080   57344\n.eh_frame_hdr          732   59424\n.eh_frame             3736   60160\n.gcc_except_table      172   63896\n.note.gnu.property      80   64072\n.note.ABI-tag           32   64152\n.init_array             16   68312\n.fini_array              8   68328\n.data.rel.ro           400   68336\n.dynamic               544   68736\n.got                   352   69280\n.data                   24   69632\n.bss                   320   69696\n.comment                81       0\nTotal                60033\n\n\n"
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "variant": "pgo",
+      "output": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O2/pgo/probe  :\nsection               size    addr\n.note.gnu.build-id      36     848\n.interp                 28     884\n.gnu.hash               40     912\n.dynsym                840     952\n.dynstr               1177    1792\n.gnu.version            70    2970\n.gnu.version_r         240    3040\n.rela.dyn              288    3280\n.rela.plt              600    3568\n.init                   27    8192\n.plt                   416    8224\n.plt.got                16    8640\n.plt.sec               400    8656\n.text                48268    9056\n.fini                   13   57324\n.rodata               2316   57344\n.eh_frame_hdr          972   59660\n.eh_frame             4584   60632\n.gcc_except_table      119   65216\n.note.gnu.property      80   65336\n.note.ABI-tag           32   65416\n.init_array             16   68792\n.fini_array              8   68808\n.dynamic               544   68816\n.got                   272   69360\n.data                   24   69632\n.bss                   320   69696\n.comment                81       0\nTotal                61827\n\n\n"
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "variant": "plain",
+      "output": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/plain/probe  :\nsection               size    addr\n.note.gnu.build-id      36     848\n.interp                 28     884\n.gnu.hash               64     912\n.dynsym               1224     976\n.dynstr               1741    2200\n.gnu.version           102    3942\n.gnu.version_r         256    4048\n.rela.dyn              408    4304\n.rela.plt              864    4712\n.init                   27    8192\n.plt                   592    8224\n.plt.got                16    8816\n.plt.sec               576    8832\n.text                57653    9408\n.fini                   13   67064\n.rodata               2164   69632\n.eh_frame_hdr          716   71796\n.eh_frame             5392   72512\n.gcc_except_table      186   77904\n.note.gnu.property      80   78096\n.note.ABI-tag           32   78176\n.init_array             16   84688\n.fini_array              8   84704\n.data.rel.ro           400   84712\n.dynamic               544   85112\n.got                   360   85656\n.data                   24   86016\n.bss                   320   86080\n.comment                81       0\nTotal                73923\n\n\n"
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "variant": "pgo",
+      "output": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/pgo/probe  :\nsection               size    addr\n.note.gnu.build-id      36     848\n.interp                 28     884\n.gnu.hash               40     912\n.dynsym                816     952\n.dynstr               1070    1768\n.gnu.version            68    2838\n.gnu.version_r         256    2912\n.rela.dyn              288    3168\n.rela.plt              576    3456\n.init                   27    4096\n.plt                   400    4128\n.plt.got                16    4528\n.plt.sec               384    4544\n.text                55824    4928\n.fini                   13   60752\n.rodata               2240   61440\n.eh_frame_hdr          884   63680\n.eh_frame             4632   64568\n.gcc_except_table      117   69200\n.note.gnu.property      80   69320\n.note.ABI-tag           32   69400\n.init_array             16   72896\n.fini_array              8   72912\n.dynamic               544   72920\n.got                   264   73464\n.data                   24   73728\n.bss                   320   73792\n.comment                81       0\nTotal                69084\n\n\n"
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "variant": "plain",
+      "output": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O2/plain/probe  :\nsection                size    addr\n.interp                  28     792\n.gnu.hash                36     824\n.dynsym                 888     864\n.dynstr                1090    1752\n.gnu.version             74    2842\n.gnu.version_r          256    2920\n.rela.dyn               288    3176\n.rela.plt               648    3464\n.init                    27    8192\n.plt                    448    8224\n.plt.got                 16    8672\n.plt.sec                432    8688\n.text                 43092    9120\n.fini                    13   52212\n.rodata                2896   53248\n.eh_frame_hdr           692   56144\n.eh_frame              3680   56840\n.gcc_except_table       260   60520\n.note.gnu.property       48   60784\n.note.ABI-tag            32   60832\n.init_array              16   64672\n.fini_array               8   64688\n.dynamic                544   64696\n.got                    296   65240\n.data                    24   65536\n.bss                     48   65568\n.comment                 52       0\n.debug_aranges           48       0\n.debug_info           27659       0\n.debug_abbrev           667       0\n.debug_line            7829       0\n.debug_str             4108       0\n.debug_line_str         403       0\n.debug_loclists       27441       0\n.debug_rnglists         524       0\nTotal                124611\n\n\n"
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "variant": "pgo",
+      "output": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O2/pgo/probe  :\nsection                size     addr\n.interp                  28      792\n.gnu.hash                40      824\n.dynsym                 960      864\n.dynstr                1349     1824\n.gnu.version             80     3174\n.gnu.version_r          272     3256\n.rela.dyn               288     3528\n.rela.plt               696     3816\n.init                    27     8192\n.plt                    480     8224\n.plt.got                 16     8704\n.plt.sec                464     8720\n.text                 75370     9184\n.fini                    13    84556\n.rodata                3128    86016\n.eh_frame_hdr           732    89144\n.eh_frame              4376    89880\n.gcc_except_table       216    94256\n.note.gnu.property       48    94472\n.note.ABI-tag            32    94520\n.init_array              16   101520\n.fini_array               8   101536\n.dynamic                544   101544\n.got                    312   102088\n.data                    24   102400\n.bss                     48   102432\n.comment                 52        0\n.debug_aranges           48        0\n.debug_info           27659        0\n.debug_abbrev           667        0\n.debug_line            7829        0\n.debug_str             4108        0\n.debug_line_str         403        0\n.debug_loclists       27441        0\n.debug_rnglists         524        0\nTotal                158298\n\n\n"
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "variant": "plain",
+      "output": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/plain/probe  :\nsection                size    addr\n.interp                  28     792\n.gnu.hash                36     824\n.dynsym                 888     864\n.dynstr                1090    1752\n.gnu.version             74    2842\n.gnu.version_r          256    2920\n.rela.dyn               288    3176\n.rela.plt               648    3464\n.init                    27    8192\n.plt                    448    8224\n.plt.got                 16    8672\n.plt.sec                432    8688\n.text                 45188    9120\n.fini                    13   54308\n.rodata                2928   57344\n.eh_frame_hdr           692   60272\n.eh_frame              3880   60968\n.gcc_except_table       296   64848\n.note.gnu.property       48   65144\n.note.ABI-tag            32   65192\n.init_array              16   68768\n.fini_array               8   68784\n.dynamic                544   68792\n.got                    296   69336\n.data                    24   69632\n.bss                     48   69664\n.comment                 52       0\n.debug_aranges           48       0\n.debug_info           27659       0\n.debug_abbrev           667       0\n.debug_line            7829       0\n.debug_str             4108       0\n.debug_line_str         403       0\n.debug_loclists       27441       0\n.debug_rnglists         524       0\nTotal                126975\n\n\n"
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "variant": "pgo",
+      "output": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/pgo/probe  :\nsection                size     addr\n.interp                  28      792\n.gnu.hash                40      824\n.dynsym                 936      864\n.dynstr                1201     1800\n.gnu.version             78     3002\n.gnu.version_r          256     3080\n.rela.dyn               288     3336\n.rela.plt               672     3624\n.init                    27     8192\n.plt                    464     8224\n.plt.got                 16     8688\n.plt.sec                448     8704\n.text                 79786     9152\n.fini                    13    88940\n.rodata                3096    90112\n.eh_frame_hdr           724    93208\n.eh_frame              4376    93936\n.gcc_except_table       312    98312\n.note.gnu.property       48    98624\n.note.ABI-tag            32    98672\n.init_array              16   105624\n.fini_array               8   105640\n.dynamic                544   105648\n.got                    304   106192\n.data                    24   106496\n.bss                     48   106528\n.comment                 52        0\n.debug_aranges           48        0\n.debug_info           27659        0\n.debug_abbrev           667        0\n.debug_line            7829        0\n.debug_str             4108        0\n.debug_line_str         403        0\n.debug_loclists       27441        0\n.debug_rnglists         524        0\nTotal                162516\n\n\n"
+    }
+  ],
+  "training": [
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "cleared_test_parser_profiles": [
+        "#home#meil#devel#linux#stomptalk-meta#stomptal-smid-2#artifacts#pgo-matrix#2026-10-28#runs#20261028T071754232573Z#build#gcc16-O2#pgo#CMakeFiles#stomptalk.dir#src#parser_avx2.cpp.gcda",
+        "#home#meil#devel#linux#stomptalk-meta#stomptal-smid-2#artifacts#pgo-matrix#2026-10-28#runs#20261028T071754232573Z#build#gcc16-O2#pgo#CMakeFiles#stomptalk.dir#src#stomptalk.cpp.gcda"
+      ]
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "cleared_test_parser_profiles": [
+        "#home#meil#devel#linux#stomptalk-meta#stomptal-smid-2#artifacts#pgo-matrix#2026-10-28#runs#20261028T071754232573Z#build#gcc16-O3#pgo#CMakeFiles#stomptalk.dir#src#parser_avx2.cpp.gcda",
+        "#home#meil#devel#linux#stomptalk-meta#stomptal-smid-2#artifacts#pgo-matrix#2026-10-28#runs#20261028T071754232573Z#build#gcc16-O3#pgo#CMakeFiles#stomptalk.dir#src#stomptalk.cpp.gcda"
+      ]
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "unit_profiles": "included (IR PGO)"
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "unit_profiles": "included (IR PGO)"
+    }
+  ],
+  "training_cases": [
+    "h8_lf",
+    "long_128",
+    "escaped",
+    "literal",
+    "fragment_chunk_7",
+    "body64k_markers",
+    "send_length"
+  ],
+  "held_out_cases": [
+    "h0_lf",
+    "h0_crlf",
+    "h1_lf",
+    "h1_crlf",
+    "h8_crlf",
+    "h32_lf",
+    "h32_crlf",
+    "h64_lf",
+    "h64_crlf",
+    "long_1024",
+    "fragment_byte",
+    "fragment_chunk_31",
+    "fragment_chunk_63",
+    "batch_body_markers",
+    "batch_short",
+    "send_length_byte",
+    "send_length_chunk_7"
+  ],
+  "source_sha256": {
+    "package-lock.json": "d6e841096485926f307048817f45312b89d8381687f7f32db6c6ff81e8bef161",
+    "package.json": "84ac7c4717e711200fb504e4cd5d6f6cd4cb0a4ea5d9748067d3aaf654c6e402",
+    "CMakeLists.txt": "ba28151971076f334f4903df26a843b959fea535877702c8ca23851d2ffe9d51",
+    "stomptalkgen.js": "496b1b59a2b6c37b184bc269ae55b4f404d986c164a3fb49bc9bbe9e99546947",
+    "src/is_header.hpp": "8da3ef26e8020f9ba14952766f56bc8c6d8c757b8c3fa97c8c2497cf4e2f1d7c",
+    "src/name_group.hpp": "b2f8a3c1e6eee786c74b7618963c909150b410b9efdc12b434fe66002cd1e1c1",
+    "src/parser_states.hpp": "a6b46376aae6a365d4235e133b74a577903a364dfef7a0491a89422a62b0c207",
+    "src/name_dispatch.hpp": "0cc7c2609f420f44fb7d3aacc85375c23417160e4c8598e0ae41315f4a424eac",
+    "src/headers.hpp": "b80bdb5c5aac4b96a166a36ff6bcb3637e3b1b60cd2d250abf9fda790d070683",
+    "src/names.cpp": "edb41b0cab0d18c68121467ddc08d74ee64c5098ce6f7f4c3bb87d31fef7bf43",
+    "src/stomptalk.cpp": "cd5d534fa4fb156115a2d176565739c7da861e4b425b2afa6a103ea7071e1cd0",
+    "src/names_avx2.cpp": "930bd2466b55fe47064357e98001718f724877fd3c302a5b4853558db468f3d2",
+    "src/methods.hpp": "8ea1a9242a18cd318ff01d01a45de0ea30873a5fa4a21795375c114dc5bb96a6",
+    "src/parser_impl.hpp": "fd1eff60db17abb9ac98de8f316c1abdfc2ba7982c4b1ece3ee29e4429100fcd",
+    "src/content_length.hpp": "3f15c11a49e9f160526f280cda2c03840a00798b60504f05af83bf8e69759d99",
+    "src/parser_avx2.cpp": "ded07e587b20780689c8465aaf2afeddea0ab1d11008fc131a57bcd22fd962a2",
+    "fuzz/fuzz_v2.cpp": "2c1132877a2bcdc5ece2c692719d3cc330d13cd372acf76a1397309b5c2661c3",
+    "fuzz/README.md": "ff9e624eeaebce177f34bfc173b6488b91153bd5385222814e0a6222bcae02ca",
+    "test/scan_backend_checks.hpp": "3f971193938cfca94e2d31d4f2d99ea7e1e03c778c0497d9427c329a8724a21e",
+    "test/unit_v2.cpp": "ff0e73aaaf2bd38ec97c7d111277f8ba175f1485411434706493921a6b8b7c88",
+    "test/name_backend_checks.hpp": "6a161c6c03efd093716e7f9cf171dbf60221bbb1d0d4c109ba4119a0950ce52c",
+    "test/purestomp.c": "b9b797ee5709c2473bcff3ab91b5516cc6a9e1f31a6fd724c2458608a4c8a10d",
+    "test/unit_backend_avx2.cpp": "f50af799d6095931be97d2911306eb266e9c36118f646d451b6f33a6b42f16fa",
+    "cmake/stomptalkConfig.cmake.in": "822f1d8ab88917287d7955de38b592b895b369f4193746ebf130b0ff06748d8e",
+    "protocol/names.json": "e5f35f04e1e534292d7c85166eee6e83a05a932ba31499a450cc6d5cf4155adf",
+    "fuzz/corpus/chunked/message_no_length_chunk11": "0706181dcc1b9e76c2d7c532fe23315a37d4569948cf51d83fd0faead90aa28a",
+    "fuzz/corpus/chunked/message_lf_chunk7": "b49b6c77af1398243e0f367e1ae6ef7cfb65efb4331a056aed7117077957f4a9",
+    "fuzz/corpus/chunked/message_escape_chunk5": "d4be4008730663512ca8a73c3f4860fee88d8abac9024f51cc96425fdde4b731",
+    "fuzz/corpus/chunked/message_partial_headers_chunk8": "05070e764dd0ef1b858a8eeb09626d1849c3ba4a9840cb1a861a411b2f77ca9c",
+    "fuzz/corpus/chunked/escaped_header_value_chunk6": "5e4918f26a6d9d8f8f1cfad9ac7071b9742162bc625f39fdb6857527f6ab6144",
+    "fuzz/corpus/chunked/send_frame_chunk2": "bf6dd6e35beecae8e98028a8e69c9ab634cdbc129c63ed9a4c7bb25d4728f2fe",
+    "fuzz/corpus/chunked/truncated_send_method_chunk3": "787d0725313fd9c380ba357b8b04a14806922409bbc32088d10e2c83731b9d7b",
+    "fuzz/corpus/chunked/message_content_length_chunk3": "34a3b87a9b1732745a7aed92bb8f12185bd9d8841e38cfcaca54485ff33256e8",
+    "fuzz/corpus/chunked/connected_frame_chunk1": "b44cd641f965c413a31de138f39650647aff7e73fd1b70447ce5ce2760a0f4c0",
+    "fuzz/corpus/chunked/send_content_length_body_chunk3": "381c61086244fc8e917201b58ebe4d2beb0bb6a35fb8f0d77763b798fb339109",
+    "fuzz/corpus/v2/split-metadata-and-body": "fddd4e8391949f7202c76f4665cf4722d1a0b02319548b249fb566e37fa287bd",
+    "fuzz/corpus/v2/wrong-terminator": "7e5a1282d84d42bbb05e9cc102aa0ff95cb4e5e9108d1f9f234f02889332b00e",
+    "fuzz/corpus/v2/duplicate-length": "0397ee398c58c9c6aa760d536e76ac149fdf02bb801540f736dc6debc6d78867",
+    "fuzz/corpus/v2/connect-literal": "f44acf379434f07abeb7d75fa5a109478b7ad4e336631f823f08a1c77b2eb0db",
+    "fuzz/corpus/v2/leading-nul-body": "3617e91090b825f7a267c8e820b6c2863c6d533a9ddb5c8bf43b4472c75e4927",
+    "fuzz/corpus/v2/leading-key-escape": "8f08000e10762d1b5ef43c0f61320467b68fa0a73fbd5cf862893cb9e8ef0876",
+    "fuzz/corpus/v2/unknown-method": "50420e26757c210c23e523bd390d40b7866ac11f18ee7963f6c259f007e4d08b",
+    "fuzz/corpus/v2/zero-length": "79b75449cd1367d0de67ec485f7e5f8c9e696ff156e21d0d96c6db2e83e1a864",
+    "fuzz/corpus/v2/missing-colon": "5e49b2c82350e8b2a8a05db3d09876ce043160b6fa8a6ac3663369783b5f0520",
+    "fuzz/corpus/v2/utf8": "251fa0ac9c356dcbdec8fb398088f5295557926d953c9dd203aa11044e56cc66",
+    "fuzz/corpus/parser/message_no_length": "f3bc7568b0d2729280374f4a57be07014e0d802cad5f23b3c18e459fd9233b38",
+    "fuzz/corpus/parser/content_length_unknown_method_crlf_body": "7d97a4415d310045f192b0c1280c927d96fa7357523135ce55fd33cd9e94c800",
+    "fuzz/corpus/parser/message_lf": "f5c9713f7e53e017d1a39f430a5b984afa2844b8bd40220667f16cdf602d37df",
+    "fuzz/corpus/parser/escaped_header_minimal": "77dcda0272ec091e0361c9a592b11e355cfcf49bfb169d1793c8d445eab5eead",
+    "fuzz/corpus/parser/connected_frame": "43333c7c68f5f9eafb1fe13a730971b30bfba49f4d373ef36cbba89e805119ac",
+    "fuzz/corpus/parser/send_frame": "e8932938238d0d4469b2080913cec07592f88c22fe30058ed291d213a77c88e2",
+    "fuzz/corpus/parser/content_length_single_letter_method_lf_body": "3de3d412dac8feb43953b40b0d81fe4d5aeecbf70db1c308b71db6875c37d8b9",
+    "fuzz/corpus/parser/message_escape": "40b03ea062ed44dbb79d6048c9e20bbd677fcb632b6ffb22780933b59c5c6275",
+    "fuzz/corpus/parser/message_content_length": "bfe2f1c7a88de4dc816eaed31258e6d4c62e34ae29779b1403cdfc90e903340f",
+    "fuzz/corpus/large_header/value_nul_payload": "d4d29ef957b92b016e425e5ede5f20b65dbd044f4c4d823ae2a385ba69e57fe5",
+    "fuzz/corpus/large_header/key_lf_4096": "37e2a93eb08080b36aeacfa9ab73d4fe28c512d6f9046d5094218eff83c19051",
+    "fuzz/corpus/large_header/key_crlf_4097": "324d84875c2194c5ea17ebb7c9827a5d7b8c75d399353beb91135f3c85e2dd9f",
+    "fuzz/corpus/large_header/value_lf_4097": "17eb30699eba13ae8898852abb2c2dfd50bbfe0ec69ea8209c381b19b7f76fbb",
+    "fuzz/corpus/large_header/key_lf_4097": "d790fcb093a339695ce65a2c49a8079a8296e7cf349423e263ab7ed8186baa91",
+    "fuzz/corpus/large_header/value_crlf_4097": "469a6aac503315a2cbec02157b1300172ef4610d041eb6a07038cbc0c953dc43",
+    "fuzz/corpus/large_header/value_mixed_printable_payload": "81725389383951b9a7879e2d4f2321fdf614c850c69e07a0e9f9e87009ca68f2",
+    "fuzz/corpus/large_header/key_crlf_4096": "86e3f2649bfc244554662116f3bb8a2a1e15ed9d4989bbdbd1627e3b9a7a2bf6",
+    "fuzz/corpus/large_header/value_lf_4096": "ddfbf54dbfc27075a5529f7cc46d4d60aa64ec807649e5d8d55657c4b9efd924",
+    "fuzz/corpus/large_header/value_crlf_4096": "8f93420a7a7b828317a331ce361df472cb760d56e854c3317cea0d13780dad1a",
+    "fuzz/corpus/large_header/key_crlf_4095": "affa0e8c1be26bf1645f7dc17704941637c538e583df644e0db93e7c84948d07",
+    "fuzz/corpus/large_header/key_lf_4095": "462fd23668ae7d949fdc2539f1baabcaa73df4b2bee3604c95707c70b592cf5b",
+    "fuzz/corpus/large_header/value_crlf_4095": "2eb6620edf382c53ff5f6ad3662871733ff0f55edad80d498f8dbac402643319",
+    "fuzz/corpus/large_header/value_lf_4095": "47cee3978e90e090d26d007d4aa5189d228e9bd1c2287deae60da14c5a71cf9d",
+    "fuzz/corpus/large_header/value_backslash_payload": "ccc78e053b1a5296ab2cd405b5642cba059f35836c888a81a2c54c863b7a97de",
+    "src/backend/avx2.hpp": "4bf5880f3be471601006394d49f8bf5c07cd37adf41129d2c20c0091ed2736e6",
+    "src/backend/config.hpp": "855da9f0a425645dd6fbc0ee59b490e83f1a6cd062e09eb62f0a30f56ee5bf1c",
+    "src/backend/swar.hpp": "ad232af6ac72aec1c882a07256a539b9fb1ed146ac503be1526c282ab7de8ea2",
+    "src/backend/sse2.hpp": "362a4ad96e97edd184925e5e301bceeb51b2f0ca5a4ed8e23fd25fc9adbe23c8",
+    "include/stomptalk/parser.hpp": "040ff5ca937477cf6c9a1e92f0c81ecb45eceadae3630afa88c3e9602936b213",
+    "include/stomptalk/method.h": "64a7a30b5f09987b0770e7797acd36c899ca5aebaebfe77c024c8b31b39df530",
+    "include/stomptalk/type.h": "751620bb3c6237962f8c02038411547fea4150aff782866cda0b0eae336db4a3",
+    "include/stomptalk/header.h": "036b0191bac15299d63528d5607181fa9e579d6c675f54a6600ea6abf2e4a6cf",
+    "include/stomptalk/antoull.hpp": "5dde280db69a8f8fca3eaca4fb974d8bfd7df924d8e9bfb4ed893985950e113a",
+    "include/stomptalk/stackbuf.hpp": "4761eb2afbd70bfd1baa99564e8e6fd0d7a8eb64e6d606b9caf46c62f7571a65",
+    "include/stomptalk/parser.h": "b3cbf08ba9e8def6633805151dcdc738ac823ddfdd024c0f232f1f263779c79b"
+  },
+  "versions": {
+    "gcc16": "g++-16 (Gentoo 16.2.1_p20260926 p1) 16.2.1 20260926\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "clang23": "clang version 23.1.4\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm/23/bin\nConfiguration file: /etc/clang/23/x86_64-pc-linux-gnu-clang++.cfg\n"
+  }
+}

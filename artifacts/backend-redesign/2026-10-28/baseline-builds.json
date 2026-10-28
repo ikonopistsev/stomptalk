@@ -1,0 +1,314 @@
+[
+  {
+    "command": [
+      "cmake",
+      "-G",
+      "Ninja",
+      "-S",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before",
+      "-B",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-Os-before",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+      "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+      "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG",
+      "-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG",
+      "-DSTOMPTALK_BUILD_TESTS=ON"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "--build",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-Os-before",
+      "-j",
+      "4"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-Os-before",
+      "--output-on-failure"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/usr/bin/g++-16",
+      "-Os",
+      "-DNDEBUG",
+      "-std=c++14",
+      "-DSTOMPTALK_STATIC",
+      "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before/include",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-Os-before/libstomptalk.a",
+      "-o",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-Os-before/probe"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "-G",
+      "Ninja",
+      "-S",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before",
+      "-B",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O2-before",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+      "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+      "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+      "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+      "-DSTOMPTALK_BUILD_TESTS=ON"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "--build",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O2-before",
+      "-j",
+      "4"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O2-before",
+      "--output-on-failure"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/usr/bin/g++-16",
+      "-O2",
+      "-DNDEBUG",
+      "-std=c++14",
+      "-DSTOMPTALK_STATIC",
+      "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before/include",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O2-before/libstomptalk.a",
+      "-o",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O2-before/probe"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "-G",
+      "Ninja",
+      "-S",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before",
+      "-B",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O3-before",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+      "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+      "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+      "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+      "-DSTOMPTALK_BUILD_TESTS=ON"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "--build",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O3-before",
+      "-j",
+      "4"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O3-before",
+      "--output-on-failure"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/usr/bin/g++-16",
+      "-O3",
+      "-DNDEBUG",
+      "-std=c++14",
+      "-DSTOMPTALK_STATIC",
+      "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before/include",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O3-before/libstomptalk.a",
+      "-o",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/gcc16-O3-before/probe"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "-G",
+      "Ninja",
+      "-S",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before",
+      "-B",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-Os-before",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+      "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+      "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG",
+      "-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG",
+      "-DSTOMPTALK_BUILD_TESTS=ON"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "--build",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-Os-before",
+      "-j",
+      "4"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-Os-before",
+      "--output-on-failure"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/usr/lib/llvm/23/bin/clang++",
+      "-Os",
+      "-DNDEBUG",
+      "-std=c++14",
+      "-DSTOMPTALK_STATIC",
+      "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before/include",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-Os-before/libstomptalk.a",
+      "-o",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-Os-before/probe"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "-G",
+      "Ninja",
+      "-S",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before",
+      "-B",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O2-before",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+      "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+      "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+      "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+      "-DSTOMPTALK_BUILD_TESTS=ON"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "--build",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O2-before",
+      "-j",
+      "4"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O2-before",
+      "--output-on-failure"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/usr/lib/llvm/23/bin/clang++",
+      "-O2",
+      "-DNDEBUG",
+      "-std=c++14",
+      "-DSTOMPTALK_STATIC",
+      "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before/include",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O2-before/libstomptalk.a",
+      "-o",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O2-before/probe"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "-G",
+      "Ninja",
+      "-S",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before",
+      "-B",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O3-before",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+      "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+      "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+      "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+      "-DSTOMPTALK_BUILD_TESTS=ON"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "cmake",
+      "--build",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O3-before",
+      "-j",
+      "4"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O3-before",
+      "--output-on-failure"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/usr/lib/llvm/23/bin/clang++",
+      "-O3",
+      "-DNDEBUG",
+      "-std=c++14",
+      "-DSTOMPTALK_STATIC",
+      "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/before/include",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O3-before/libstomptalk.a",
+      "-o",
+      "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-O3-before/probe"
+    ],
+    "exit": 0
+  }
+]

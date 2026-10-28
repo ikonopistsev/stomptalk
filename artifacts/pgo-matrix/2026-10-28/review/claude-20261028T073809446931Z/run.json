@@ -1,0 +1,30 @@
+{
+  "status": "completed",
+  "started_utc": "2026-10-28T07:38:09.447335+00:00",
+  "command": [
+    "/home/meil/.local/bin/claude",
+    "--print",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--no-session-persistence",
+    "--permission-mode",
+    "dontAsk",
+    "--safe-mode",
+    "--restricted",
+    "--no-chrome",
+    "--disable-slash-commands",
+    "--tools",
+    "Read,Glob,Grep",
+    "--allowedTools",
+    "Read,Glob,Grep",
+    "--strict-mcp-config"
+  ],
+  "cwd": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/review/snapshot",
+  "timeout_seconds": 1200,
+  "task_sha256": "ff3f3ff429c5d72b04ad2dd1fdf788b817faf994d9f7c601298b49dbf0b297f1",
+  "inputs_sha256": "33c180ab7800aad726c098c0bc38e4d78b5aa786549930a980750c0579d829e7",
+  "exit_code": 0,
+  "changed_inputs": [],
+  "finished_utc": "2026-10-28T07:44:53.328800+00:00"
+}

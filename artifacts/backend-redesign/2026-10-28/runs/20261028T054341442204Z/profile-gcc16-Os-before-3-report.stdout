@@ -1,0 +1,30 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 994  of event 'cpu_core/cycles/u'
+# Event count (approx.): 4643686744
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    17.53%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)      -      -            
+    14.83%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)          -      -            
+    10.03%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     9.86%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     7.98%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     7.82%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     4.60%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     4.55%  [.] main                                                                              -      -            
+     3.14%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     2.96%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     2.93%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     1.93%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)  -      -            
+     1.87%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     1.82%  [.] 0x000000000016465d                                                                -      -            
+
+
+#
+# (Tip: For hierarchical output, try: perf report --hierarchy)
+#

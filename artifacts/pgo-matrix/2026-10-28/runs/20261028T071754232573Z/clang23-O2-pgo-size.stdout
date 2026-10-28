@@ -1,0 +1,40 @@
+/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O2/pgo/probe  :
+section                size     addr
+.interp                  28      792
+.gnu.hash                40      824
+.dynsym                 960      864
+.dynstr                1349     1824
+.gnu.version             80     3174
+.gnu.version_r          272     3256
+.rela.dyn               288     3528
+.rela.plt               696     3816
+.init                    27     8192
+.plt                    480     8224
+.plt.got                 16     8704
+.plt.sec                464     8720
+.text                 75370     9184
+.fini                    13    84556
+.rodata                3128    86016
+.eh_frame_hdr           732    89144
+.eh_frame              4376    89880
+.gcc_except_table       216    94256
+.note.gnu.property       48    94472
+.note.ABI-tag            32    94520
+.init_array              16   101520
+.fini_array               8   101536
+.dynamic                544   101544
+.got                    312   102088
+.data                    24   102400
+.bss                     48   102432
+.comment                 52        0
+.debug_aranges           48        0
+.debug_info           27659        0
+.debug_abbrev           667        0
+.debug_line            7829        0
+.debug_str             4108        0
+.debug_line_str         403        0
+.debug_loclists       27441        0
+.debug_rnglists         524        0
+Total                158298
+
+

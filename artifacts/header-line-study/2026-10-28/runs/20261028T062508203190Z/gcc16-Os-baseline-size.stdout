@@ -1,0 +1,33 @@
+/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/runs/20261028T054341442204Z/build/gcc16-Os-after/probe  :
+section               size    addr
+.note.gnu.build-id      36     848
+.interp                 28     884
+.gnu.hash               40     912
+.dynsym                840     952
+.dynstr               1211    1792
+.gnu.version            70    3004
+.gnu.version_r         224    3080
+.rela.dyn              288    3304
+.rela.plt              600    3592
+.init                   27    8192
+.plt                   416    8224
+.plt.got                16    8640
+.plt.sec               400    8656
+.text                29565    9056
+.fini                   13   38624
+.rodata               2348   40960
+.eh_frame_hdr          876   43308
+.eh_frame             4136   44184
+.gcc_except_table       97   48320
+.note.gnu.property      80   48424
+.note.ABI-tag           32   48504
+.init_array             16   52408
+.fini_array              8   52424
+.dynamic               544   52432
+.got                   272   52976
+.data                   24   53248
+.bss                   320   53312
+.comment                81       0
+Total                42608
+
+

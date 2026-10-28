@@ -1,0 +1,31 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu_core/cycles/u'
+# Event count (approx.): 4939467691
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    20.66%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    16.29%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+    10.11%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+     8.90%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     6.44%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     5.82%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     4.20%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     3.87%  [.] main                                                                              -      -            
+     3.79%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     3.69%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     3.31%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     2.00%  [.] 0x000000000016465d                                                                -      -            
+     1.98%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     1.23%  [.] stomptalk::parser::own_token()                                                    -      -            
+     1.23%  [.] char const* stomptalk::parser::body_read_no_length<4u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: Create an archive with symtabs to analyse on other machine: perf archive)
+#

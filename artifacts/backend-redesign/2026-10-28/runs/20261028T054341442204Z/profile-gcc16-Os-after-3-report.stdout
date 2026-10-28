@@ -1,0 +1,32 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cpu_core/cycles/u'
+# Event count (approx.): 5030290601
+#
+# Overhead  Symbol                                                                                       IPC   [IPC Coverage]
+# ........  ...........................................................................................  ....................
+#
+    17.93%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)             -      -            
+    13.60%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)                 -      -            
+    10.80%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)                 -      -            
+     9.96%  [.] stomptalk::parser::finish_value(char const*)                                             -      -            
+     9.09%  [.] stomptalk::parser::publish(bool)                                                         -      -            
+     6.57%  [.] stomptalk::parser::append(char const*, unsigned long)                                    -      -            
+     4.89%  [.] stomptalk::parser::reserve(unsigned long, char const*)                                   -      -            
+     3.97%  [.] stomptalk::parser::finish_token()                                                        -      -            
+     3.27%  [.] main                                                                                     -      -            
+     3.19%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)                -      -            
+     2.49%  [.] stomptalk::parser::own(stomptalk_view&)                                                  -      -            
+     2.17%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)                -      -            
+     1.77%  [.] 0x000000000016465d                                                                       -      -            
+     1.32%  [.] stomptalk::parser::own_token()                                                           -      -            
+     1.31%  [.] char const* stomptalk::parser::hdrline_almost_done<3u>(char const*, char const*)         -      -            
+     1.04%  [.] 0x0000000000164448                                                                       -      -            
+
+
+#
+# (Tip: If you have debuginfo enabled, try: perf report -s sym,srcline)
+#

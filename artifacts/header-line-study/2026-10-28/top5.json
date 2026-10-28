@@ -1,0 +1,194 @@
+[
+  {
+    "compiler": "gcc16",
+    "opt": "O2",
+    "variant": "baseline",
+    "backend": 3,
+    "label": "profile-gcc16-O2-baseline-3",
+    "top5": [
+      {
+        "percent": 20.57,
+        "symbol": "char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 19.57,
+        "symbol": "char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 13.15,
+        "symbol": "stomptalk::parser::append(char const*, unsigned long)"
+      },
+      {
+        "percent": 9.92,
+        "symbol": "char const* stomptalk::parser::start_state<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 8.2,
+        "symbol": "stomptalk::parser::publish(bool)"
+      }
+    ],
+    "lost": [
+      "# Total Lost Samples: 0"
+    ]
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O2",
+    "variant": "wire",
+    "backend": 3,
+    "label": "profile-gcc16-O2-wire-3",
+    "top5": [
+      {
+        "percent": 20.48,
+        "symbol": "char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 19.6,
+        "symbol": "char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 13.02,
+        "symbol": "stomptalk::parser::append(char const*, unsigned long)"
+      },
+      {
+        "percent": 9.34,
+        "symbol": "char const* stomptalk::parser::start_state<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 8.73,
+        "symbol": "stomptalk::parser::publish(bool)"
+      }
+    ],
+    "lost": [
+      "# Total Lost Samples: 0"
+    ]
+  },
+  {
+    "compiler": "gcc16",
+    "opt": "O2",
+    "variant": "line",
+    "backend": 3,
+    "label": "profile-gcc16-O2-line-3",
+    "top5": [
+      {
+        "percent": 38.0,
+        "symbol": "char const* stomptalk::parser::hdrline<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 10.56,
+        "symbol": "stomptalk::parser::append(char const*, unsigned long)"
+      },
+      {
+        "percent": 10.24,
+        "symbol": "stomptalk::parser::finish_value(char const*)"
+      },
+      {
+        "percent": 8.64,
+        "symbol": "char const* stomptalk::parser::start_state<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 8.4,
+        "symbol": "stomptalk::parser::publish(bool)"
+      }
+    ],
+    "lost": [
+      "# Total Lost Samples: 0"
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O2",
+    "variant": "baseline",
+    "backend": 3,
+    "label": "profile-clang23-O2-baseline-3",
+    "top5": [
+      {
+        "percent": 28.42,
+        "symbol": "char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 27.39,
+        "symbol": "char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 9.7,
+        "symbol": "stomptalk::parser::finish_value(char const*)"
+      },
+      {
+        "percent": 7.13,
+        "symbol": "char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 6.81,
+        "symbol": "char const* stomptalk::parser::method_state<3u>(char const*, char const*)"
+      }
+    ],
+    "lost": [
+      "# Total Lost Samples: 0"
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O2",
+    "variant": "wire",
+    "backend": 3,
+    "label": "profile-clang23-O2-wire-3",
+    "top5": [
+      {
+        "percent": 29.22,
+        "symbol": "char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 26.88,
+        "symbol": "char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 9.38,
+        "symbol": "stomptalk::parser::finish_value(char const*)"
+      },
+      {
+        "percent": 7.57,
+        "symbol": "char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 6.74,
+        "symbol": "char const* stomptalk::parser::method_state<3u>(char const*, char const*)"
+      }
+    ],
+    "lost": [
+      "# Total Lost Samples: 0"
+    ]
+  },
+  {
+    "compiler": "clang23",
+    "opt": "O2",
+    "variant": "line",
+    "backend": 3,
+    "label": "profile-clang23-O2-line-3",
+    "top5": [
+      {
+        "percent": 39.76,
+        "symbol": "char const* stomptalk::parser::hdrline<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 24.26,
+        "symbol": "stomptalk::parser::finish_value(char const*)"
+      },
+      {
+        "percent": 7.72,
+        "symbol": "char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 7.38,
+        "symbol": "char const* stomptalk::parser::method_state<3u>(char const*, char const*)"
+      },
+      {
+        "percent": 5.07,
+        "symbol": "main"
+      }
+    ],
+    "lost": [
+      "# Total Lost Samples: 0"
+    ]
+  }
+]

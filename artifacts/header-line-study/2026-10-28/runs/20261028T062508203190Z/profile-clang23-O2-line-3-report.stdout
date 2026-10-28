@@ -1,0 +1,25 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 5K of event 'cpu_core/cycles/u'
+# Event count (approx.): 24953713042
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    39.76%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -            
+    24.26%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     7.72%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -            
+     7.38%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     5.07%  [.] main                                                                              -      -            
+     3.17%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     2.74%  [.] char const* stomptalk::parser::done<3u>(char const*, char const*)                 -      -            
+     2.54%  [.] stomptalk::parser::own_metadata()                                                 -      -            
+     2.52%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+
+
+#
+# (Tip: To analyze cache line scalability issues use perf c2c record ... ; perf c2c report)
+#

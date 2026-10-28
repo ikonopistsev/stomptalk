@@ -1,0 +1,31 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 925  of event 'cpu_core/cycles/u'
+# Event count (approx.): 4356169427
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    22.06%  [.] char const* stomptalk::parser::hdrline_hdr_key<4u>(char const*, char const*)      -      -            
+    19.52%  [.] char const* stomptalk::parser::hdrline_val<4u>(char const*, char const*)          -      -            
+    10.77%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     9.34%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     6.26%  [.] char const* stomptalk::parser::method_state<4u>(char const*, char const*)         -      -            
+     6.19%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     5.00%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     2.61%  [.] char const* stomptalk::parser::hdrline_done<4u>(char const*, char const*)         -      -            
+     2.17%  [.] main                                                                              -      -            
+     2.07%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     1.85%  [.] char const* stomptalk::parser::start_state<4u>(char const*, char const*)          -      -            
+     1.75%  [.] stomptalk::parser::finish_token()                                                 -      -            
+     1.31%  [.] char const* stomptalk::parser::body_read_no_length<4u>(char const*, char const*)  -      -            
+     1.20%  [.] char const* stomptalk::parser::hdrline_almost_done<4u>(char const*, char const*)  -      -            
+     1.09%  [.] stomptalk::parser::own_metadata()                                                 -      -            
+
+
+#
+# (Tip: To add Node.js USDT(User-Level Statically Defined Tracing): perf buildid-cache --add `which node`)
+#

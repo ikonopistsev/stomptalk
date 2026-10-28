@@ -1,0 +1,2061 @@
+{
+  "status": "completed",
+  "cpu": 4,
+  "commands": [
+    {
+      "label": "gcc16-Os-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-Os",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.29732087394222617,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-Os-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-Os",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 5.361647795885801,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-Os-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-Os",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.36984050599858165,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-Os-probe",
+      "args": [
+        "/usr/bin/g++-16",
+        "-Os",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-Os/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-Os/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.300998694030568,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-Os-before-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/gcc16-Os-before.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-Os-wire/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.004147784085944295,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-Os-after-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/gcc16-Os-after.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-Os/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.004391798982396722,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O2-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.28335509402677417,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O2-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 7.861760042142123,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O2-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.28230938082560897,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O2-probe",
+      "args": [
+        "/usr/bin/g++-16",
+        "-O2",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.32419852190651,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O2-before-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/gcc16-O2-before.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.003777843900024891,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O2-after-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/gcc16-O2-after.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.004172047832980752,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O3-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O3",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.28717423998750746,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O3-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O3",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 8.609823850914836,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O3-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O3",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.26524710399098694,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O3-probe",
+      "args": [
+        "/usr/bin/g++-16",
+        "-O3",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O3/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O3/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.32940511498600245,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O3-before-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/gcc16-O3-before.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O3-wire/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.004292599856853485,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O3-after-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/gcc16-O3-after.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O3/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.005134529899805784,
+      "affinity": null
+    },
+    {
+      "label": "clang23-Os-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-Os",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.315725679975003,
+      "affinity": null
+    },
+    {
+      "label": "clang23-Os-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-Os",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 3.7925738599151373,
+      "affinity": null
+    },
+    {
+      "label": "clang23-Os-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-Os",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.31314982008188963,
+      "affinity": null
+    },
+    {
+      "label": "clang23-Os-probe",
+      "args": [
+        "/usr/lib/llvm/23/bin/clang++",
+        "-Os",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-Os/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-Os/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.2903499968815595,
+      "affinity": null
+    },
+    {
+      "label": "clang23-Os-before-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/clang23-Os-before.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-Os-wire/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.004293243866413832,
+      "affinity": null
+    },
+    {
+      "label": "clang23-Os-after-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/clang23-Os-after.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-Os/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.004582710098475218,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O2-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.3165912239346653,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O2-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 5.540356868878007,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O2-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.2916085480246693,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O2-probe",
+      "args": [
+        "/usr/lib/llvm/23/bin/clang++",
+        "-O2",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.30254747718572617,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O2-before-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/clang23-O2-before.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.004854924976825714,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O2-after-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/clang23-O2-after.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.004580007866024971,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O3-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O3",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.3226243059616536,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O3-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O3",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 6.42768501280807,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O3-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O3",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.25069865002296865,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O3-probe",
+      "args": [
+        "/usr/lib/llvm/23/bin/clang++",
+        "-O3",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O3/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O3/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.3103826749138534,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O3-before-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/clang23-O3-before.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O3-wire/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.00482700509019196,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O3-after-text",
+      "args": [
+        "objcopy",
+        "--dump-section",
+        ".text=/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/clang23-O3-after.text",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O3/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.004867294104769826,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O2-line-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2-line",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_EXPERIMENT_HEADER_LINE=ON"
+      ],
+      "exit": 0,
+      "seconds": 0.30461157113313675,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O2-line-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2-line",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 5.646853473968804,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O2-line-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2-line",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.28973492607474327,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O2-swar-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2-swar",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_BUILD_SSE2=OFF"
+      ],
+      "exit": 0,
+      "seconds": 0.30835103685967624,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O2-swar-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2-swar",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 4.788473581895232,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-O2-swar-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2-swar",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.12226218986324966,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O1-sanitize-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O1-sanitize",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_EXPERIMENT_HEADER_LINE=ON",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -DSTOMPTALK_TRAMPOLINE",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -g -DNDEBUG -fsanitize=address,undefined"
+      ],
+      "exit": 0,
+      "seconds": 0.3186339410021901,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O1-sanitize-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O1-sanitize",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 13.069475607946515,
+      "affinity": null
+    },
+    {
+      "label": "clang23-O1-sanitize-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O1-sanitize",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.7998464428819716,
+      "affinity": null
+    },
+    {
+      "label": "bench-gcc16-after-4--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6377927800640464,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-2--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.746157004032284,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-2--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.7613029750064015,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-3--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6012926429975778,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-3--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5885075889527798,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-4--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6350203820038587,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-2-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.745459055993706,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-2-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.814922743011266,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-3-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5942549840547144,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-3-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5943756820634007,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-4-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6343384489882737,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-4-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7710761621128768,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-2-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.7891470410395414,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-3-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5919995880685747,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-3-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5946131020318717,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-4-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6422033009584993,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-4-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6377781319897622,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-2-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.7455695481039584,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-3-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5905655128881335,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-3-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5894616548903286,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-4-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6393032409250736,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-4-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.629637683974579,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-2-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.7486668501514941,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-2-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.7507059290073812,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-3-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5907618270721287,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-4-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6437236049678177,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-4-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6378341810777783,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-2-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.749448083108291,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-2-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.745492059038952,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-3-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5967626660130918,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-4-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6347513990476727,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-4-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.6332908619660884,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-2-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.7532397911418229,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-2-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.741901075001806,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-before-3-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/gcc16-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6131175719201565,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-gcc16-after-3-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/gcc16-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5832559561822563,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-4--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7255540590267628,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-2--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.588840652955696,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-2--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5832939308602363,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-3--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5760593449231237,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-3--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5714817778207362,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-4--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7306096709799021,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-2-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5890494689811021,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-2-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5895258630625904,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-3-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5764432840514928,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-3-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5864055058918893,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-4-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7332267810124904,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-4-0",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7243197471834719,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-2-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5836466408800334,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-3-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5732967529911548,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-3-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5817166229244322,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-4-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7331935788970441,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-4-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7296615729574114,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-2-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5850288490764797,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-3-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.594617344206199,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-3-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5748484870418906,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-4-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7276938310824335,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-4-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7286681451369077,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-2-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5886985789984465,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-2-2",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5871832431294024,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-3-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5741215348243713,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-4-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7306030639447272,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-4-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7301739470567554,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-2-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5868100828956813,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-2-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.584909780183807,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-3-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5719426851719618,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-4-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7338442630134523,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-4-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 0.7277123739477247,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-2-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5908044658135623,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-2-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 0.5844428448472172,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-before-3-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O2-wire/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5691806231625378,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "bench-clang23-after-3-4",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/one-constant/runs/20261028T065415828970Z/build/clang23-O2/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5732383111026138,
+      "affinity": [
+        4
+      ]
+    }
+  ],
+  "code": [
+    {
+      "compiler": "gcc16",
+      "opt": "Os",
+      "equal": false,
+      "before": {
+        "size": 29835,
+        "sha256": "387da1c31c90de010c36013c960a1c1a982f96c9545e7059aa41c1b327ff4b5a"
+      },
+      "after": {
+        "size": 29835,
+        "sha256": "5e6e443e29430f78bf1c05b6896bd368bdc1e4a3d92aef870675ecb8721697b1"
+      }
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "equal": false,
+      "before": {
+        "size": 47685,
+        "sha256": "e29902105dd62147edc3c78ad071d6cbddaac414afa02674b29e4cb3ba6c5d9b"
+      },
+      "after": {
+        "size": 47685,
+        "sha256": "ce36e49a9b3ab6f42817cfa48de732ed190e878962b247edf18064efaf1b1b64"
+      }
+    },
+    {
+      "compiler": "gcc16",
+      "opt": "O3",
+      "equal": false,
+      "before": {
+        "size": 65943,
+        "sha256": "f9a6961a3778e9fca6059488d0229cdb4b5038aef6c8d3fbdff4682c6ed4cebb"
+      },
+      "after": {
+        "size": 65943,
+        "sha256": "28b136942e0e65f8096b3813f226816829b12f1b4f2f6d73edf7132f5c0f8730"
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "Os",
+      "equal": true,
+      "before": {
+        "size": 31496,
+        "sha256": "2e1c3b8b2fe44fd06a86df04f9444ad99a3330f6e0d66f794d268f6df9a2d910"
+      },
+      "after": {
+        "size": 31496,
+        "sha256": "2e1c3b8b2fe44fd06a86df04f9444ad99a3330f6e0d66f794d268f6df9a2d910"
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "equal": true,
+      "before": {
+        "size": 45424,
+        "sha256": "17fae0ffa934d22208b88034e0c16b6536862d1d916c32607edccd4ac1522635"
+      },
+      "after": {
+        "size": 45424,
+        "sha256": "17fae0ffa934d22208b88034e0c16b6536862d1d916c32607edccd4ac1522635"
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O3",
+      "equal": true,
+      "before": {
+        "size": 47626,
+        "sha256": "b78b52ef19f0f682c5f36f877e400c2104d11af9e3b3253d38e326082cfee8c1"
+      },
+      "after": {
+        "size": 47626,
+        "sha256": "b78b52ef19f0f682c5f36f877e400c2104d11af9e3b3253d38e326082cfee8c1"
+      }
+    }
+  ],
+  "matrix": [
+    {
+      "compiler": "gcc16",
+      "opt": "O2",
+      "before/2": {
+        "samples": [
+          0.742965486,
+          0.742151222,
+          0.745480918,
+          0.746580459,
+          0.750370777
+        ],
+        "median": 0.745480918,
+        "spread_percent": 1.102584224697745
+      },
+      "after/2": {
+        "samples": [
+          0.812188804,
+          0.785817906,
+          0.74779991,
+          0.742876533,
+          0.739401259
+        ],
+        "median": 0.74779991,
+        "spread_percent": 9.73355894092045
+      },
+      "before/3": {
+        "samples": [
+          0.591304158,
+          0.589088786,
+          0.588121725,
+          0.593936331,
+          0.610265683
+        ],
+        "median": 0.591304158,
+        "spread_percent": 3.7449352757637646
+      },
+      "after/3": {
+        "samples": [
+          0.591441874,
+          0.592047223,
+          0.586723095,
+          0.587880639,
+          0.580755064
+        ],
+        "median": 0.587880639,
+        "spread_percent": 1.9208251217812302
+      },
+      "before/4": {
+        "samples": [
+          0.631240301,
+          0.639256455,
+          0.636370879,
+          0.640884797,
+          0.632407466
+        ],
+        "median": 0.636370879,
+        "spread_percent": 1.5155464082761805
+      },
+      "after/4": {
+        "samples": [
+          0.767961442,
+          0.635026473,
+          0.626702487,
+          0.635126744,
+          0.630526325
+        ],
+        "median": 0.635026473,
+        "spread_percent": 22.244577353234227
+      }
+    },
+    {
+      "compiler": "clang23",
+      "opt": "O2",
+      "before/2": {
+        "samples": [
+          0.586591625,
+          0.582234874,
+          0.585951187,
+          0.584075107,
+          0.587951448
+        ],
+        "median": 0.585951187,
+        "spread_percent": 0.9756058400134326
+      },
+      "after/2": {
+        "samples": [
+          0.587087871,
+          0.581155347,
+          0.584787523,
+          0.582218205,
+          0.5816821
+        ],
+        "median": 0.582218205,
+        "spread_percent": 1.0189519924063513
+      },
+      "before/3": {
+        "samples": [
+          0.573435994,
+          0.570603205,
+          0.592174459,
+          0.569466909,
+          0.566408371
+        ],
+        "median": 0.570603205,
+        "spread_percent": 4.515587675326854
+      },
+      "after/3": {
+        "samples": [
+          0.583173899,
+          0.578823416,
+          0.57197733,
+          0.571064041,
+          0.570377178
+        ],
+        "median": 0.57197733,
+        "spread_percent": 2.237277655742067
+      },
+      "before/4": {
+        "samples": [
+          0.729994561,
+          0.730201141,
+          0.724927424,
+          0.727664558,
+          0.731156999
+        ],
+        "median": 0.729994561,
+        "spread_percent": 0.8533727965679989
+      },
+      "after/4": {
+        "samples": [
+          0.721393872,
+          0.727019047,
+          0.725357602,
+          0.726944577,
+          0.724967295
+        ],
+        "median": 0.725357602,
+        "spread_percent": 0.7755036942454112
+      }
+    }
+  ],
+  "source_sha256": {
+    "package-lock.json": "d6e841096485926f307048817f45312b89d8381687f7f32db6c6ff81e8bef161",
+    "package.json": "84ac7c4717e711200fb504e4cd5d6f6cd4cb0a4ea5d9748067d3aaf654c6e402",
+    "CMakeLists.txt": "ba28151971076f334f4903df26a843b959fea535877702c8ca23851d2ffe9d51",
+    "stomptalkgen.js": "b5e62304b2136c98bf08ee86f3d6c0442cfc1457a3f6f6068a4d5d2a56aea5b9",
+    "src/is_header.hpp": "8da3ef26e8020f9ba14952766f56bc8c6d8c757b8c3fa97c8c2497cf4e2f1d7c",
+    "src/name_group.hpp": "b2f8a3c1e6eee786c74b7618963c909150b410b9efdc12b434fe66002cd1e1c1",
+    "src/parser_states.hpp": "a6b46376aae6a365d4235e133b74a577903a364dfef7a0491a89422a62b0c207",
+    "src/name_dispatch.hpp": "0cc7c2609f420f44fb7d3aacc85375c23417160e4c8598e0ae41315f4a424eac",
+    "src/headers.hpp": "e1e38043674b3a46830f24801a1e1f58a797b495145567a7e82843d8b943bab8",
+    "src/names.cpp": "09742513bf20a778df2233877b59981492e96faf2e5cc0a5b3ccfe9c7ca2fb69",
+    "src/stomptalk.cpp": "a88b4f6d5314be896eefe8300881600bdf98b22d5fc146ca20626a4354adb047",
+    "src/names_avx2.cpp": "930bd2466b55fe47064357e98001718f724877fd3c302a5b4853558db468f3d2",
+    "src/methods.hpp": "f85cf39fba28fb7d26dba0f13fb192f98034b96adeb0a0a21e02651557950741",
+    "src/parser_impl.hpp": "fd1eff60db17abb9ac98de8f316c1abdfc2ba7982c4b1ece3ee29e4429100fcd",
+    "src/content_length.hpp": "3f15c11a49e9f160526f280cda2c03840a00798b60504f05af83bf8e69759d99",
+    "src/parser_avx2.cpp": "ded07e587b20780689c8465aaf2afeddea0ab1d11008fc131a57bcd22fd962a2",
+    "fuzz/fuzz_v2.cpp": "2c1132877a2bcdc5ece2c692719d3cc330d13cd372acf76a1397309b5c2661c3",
+    "fuzz/README.md": "ff9e624eeaebce177f34bfc173b6488b91153bd5385222814e0a6222bcae02ca",
+    "test/scan_backend_checks.hpp": "3f971193938cfca94e2d31d4f2d99ea7e1e03c778c0497d9427c329a8724a21e",
+    "test/unit_v2.cpp": "6508c7b73445b663f1e063157ff7a7f52f44ba0505cfd5eaa8eb473fee770b5c",
+    "test/name_backend_checks.hpp": "6a161c6c03efd093716e7f9cf171dbf60221bbb1d0d4c109ba4119a0950ce52c",
+    "test/purestomp.c": "b9b797ee5709c2473bcff3ab91b5516cc6a9e1f31a6fd724c2458608a4c8a10d",
+    "test/unit_backend_avx2.cpp": "f50af799d6095931be97d2911306eb266e9c36118f646d451b6f33a6b42f16fa",
+    "cmake/stomptalkConfig.cmake.in": "822f1d8ab88917287d7955de38b592b895b369f4193746ebf130b0ff06748d8e",
+    "protocol/names.json": "e5f35f04e1e534292d7c85166eee6e83a05a932ba31499a450cc6d5cf4155adf",
+    "fuzz/corpus/chunked/message_no_length_chunk11": "0706181dcc1b9e76c2d7c532fe23315a37d4569948cf51d83fd0faead90aa28a",
+    "fuzz/corpus/chunked/message_lf_chunk7": "b49b6c77af1398243e0f367e1ae6ef7cfb65efb4331a056aed7117077957f4a9",
+    "fuzz/corpus/chunked/message_escape_chunk5": "d4be4008730663512ca8a73c3f4860fee88d8abac9024f51cc96425fdde4b731",
+    "fuzz/corpus/chunked/message_partial_headers_chunk8": "05070e764dd0ef1b858a8eeb09626d1849c3ba4a9840cb1a861a411b2f77ca9c",
+    "fuzz/corpus/chunked/escaped_header_value_chunk6": "5e4918f26a6d9d8f8f1cfad9ac7071b9742162bc625f39fdb6857527f6ab6144",
+    "fuzz/corpus/chunked/send_frame_chunk2": "bf6dd6e35beecae8e98028a8e69c9ab634cdbc129c63ed9a4c7bb25d4728f2fe",
+    "fuzz/corpus/chunked/truncated_send_method_chunk3": "787d0725313fd9c380ba357b8b04a14806922409bbc32088d10e2c83731b9d7b",
+    "fuzz/corpus/chunked/message_content_length_chunk3": "34a3b87a9b1732745a7aed92bb8f12185bd9d8841e38cfcaca54485ff33256e8",
+    "fuzz/corpus/chunked/connected_frame_chunk1": "b44cd641f965c413a31de138f39650647aff7e73fd1b70447ce5ce2760a0f4c0",
+    "fuzz/corpus/chunked/send_content_length_body_chunk3": "381c61086244fc8e917201b58ebe4d2beb0bb6a35fb8f0d77763b798fb339109",
+    "fuzz/corpus/v2/split-metadata-and-body": "fddd4e8391949f7202c76f4665cf4722d1a0b02319548b249fb566e37fa287bd",
+    "fuzz/corpus/v2/wrong-terminator": "7e5a1282d84d42bbb05e9cc102aa0ff95cb4e5e9108d1f9f234f02889332b00e",
+    "fuzz/corpus/v2/duplicate-length": "0397ee398c58c9c6aa760d536e76ac149fdf02bb801540f736dc6debc6d78867",
+    "fuzz/corpus/v2/connect-literal": "f44acf379434f07abeb7d75fa5a109478b7ad4e336631f823f08a1c77b2eb0db",
+    "fuzz/corpus/v2/leading-nul-body": "3617e91090b825f7a267c8e820b6c2863c6d533a9ddb5c8bf43b4472c75e4927",
+    "fuzz/corpus/v2/leading-key-escape": "8f08000e10762d1b5ef43c0f61320467b68fa0a73fbd5cf862893cb9e8ef0876",
+    "fuzz/corpus/v2/unknown-method": "50420e26757c210c23e523bd390d40b7866ac11f18ee7963f6c259f007e4d08b",
+    "fuzz/corpus/v2/zero-length": "79b75449cd1367d0de67ec485f7e5f8c9e696ff156e21d0d96c6db2e83e1a864",
+    "fuzz/corpus/v2/missing-colon": "5e49b2c82350e8b2a8a05db3d09876ce043160b6fa8a6ac3663369783b5f0520",
+    "fuzz/corpus/v2/utf8": "251fa0ac9c356dcbdec8fb398088f5295557926d953c9dd203aa11044e56cc66",
+    "fuzz/corpus/parser/message_no_length": "f3bc7568b0d2729280374f4a57be07014e0d802cad5f23b3c18e459fd9233b38",
+    "fuzz/corpus/parser/content_length_unknown_method_crlf_body": "7d97a4415d310045f192b0c1280c927d96fa7357523135ce55fd33cd9e94c800",
+    "fuzz/corpus/parser/message_lf": "f5c9713f7e53e017d1a39f430a5b984afa2844b8bd40220667f16cdf602d37df",
+    "fuzz/corpus/parser/escaped_header_minimal": "77dcda0272ec091e0361c9a592b11e355cfcf49bfb169d1793c8d445eab5eead",
+    "fuzz/corpus/parser/connected_frame": "43333c7c68f5f9eafb1fe13a730971b30bfba49f4d373ef36cbba89e805119ac",
+    "fuzz/corpus/parser/send_frame": "e8932938238d0d4469b2080913cec07592f88c22fe30058ed291d213a77c88e2",
+    "fuzz/corpus/parser/content_length_single_letter_method_lf_body": "3de3d412dac8feb43953b40b0d81fe4d5aeecbf70db1c308b71db6875c37d8b9",
+    "fuzz/corpus/parser/message_escape": "40b03ea062ed44dbb79d6048c9e20bbd677fcb632b6ffb22780933b59c5c6275",
+    "fuzz/corpus/parser/message_content_length": "bfe2f1c7a88de4dc816eaed31258e6d4c62e34ae29779b1403cdfc90e903340f",
+    "fuzz/corpus/large_header/value_nul_payload": "d4d29ef957b92b016e425e5ede5f20b65dbd044f4c4d823ae2a385ba69e57fe5",
+    "fuzz/corpus/large_header/key_lf_4096": "37e2a93eb08080b36aeacfa9ab73d4fe28c512d6f9046d5094218eff83c19051",
+    "fuzz/corpus/large_header/key_crlf_4097": "324d84875c2194c5ea17ebb7c9827a5d7b8c75d399353beb91135f3c85e2dd9f",
+    "fuzz/corpus/large_header/value_lf_4097": "17eb30699eba13ae8898852abb2c2dfd50bbfe0ec69ea8209c381b19b7f76fbb",
+    "fuzz/corpus/large_header/key_lf_4097": "d790fcb093a339695ce65a2c49a8079a8296e7cf349423e263ab7ed8186baa91",
+    "fuzz/corpus/large_header/value_crlf_4097": "469a6aac503315a2cbec02157b1300172ef4610d041eb6a07038cbc0c953dc43",
+    "fuzz/corpus/large_header/value_mixed_printable_payload": "81725389383951b9a7879e2d4f2321fdf614c850c69e07a0e9f9e87009ca68f2",
+    "fuzz/corpus/large_header/key_crlf_4096": "86e3f2649bfc244554662116f3bb8a2a1e15ed9d4989bbdbd1627e3b9a7a2bf6",
+    "fuzz/corpus/large_header/value_lf_4096": "ddfbf54dbfc27075a5529f7cc46d4d60aa64ec807649e5d8d55657c4b9efd924",
+    "fuzz/corpus/large_header/value_crlf_4096": "8f93420a7a7b828317a331ce361df472cb760d56e854c3317cea0d13780dad1a",
+    "fuzz/corpus/large_header/key_crlf_4095": "affa0e8c1be26bf1645f7dc17704941637c538e583df644e0db93e7c84948d07",
+    "fuzz/corpus/large_header/key_lf_4095": "462fd23668ae7d949fdc2539f1baabcaa73df4b2bee3604c95707c70b592cf5b",
+    "fuzz/corpus/large_header/value_crlf_4095": "2eb6620edf382c53ff5f6ad3662871733ff0f55edad80d498f8dbac402643319",
+    "fuzz/corpus/large_header/value_lf_4095": "47cee3978e90e090d26d007d4aa5189d228e9bd1c2287deae60da14c5a71cf9d",
+    "fuzz/corpus/large_header/value_backslash_payload": "ccc78e053b1a5296ab2cd405b5642cba059f35836c888a81a2c54c863b7a97de",
+    "src/backend/avx2.hpp": "4bf5880f3be471601006394d49f8bf5c07cd37adf41129d2c20c0091ed2736e6",
+    "src/backend/config.hpp": "855da9f0a425645dd6fbc0ee59b490e83f1a6cd062e09eb62f0a30f56ee5bf1c",
+    "src/backend/swar.hpp": "ad232af6ac72aec1c882a07256a539b9fb1ed146ac503be1526c282ab7de8ea2",
+    "src/backend/sse2.hpp": "362a4ad96e97edd184925e5e301bceeb51b2f0ca5a4ed8e23fd25fc9adbe23c8",
+    "include/stomptalk/parser.hpp": "040ff5ca937477cf6c9a1e92f0c81ecb45eceadae3630afa88c3e9602936b213",
+    "include/stomptalk/method.h": "64a7a30b5f09987b0770e7797acd36c899ca5aebaebfe77c024c8b31b39df530",
+    "include/stomptalk/type.h": "751620bb3c6237962f8c02038411547fea4150aff782866cda0b0eae336db4a3",
+    "include/stomptalk/header.h": "036b0191bac15299d63528d5607181fa9e579d6c675f54a6600ea6abf2e4a6cf",
+    "include/stomptalk/antoull.hpp": "5dde280db69a8f8fca3eaca4fb974d8bfd7df924d8e9bfb4ed893985950e113a",
+    "include/stomptalk/stackbuf.hpp": "4761eb2afbd70bfd1baa99564e8e6fd0d7a8eb64e6d606b9caf46c62f7571a65",
+    "include/stomptalk/parser.h": "8789dcc3aa32f9666c3367d744a077736aad2b7da78587d9085f492c7d9fb9a3"
+  }
+}

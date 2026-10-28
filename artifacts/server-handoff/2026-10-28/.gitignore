@@ -1,0 +1,5 @@
+build/
+relocated/
+fuzz-corpus/
+*.data
+*.data.old

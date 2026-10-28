@@ -1,0 +1,12 @@
+-- Install configuration: "Release"
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/lib64/libstomptalk.so.2.0.0
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/lib64/libstomptalk.so.2
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/lib64/libstomptalk.so
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/include/stomptalk/type.h
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/include/stomptalk/parser.h
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/include/stomptalk/method.h
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/include/stomptalk/header.h
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/lib64/cmake/stomptalk/stomptalkConfig.cmake
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/lib64/cmake/stomptalk/stomptalkConfigVersion.cmake
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/lib64/cmake/stomptalk/stomptalkTargets.cmake
+-- Installing: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/server-handoff/2026-10-28/build/install/lib64/cmake/stomptalk/stomptalkTargets-release.cmake

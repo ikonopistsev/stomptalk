@@ -1,0 +1,40 @@
+/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T062508203190Z/build/clang23-O3-wire/probe  :
+section                size    addr
+.interp                  28     792
+.gnu.hash                36     824
+.dynsym                 888     864
+.dynstr                1090    1752
+.gnu.version             74    2842
+.gnu.version_r          256    2920
+.rela.dyn               288    3176
+.rela.plt               648    3464
+.init                    27    8192
+.plt                    448    8224
+.plt.got                 16    8672
+.plt.sec                432    8688
+.text                 47626    9120
+.fini                    13   56748
+.rodata                3028   57344
+.eh_frame_hdr           724   60372
+.eh_frame              4296   61096
+.gcc_except_table       296   65392
+.note.gnu.property       48   65688
+.note.ABI-tag            32   65736
+.init_array              16   72864
+.fini_array               8   72880
+.dynamic                544   72888
+.got                    296   73432
+.data                    24   73728
+.bss                     48   73760
+.comment                 52       0
+.debug_aranges           48       0
+.debug_info           27659       0
+.debug_abbrev           667       0
+.debug_line            7829       0
+.debug_str             4108       0
+.debug_line_str         403       0
+.debug_loclists       27441       0
+.debug_rnglists         524       0
+Total                129961
+
+

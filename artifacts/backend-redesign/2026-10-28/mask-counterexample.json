@@ -1,0 +1,9 @@
+{
+  "xor_word": "0x101010101010100",
+  "current_has_zero": "0x8080808080808080",
+  "exact_zero_lanes": "0x80",
+  "expected_equal_byte_indices_little_endian": [
+    0
+  ],
+  "current_mask_is_safe_for_first_match_only": true
+}

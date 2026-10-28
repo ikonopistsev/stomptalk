@@ -23,5 +23,6 @@
       "options": "-DCMAKE_BUILD_TYPE=Release;-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang;-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++;-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG;-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG;-DSTOMPTALK_BUILD_TESTS=ON;-DSTOMPTALK_LIBRARY_INSTALL=ON;-DSTOMPTALK_PGO_ITERATIONS=500000"
     }
   },
-  "note": "O2 and O3 were generated independently. Their IR profiles are byte-identical for this training; one file is shipped, validated with both optimization levels."
+  "note": "O2 and O3 were generated independently. Their IR profiles are byte-identical for this training; one file is shipped, validated with both optimization levels.",
+  "source_commit": "68d553f3578460e9f4f9d66d708c60cfdf153706"
 }

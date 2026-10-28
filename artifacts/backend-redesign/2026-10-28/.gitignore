@@ -1,0 +1,5 @@
+**/build/
+**/install/
+**/fuzz-corpus/
+**/*.data
+**/__pycache__/

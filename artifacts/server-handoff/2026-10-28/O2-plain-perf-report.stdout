@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 5K of event 'cpu_core/cycles/u'
+# Event count (approx.): 25147008279
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    40.02%  [.] char const* stomptalk::parser::hdrline<3u>(char const*, char const*)              -      -            
+    23.48%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     7.78%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -            
+     6.80%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     5.07%  [.] main                                                                              -      -            
+     4.20%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     2.54%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     2.34%  [.] stomptalk::parser::own_metadata()                                                 -      -            
+     2.00%  [.] char const* stomptalk::parser::done<3u>(char const*, char const*)                 -      -            
+     1.14%  [.] char const* stomptalk::parser::body_read<3u>(char const*, char const*)            -      -            
+     0.75%  [.] 0x00000000001640e8                                                                -      -            
+     0.67%  [.] stomptalk::parser::append(char, char const*)                                      -      -            
+     0.56%  [.] stomptalk::parser::run(char const*, unsigned long)                                -      -            
+
+
+#
+# (Tip: For latency profiling, try: perf record/report --latency)
+#

@@ -1,0 +1,1 @@
+assert_contract: /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/source/src/headers.hpp:585: stomptalk_header_id stomptalk::detail::(anonymous namespace)::detect_header(stomptalk_view) [Backend = stomptalk::detail::backend::avx2]: Assertion `name.data || !name.size' failed.

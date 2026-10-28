@@ -1,0 +1,658 @@
+{
+  "status": "completed",
+  "source_run": "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z",
+  "commands": [
+    {
+      "label": "gcc16-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/gcc16",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-16",
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-16",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_EXPERIMENT_HEADER_LINE=OFF"
+      ],
+      "exit": 0,
+      "seconds": 0.31979069602675736,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/gcc16",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 8.71689545107074,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/gcc16",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.27264700294472277,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-probe",
+      "args": [
+        "/usr/bin/g++-16",
+        "-O3",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/source/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/gcc16/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/gcc16/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.3342463239096105,
+      "affinity": null
+    },
+    {
+      "label": "clang23-configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/clang23",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON",
+        "-DSTOMPTALK_EXPERIMENT_HEADER_LINE=OFF"
+      ],
+      "exit": 0,
+      "seconds": 0.31489853491075337,
+      "affinity": null
+    },
+    {
+      "label": "clang23-build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/clang23",
+        "-j",
+        "4"
+      ],
+      "exit": 0,
+      "seconds": 6.344414270948619,
+      "affinity": null
+    },
+    {
+      "label": "clang23-test",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/clang23",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 0.2429532411042601,
+      "affinity": null
+    },
+    {
+      "label": "clang23-probe",
+      "args": [
+        "/usr/lib/llvm/23/bin/clang++",
+        "-O3",
+        "-DNDEBUG",
+        "-std=c++14",
+        "-DSTOMPTALK_STATIC",
+        "-I/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/source/include",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/probe.cpp",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/clang23/libstomptalk.a",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/clang23/probe"
+      ],
+      "exit": 0,
+      "seconds": 0.3174477890133858,
+      "affinity": null
+    },
+    {
+      "label": "gcc16-pgo--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/pgo/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4893335320521146,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-split--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/gcc16/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6439332889858633,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-line--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/plain/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5697881339583546,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-split-0",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/gcc16-split-0.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/gcc16/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6496794489212334,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-line-0",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/gcc16-line-0.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/plain/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5711335251107812,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-pgo-0",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/gcc16-pgo-0.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/pgo/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.41895943600684404,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-line-1",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/gcc16-line-1.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/plain/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5742719201371074,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-pgo-1",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/gcc16-pgo-1.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/pgo/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4155898478347808,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-split-1",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/gcc16-split-1.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/gcc16/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6309518420603126,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-pgo-2",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/gcc16-pgo-2.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/pgo/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.42819708096794784,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-split-2",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/gcc16-split-2.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/gcc16/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.6272071551065892,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "gcc16-line-2",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/gcc16-line-2.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/gcc16-O3/plain/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5741748900618404,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-pgo--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/pgo/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4455569889396429,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-split--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/clang23/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5431782270316035,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-line--1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/plain/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.525040898937732,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-split-0",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/clang23-split-0.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/clang23/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.551423026015982,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-line-0",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/clang23-line-0.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/plain/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5210824108216912,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-pgo-0",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/clang23-pgo-0.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/pgo/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.44448946393094957,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-line-1",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/clang23-line-1.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/plain/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5295228259637952,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-pgo-1",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/clang23-pgo-1.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/pgo/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.44908257899805903,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-split-1",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/clang23-split-1.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/clang23/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5410048579797149,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-pgo-2",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/clang23-pgo-2.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/pgo/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.4474156789947301,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-split-2",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/clang23-split-2.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/build/clang23/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.542412773007527,
+      "affinity": [
+        4
+      ]
+    },
+    {
+      "label": "clang23-line-2",
+      "args": [
+        "perf",
+        "stat",
+        "-x,",
+        "--no-big-num",
+        "-e",
+        "cycles:u,instructions:u,branches:u,branch-misses:u",
+        "-o",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/branch-counters/clang23-line-2.csv",
+        "--",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/build/clang23-O3/plain/probe",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/pgo-matrix/2026-10-28/runs/20261028T071754232573Z/fixtures/original.bin",
+        "whole",
+        "1000000",
+        "3"
+      ],
+      "exit": 0,
+      "seconds": 0.5325575771275908,
+      "affinity": [
+        4
+      ]
+    }
+  ]
+}

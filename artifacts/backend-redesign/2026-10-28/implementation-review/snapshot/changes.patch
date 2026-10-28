@@ -1,0 +1,799 @@
+--- before/src/backend/avx2.hpp
++++ src/backend/avx2.hpp
+@@ -1,22 +1,27 @@
+ #pragma once
+ 
+ #include "sse2.hpp"
++
++#if STOMPTALK_AVX2
+ #include <immintrin.h>
+ 
+-// Include/instantiate in an AVX2 compilation context. The dispatcher checks
+-// both CPU/OS availability and whether that implementation was compiled.
++// Include in an AVX2 target context. CPU/OS support is checked once at init.
+ namespace stomptalk {
+ namespace detail {
+ namespace backend {
+ 
+-struct avx2
++struct avx2 : sse2
+ {
+-    template<std::size_t Size>
+     STOMPTALK_FORCE_INLINE
+-    static bool equal_ends8(const char* data, const char* text) noexcept
++    static __m256i load(const char* data) noexcept
+     {
+-        // Short names use VEX-encoded XMM operations in this AVX2 context.
+-        return sse2::equal_ends8<Size>(data, text);
++        return _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data));
++    }
++
++    STOMPTALK_FORCE_INLINE
++    static unsigned mask(__m256i matches) noexcept
++    {
++        return static_cast<unsigned>(_mm256_movemask_epi8(matches));
+     }
+ 
+     STOMPTALK_FORCE_INLINE
+@@ -24,10 +29,7 @@
+     {
+         while (size >= 32)
+         {
+-            const auto matches = _mm256_cmpeq_epi8(
+-                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data)),
+-                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(text)));
+-            if (_mm256_movemask_epi8(matches) != -1)
++            if (mask(_mm256_cmpeq_epi8(load(data), load(text))) != UINT32_MAX)
+                 return false;
+             data += 32;
+             text += 32;
+@@ -38,33 +40,47 @@
+ 
+     template<std::size_t Size>
+     STOMPTALK_FORCE_INLINE
+-    static bool equal(const char* data, const char* text) noexcept
++    static typename std::enable_if<(Size < 32), bool>::type
++    equal(const char* data, const char* text) noexcept
+     {
+-        if (Size < 32)
+-            return sse2::equal<Size>(data, text);
++        return sse2::equal<Size>(data, text);
++    }
+ 
+-        const auto first = _mm256_cmpeq_epi8(
+-            _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data)),
+-            _mm256_loadu_si256(reinterpret_cast<const __m256i*>(text)));
++    template<std::size_t Size>
++    STOMPTALK_FORCE_INLINE
++    static typename std::enable_if<(Size >= 32), bool>::type
++    equal(const char* data, const char* text) noexcept
++    {
++        return mask(_mm256_cmpeq_epi8(load(data), load(text))) == UINT32_MAX &&
++            equal<Size - 32>(data + 32, text + 32);
++    }
+ 
+-        if (Size == 32)
+-            return _mm256_movemask_epi8(first) == -1;
+-
+-        if (Size <= 64)
++    // content-length is shorter than a YMM word; reuse the safe SSE2 comparison.
++    STOMPTALK_FORCE_INLINE
++    static const char* scan_header(const char* p, const char* end, bool key, bool literal) noexcept
++    {
++        while (end - p >= 32)
+         {
+-            const auto last = _mm256_cmpeq_epi8(
+-                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data + Size - 32)),
+-                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(text + Size - 32)));
+-            return _mm256_movemask_epi8(_mm256_and_si256(first, last)) == -1;
++            const auto word = load(p);
++            auto events = _mm256_or_si256(_mm256_cmpeq_epi8(word, _mm256_setzero_si256()),
++                _mm256_or_si256(_mm256_cmpeq_epi8(word, _mm256_set1_epi8('\n')),
++                                _mm256_cmpeq_epi8(word, _mm256_set1_epi8('\r'))));
++            if (key || !literal)
++                events = _mm256_or_si256(events, _mm256_cmpeq_epi8(word, _mm256_set1_epi8(':')));
++            if (!literal)
++                events = _mm256_or_si256(events, _mm256_cmpeq_epi8(word, _mm256_set1_epi8('\\')));
++            const auto found = mask(events);
++            if (found)
++                return p + __builtin_ctz(found);
++            p += 32;
+         }
+-
+-        return _mm256_movemask_epi8(first) == -1 &&
+-            swar::equal<Size - (Size >= 32 ? 32 : 0)>(data + 32, text + 32);
++        return sse2::scan_header(p, end, key, literal);
+     }
+ };
+ 
+-template<> struct comparison<STOMPTALK_BACKEND_AVX2> : avx2 {};
++template<> struct engine<STOMPTALK_BACKEND_AVX2> : avx2 {};
+ 
+ } // namespace backend
+ } // namespace detail
+ } // namespace stomptalk
++#endif
+--- before/src/backend/config.hpp
++++ src/backend/config.hpp
+@@ -0,0 +1,27 @@
++#pragma once
++
++#if defined(__SSE2__) && !defined(STOMPTALK_DISABLE_SSE2)
++#define STOMPTALK_SSE2 1
++#else
++#define STOMPTALK_SSE2 0
++#endif
++
++// AVX2 uses the SSE2 tail. Disabling SSE2 disables both SIMD implementations.
++#if STOMPTALK_SSE2 && (defined(__i386__) || defined(__x86_64__)) && \
++    (defined(__GNUC__) || defined(__clang__)) && !defined(STOMPTALK_DISABLE_AVX2)
++#define STOMPTALK_AVX2 1
++#else
++#define STOMPTALK_AVX2 0
++#endif
++
++#if STOMPTALK_AVX2 && !defined(STOMPTALK_DISABLE_AVX2_PARSER)
++#define STOMPTALK_PARSER_AVX2 1
++#else
++#define STOMPTALK_PARSER_AVX2 0
++#endif
++
++#if STOMPTALK_AVX2 && !defined(STOMPTALK_DISABLE_AVX2_NAMES)
++#define STOMPTALK_NAMES_AVX2 1
++#else
++#define STOMPTALK_NAMES_AVX2 0
++#endif
+--- before/src/backend/scan_avx2.hpp
++++ src/backend/scan_avx2.hpp
+@@ -1,30 +0,0 @@
+-#pragma once
+-
+-#include "../scan.hpp"
+-#include <immintrin.h>
+-
+-namespace stomptalk { namespace detail {
+-
+-template<>
+-struct header_scanner<STOMPTALK_BACKEND_AVX2> {
+-    template<bool Key>
+-    __attribute__((target("avx2"))) STOMPTALK_FORCE_INLINE
+-    static const char *scan(const char *p, const char *end, bool literal) noexcept {
+-        while (end - p >= 32) {
+-            const auto v = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(p));
+-            auto events = _mm256_or_si256(_mm256_cmpeq_epi8(v, _mm256_setzero_si256()),
+-                _mm256_or_si256(_mm256_cmpeq_epi8(v, _mm256_set1_epi8('\n')),
+-                                 _mm256_cmpeq_epi8(v, _mm256_set1_epi8('\r'))));
+-            if (Key || !literal)
+-                events = _mm256_or_si256(events, _mm256_cmpeq_epi8(v, _mm256_set1_epi8(':')));
+-            if (!literal)
+-                events = _mm256_or_si256(events, _mm256_cmpeq_epi8(v, _mm256_set1_epi8('\\')));
+-            const auto mask = static_cast<unsigned>(_mm256_movemask_epi8(events));
+-            if (mask) return p + __builtin_ctz(mask);
+-            p += 32;
+-        }
+-        return scan_header<STOMPTALK_BACKEND_SSE2, Key>(p, end, literal);
+-    }
+-};
+-
+-} }
+--- before/src/backend/sse2.hpp
++++ src/backend/sse2.hpp
+@@ -2,31 +2,26 @@
+ 
+ #include "swar.hpp"
+ 
+-#if defined(__SSE2__)
++#if STOMPTALK_SSE2
+ #include <emmintrin.h>
++#include <type_traits>
+ 
+ namespace stomptalk {
+ namespace detail {
+ namespace backend {
+ 
+-struct sse2
++struct sse2 : swar
+ {
+     STOMPTALK_FORCE_INLINE
+-    static __m128i ends8(const char* data, std::size_t size) noexcept
++    static __m128i load(const char* data) noexcept
+     {
+-        const auto first = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(data));
+-        const auto last = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(data + size - 8));
+-        return _mm_unpacklo_epi64(first, last);
++        return _mm_loadu_si128(reinterpret_cast<const __m128i*>(data));
+     }
+ 
+-    // text contains the first/last eight bytes, packed in an aligned XMM word.
+-    template<std::size_t Size>
+     STOMPTALK_FORCE_INLINE
+-    static bool equal_ends8(const char* data, const char* text) noexcept
++    static unsigned mask(__m128i matches) noexcept
+     {
+-        static_assert(Size >= 8 && Size <= 16, "Two overlapping eight-byte words");
+-        const auto expected = _mm_load_si128(reinterpret_cast<const __m128i*>(text));
+-        return _mm_movemask_epi8(_mm_cmpeq_epi8(ends8(data, Size), expected)) == 0xffff;
++        return static_cast<unsigned>(_mm_movemask_epi8(matches));
+     }
+ 
+     STOMPTALK_FORCE_INLINE
+@@ -34,56 +29,66 @@
+     {
+         while (size >= 16)
+         {
+-            const auto matches = _mm_cmpeq_epi8(
+-                _mm_loadu_si128(reinterpret_cast<const __m128i*>(data)),
+-                _mm_loadu_si128(reinterpret_cast<const __m128i*>(text)));
+-            if (_mm_movemask_epi8(matches) != 0xffff)
++            if (mask(_mm_cmpeq_epi8(load(data), load(text))) != 0xffff)
+                 return false;
+             data += 16;
+             text += 16;
+             size -= 16;
+         }
+-        if (size > 8)
+-            return _mm_movemask_epi8(_mm_cmpeq_epi8(ends8(data, size), ends8(text, size))) == 0xffff;
+         return swar::equal(data, text, size);
+     }
+ 
+     template<std::size_t Size>
+     STOMPTALK_FORCE_INLINE
+-    static bool equal(const char* data, const char* text) noexcept
++    static typename std::enable_if<(Size < 16), bool>::type
++    equal(const char* data, const char* text) noexcept
+     {
+-        if (Size <= 8)
+-            return swar::equal<Size>(data, text);
++        return swar::equal<Size>(data, text);
++    }
+ 
+-        if (Size < 16)
++    template<std::size_t Size>
++    STOMPTALK_FORCE_INLINE
++    static typename std::enable_if<(Size >= 16), bool>::type
++    equal(const char* data, const char* text) noexcept
++    {
++        return mask(_mm_cmpeq_epi8(load(data), load(text))) == 0xffff &&
++            equal<Size - 16>(data + 16, text + 16);
++    }
++
++    STOMPTALK_FORCE_INLINE
++    static bool is_content_length(const char* data) noexcept
++    {
++        // Exactly 14 input bytes: two overlapping 8-byte loads, never load16(data).
++        constexpr auto size = sizeof(content_length) - 1;
++        const auto first = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(data));
++        const auto last = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(data + size - 8));
++        const auto expected = _mm_load_si128(reinterpret_cast<const __m128i*>(content_length_sse2));
++        return mask(_mm_cmpeq_epi8(_mm_unpacklo_epi64(first, last), expected)) == 0xffff;
++    }
++
++    STOMPTALK_FORCE_INLINE
++    static const char* scan_header(const char* p, const char* end, bool key, bool literal) noexcept
++    {
++        while (end - p >= 16)
+         {
+-            // Both eight-byte loads stay inside the name, including a name
+-            // ending at a guard page. Overlap does not change equality.
+-            const auto matches = _mm_cmpeq_epi8(ends8(data, Size), ends8(text, Size));
+-            return _mm_movemask_epi8(matches) == 0xffff;
++            const auto word = load(p);
++            auto events = _mm_or_si128(_mm_cmpeq_epi8(word, _mm_setzero_si128()),
++                _mm_or_si128(_mm_cmpeq_epi8(word, _mm_set1_epi8('\n')),
++                             _mm_cmpeq_epi8(word, _mm_set1_epi8('\r'))));
++            if (key || !literal)
++                events = _mm_or_si128(events, _mm_cmpeq_epi8(word, _mm_set1_epi8(':')));
++            if (!literal)
++                events = _mm_or_si128(events, _mm_cmpeq_epi8(word, _mm_set1_epi8('\\')));
++            const auto found = mask(events);
++            if (found)
++                return p + __builtin_ctz(found);
++            p += 16;
+         }
+-
+-        const auto first = _mm_cmpeq_epi8(
+-            _mm_loadu_si128(reinterpret_cast<const __m128i*>(data)),
+-            _mm_loadu_si128(reinterpret_cast<const __m128i*>(text)));
+-
+-        if (Size == 16)
+-            return _mm_movemask_epi8(first) == 0xffff;
+-
+-        if (Size <= 32)
+-        {
+-            const auto last = _mm_cmpeq_epi8(
+-                _mm_loadu_si128(reinterpret_cast<const __m128i*>(data + Size - 16)),
+-                _mm_loadu_si128(reinterpret_cast<const __m128i*>(text + Size - 16)));
+-            return _mm_movemask_epi8(_mm_and_si128(first, last)) == 0xffff;
+-        }
+-
+-        return _mm_movemask_epi8(first) == 0xffff &&
+-            swar::equal<Size - (Size >= 16 ? 16 : 0)>(data + 16, text + 16);
++        return swar::scan_header(p, end, key, literal);
+     }
+ };
+ 
+-template<> struct comparison<STOMPTALK_BACKEND_SSE2> : sse2 {};
++template<> struct engine<STOMPTALK_BACKEND_SSE2> : sse2 {};
+ 
+ } // namespace backend
+ } // namespace detail
+--- before/src/backend/swar.hpp
++++ src/backend/swar.hpp
+@@ -1,6 +1,8 @@
+ #pragma once
+ 
++#include "config.hpp"
+ #include "stomptalk/parser.h"
++#include "../content_length.hpp"
+ #include <cstring>
+ 
+ namespace stomptalk {
+@@ -8,9 +10,9 @@
+ namespace backend {
+ 
+ template<stomptalk_backend Backend>
+-struct comparison;
++struct engine;
+ 
+-struct swar
++struct scalar
+ {
+     STOMPTALK_FORCE_INLINE
+     static bool equal(const char* data, const char* text, std::size_t size) noexcept
+@@ -22,22 +24,77 @@
+     STOMPTALK_FORCE_INLINE
+     static bool equal(const char* data, const char* text) noexcept
+     {
+-        // A constant size lets the compiler use word loads without unaligned
+-        // typed dereferences or a hand-written byte comparison loop.
++        // One comparison of the entire known length; the compiler selects loads.
+         return Size == 0 || std::memcmp(data, text, Size) == 0;
+     }
+ 
+-    template<std::size_t Size>
+     STOMPTALK_FORCE_INLINE
+-    static bool equal_ends8(const char* data, const char* text) noexcept
++    static bool is_content_length(const char* data) noexcept
+     {
+-        static_assert(Size >= 8 && Size <= 16, "Two overlapping eight-byte words");
+-        return equal<8>(data, text) && equal<8>(data + Size - 8, text + 8);
++        return equal<sizeof(content_length) - 1>(data, content_length);
++    }
++
++    STOMPTALK_FORCE_INLINE
++    static const char* scan_header(const char* p, const char* end, bool key, bool literal) noexcept
++    {
++        while (p < end)
++        {
++            const auto c = static_cast<unsigned char>(*p);
++            if (c == 0 || c == '\n' || c == '\r' ||
++                (c == ':' && (key || !literal)) || (c == '\\' && !literal))
++                break;
++            ++p;
++        }
++        return p;
+     }
+ };
+ 
+-template<> struct comparison<STOMPTALK_BACKEND_SCALAR> : swar {};
+-template<> struct comparison<STOMPTALK_BACKEND_SWAR> : swar {};
++struct swar : scalar
++{
++    STOMPTALK_FORCE_INLINE
++    static uint64_t load(const char* data) noexcept
++    {
++        uint64_t word;
++        std::memcpy(&word, data, sizeof(word));
++        return word;
++    }
++
++    STOMPTALK_FORCE_INLINE
++    static uint64_t zero_mask(uint64_t word) noexcept
++    {
++        // Presence / first match only: borrow may mark later bytes too.
++        // Equality uses memcmp, not this approximate mask.
++        return (word - UINT64_C(0x0101010101010101)) & ~word & UINT64_C(0x8080808080808080);
++    }
++
++    STOMPTALK_FORCE_INLINE
++    static const char* scan_header(const char* p, const char* end, bool key, bool literal) noexcept
++    {
++        while (end - p >= 8)
++        {
++            const auto word = load(p);
++            auto events = zero_mask(word) | zero_mask(word ^ UINT64_C(0x0a0a0a0a0a0a0a0a)) |
++                zero_mask(word ^ UINT64_C(0x0d0d0d0d0d0d0d0d));
++            if (key || !literal)
++                events |= zero_mask(word ^ UINT64_C(0x3a3a3a3a3a3a3a3a));
++            if (!literal)
++                events |= zero_mask(word ^ UINT64_C(0x5c5c5c5c5c5c5c5c));
++            if (events)
++            {
++#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++                return p + (__builtin_ctzll(events) >> 3);
++#else
++                break; // locate the first byte in memory order below
++#endif
++            }
++            p += 8;
++        }
++        return scalar::scan_header(p, end, key, literal);
++    }
++};
++
++template<> struct engine<STOMPTALK_BACKEND_SCALAR> : scalar {};
++template<> struct engine<STOMPTALK_BACKEND_SWAR> : swar {};
+ 
+ } // namespace backend
+ } // namespace detail
+--- before/src/content_length.hpp
++++ src/content_length.hpp
+@@ -1,32 +1,21 @@
+ /* Generated by stomptalkgen.js; edit protocol/names.json. */
+ #pragma once
+ 
+-#include "stomptalk/parser.h"
+-#include "backend/swar.hpp"
+-#include <cassert>
+-#if defined(__SSE2__)
+-#include "backend/sse2.hpp"
+-#endif
++#include "backend/config.hpp"
+ 
+ namespace stomptalk {
+ namespace detail {
++namespace backend {
+ 
+-// This is the only header-name check in the parser itself.
+-template<stomptalk_backend Backend>
+-STOMPTALK_FORCE_INLINE
+-bool is_content_length(stomptalk_view name) noexcept
+-{
+-    assert(name.data || !name.size);
+-    if (name.size != 14)
+-        return false;
++constexpr char content_length[] = "content-length";
++#if STOMPTALK_SSE2
++// First eight + last eight bytes; matches two overlapping input loads.
++alignas(16) constexpr char content_length_sse2[16] = {
++    'c', 'o', 'n', 't', 'e', 'n', 't', '-',
++    't', '-', 'l', 'e', 'n', 'g', 't', 'h'
++};
++#endif
+ 
+-    // First eight + last eight bytes of content-length; no runtime packing.
+-    alignas(16) static constexpr char text[16] = {
+-        'c', 'o', 'n', 't', 'e', 'n', 't', '-',
+-        't', '-', 'l', 'e', 'n', 'g', 't', 'h'
+-    };
+-    return backend::comparison<Backend>::template equal_ends8<14>(name.data, text);
+-}
+-
++} // namespace backend
+ } // namespace detail
+ } // namespace stomptalk
+--- before/src/is_header.hpp
++++ src/is_header.hpp
+@@ -1,20 +1,38 @@
+ #pragma once
+ 
+-#include "backend/swar.hpp"
++#include "backend/sse2.hpp"
+ #include <cassert>
+ 
+ namespace stomptalk {
+ namespace detail {
+ 
+-// Include this header and the selected SIMD backend in that backend's target context.
+-template<stomptalk_backend Backend = STOMPTALK_BACKEND_SWAR>
++template<class Backend = backend::swar>
++struct is_header
++{
++    template<std::size_t Size>
++    STOMPTALK_FORCE_INLINE
++    bool operator()(stomptalk_view name, const char (&text)[Size]) const noexcept
++    {
++        assert(name.data || !name.size);
++        return name.size == Size - 1 && Backend::template equal<Size - 1>(name.data, text);
++    }
++
++    STOMPTALK_FORCE_INLINE
++    bool operator()(stomptalk_view name, stomptalk_view expected) const noexcept
++    {
++        assert(name.data || !name.size);
++        assert(expected.data || !expected.size);
++        return name.size == expected.size && Backend::equal(name.data, expected.data, name.size);
++    }
++};
++
++template<stomptalk_backend Backend>
+ STOMPTALK_FORCE_INLINE
+-bool is_header(stomptalk_view name, stomptalk_view expected) noexcept
++bool is_content_length(stomptalk_view name) noexcept
+ {
+     assert(name.data || !name.size);
+-    assert(expected.data || !expected.size);
+-    return name.size == expected.size &&
+-        backend::comparison<Backend>::equal(name.data, expected.data, name.size);
++    return name.size == sizeof(backend::content_length) - 1 &&
++        backend::engine<Backend>::is_content_length(name.data);
+ }
+ 
+ } // namespace detail
+--- before/src/name_dispatch.hpp
++++ src/name_dispatch.hpp
+@@ -2,12 +2,7 @@
+ 
+ #include "stomptalk/parser.h"
+ 
+-#if defined(__SSE2__) && (defined(__i386__) || defined(__x86_64__)) && \
+-    (defined(__GNUC__) || defined(__clang__)) && !defined(STOMPTALK_DISABLE_AVX2)
+-#define STOMPTALK_NAMES_AVX2 1
+-#else
+-#define STOMPTALK_NAMES_AVX2 0
+-#endif
++#include "backend/config.hpp"
+ 
+ namespace stomptalk {
+ namespace detail {
+--- before/src/names.cpp
++++ src/names.cpp
+@@ -11,7 +11,7 @@
+     const auto features = stomptalk_cpu_features();
+     (void)features;
+ 
+-#if defined(__SSE2__)
++#if STOMPTALK_SSE2
+     if (features & STOMPTALK_CPU_SSE2)
+         available |= STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2);
+ #endif
+@@ -31,7 +31,7 @@
+         if (available & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2))
+             return detect_header_avx2;
+ #endif
+-#if defined(__SSE2__)
++#if STOMPTALK_SSE2
+         if (available & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2))
+             return detect_header<backend::sse2>;
+ #endif
+@@ -48,7 +48,7 @@
+     case STOMPTALK_BACKEND_AVX2:
+         return detect_header_avx2;
+ #endif
+-#if defined(__SSE2__)
++#if STOMPTALK_SSE2
+     case STOMPTALK_BACKEND_SSE2:
+         return detect_header<backend::sse2>;
+ #endif
+--- before/src/parser_avx2.cpp
++++ src/parser_avx2.cpp
+@@ -1,20 +1,32 @@
+-#include "parser_dispatch.hpp"
++#include "backend/config.hpp"
+ 
+ #if STOMPTALK_PARSER_AVX2
+ #include "stomptalk/parser.hpp"
+-#include "methods.hpp"
+-#include "content_length.hpp"
+-#include "backend/scan_avx2.hpp"
+ #include <algorithm>
+ #include <cassert>
+ 
+-// Only the AVX2 state instantiations get this target. Shared helpers and the
+-// dispatcher retain the baseline ISA; no global -mavx2 or per-field dispatch.
++#if defined(__clang__)
++#pragma clang attribute push(__attribute__((target("avx2"))), apply_to = function)
++#else
++#pragma GCC push_options
++#pragma GCC target("avx2")
++#endif
++
++#include "backend/avx2.hpp"
++#include "methods.hpp"
++#include "is_header.hpp"
++
+ namespace stomptalk {
+ 
+-#define STOMPTALK_STATE_TARGET __attribute__((target("avx2")))
++#define STOMPTALK_STATE_TARGET
+ #include "parser_states.hpp"
+ #undef STOMPTALK_STATE_TARGET
++
++#if defined(__clang__)
++#pragma clang attribute pop
++#else
++#pragma GCC pop_options
++#endif
+ 
+ parser::state_type parser::avx2_state() noexcept {
+     return &parser::start_state<STOMPTALK_BACKEND_AVX2>;
+--- before/src/parser_dispatch.hpp
++++ src/parser_dispatch.hpp
+@@ -1,8 +0,0 @@
+-#pragma once
+-
+-#if defined(__SSE2__) && (defined(__i386__) || defined(__x86_64__)) && \
+-    (defined(__GNUC__) || defined(__clang__)) && !defined(STOMPTALK_DISABLE_AVX2_PARSER)
+-#define STOMPTALK_PARSER_AVX2 1
+-#else
+-#define STOMPTALK_PARSER_AVX2 0
+-#endif
+--- before/src/parser_impl.hpp
++++ src/parser_impl.hpp
+@@ -4,9 +4,7 @@
+ #include "stomptalk/parser.hpp"
+ #include "stomptalk/antoull.hpp"
+ #include "methods.hpp"
+-#include "content_length.hpp"
+-#include "scan.hpp"
+-#include "parser_dispatch.hpp"
++#include "is_header.hpp"
+ #include <algorithm>
+ #include <cassert>
+ #include <cstdint>
+@@ -31,7 +29,7 @@
+     begin_ = stop_ = nullptr;
+     switch (backend_) {
+     case STOMPTALK_BACKEND_SWAR: state_ = &parser::start_state<STOMPTALK_BACKEND_SWAR>; break;
+-#if defined(__SSE2__)
++#if STOMPTALK_SSE2
+     case STOMPTALK_BACKEND_SSE2: state_ = &parser::start_state<STOMPTALK_BACKEND_SSE2>; break;
+ #endif
+ #if STOMPTALK_PARSER_AVX2
+@@ -240,7 +238,7 @@
+     if (status_ == STOMPTALK_PARSE_OK) {
+         const bool boundary = state_ == &parser::start_state<STOMPTALK_BACKEND_SCALAR> ||
+                               state_ == &parser::start_state<STOMPTALK_BACKEND_SWAR>
+-#if defined(__SSE2__)
++#if STOMPTALK_SSE2
+                               || state_ == &parser::start_state<STOMPTALK_BACKEND_SSE2>
+ #endif
+ #if STOMPTALK_PARSER_AVX2
+--- before/src/parser_states.hpp
++++ src/parser_states.hpp
+@@ -84,7 +84,7 @@
+             ++curr;
+             continue;
+         }
+-        const pointer p = detail::header_scanner<B>::template scan<true>(curr, end, literal_);
++        const pointer p = detail::backend::engine<B>::scan_header(curr, end, true, literal_);
+         // Copy/borrow the entire clean range, including all preceding SIMD blocks.
+         if (!append(curr, static_cast<size_t>(p - curr))) return stop_;
+         if (p == end) return p;
+@@ -97,7 +97,7 @@
+         if (*p != ':' || !token_.size) return fail(STOMPTALK_ERROR_HEADER, p);
+         key_ = finish_token();
+         length_header_ = !(current_.parsed.flags & STOMPTALK_FRAME_HAS_CONTENT_LENGTH) &&
+-            detail::is_content_length<B == STOMPTALK_BACKEND_AVX2 ? STOMPTALK_BACKEND_SSE2 : B>(key_);
++            detail::is_content_length<B>(key_);
+         return tailcall(&parser::hdrline_val<B>, p + 1, end);
+     }
+     return curr;
+@@ -121,7 +121,7 @@
+             ++curr;
+             continue;
+         }
+-        const pointer p = detail::header_scanner<B>::template scan<false>(curr, end, literal_);
++        const pointer p = detail::backend::engine<B>::scan_header(curr, end, false, literal_);
+         if (!append(curr, static_cast<size_t>(p - curr))) return stop_;
+         if (p == end) return p;
+         if (*p == '\\' && !literal_) {
+--- before/src/scan.hpp
++++ src/scan.hpp
+@@ -1,71 +0,0 @@
+-#pragma once
+-#include "stomptalk/parser.h"
+-#include <cstring>
+-#if defined(__SSE2__)
+-#include <emmintrin.h>
+-#endif
+-
+-namespace stomptalk { namespace detail {
+-STOMPTALK_FORCE_INLINE bool header_event(unsigned char c, bool key, bool literal) noexcept {
+-    return c == 0 || c == '\n' || c == '\r' ||
+-           (c == ':' && (key || !literal)) || (c == '\\' && !literal);
+-}
+-STOMPTALK_FORCE_INLINE uint64_t has_zero(uint64_t x) noexcept {
+-    return (x - UINT64_C(0x0101010101010101)) & ~x & UINT64_C(0x8080808080808080);
+-}
+-
+-// The backup's SIMD loop, with full-range prefix handling in the caller and
+-// length checks before every load. No assumptions about bytes past end.
+-template<stomptalk_backend B, bool Key>
+-STOMPTALK_FORCE_INLINE const char *scan_header(
+-    const char *p, const char *end, bool literal) noexcept {
+-#if defined(__SSE2__)
+-    if (B == STOMPTALK_BACKEND_SSE2) {
+-        while (end - p >= 16) {
+-            const __m128i v = _mm_loadu_si128(reinterpret_cast<const __m128i *>(p));
+-            __m128i events = _mm_or_si128(_mm_cmpeq_epi8(v, _mm_setzero_si128()),
+-                _mm_or_si128(_mm_cmpeq_epi8(v, _mm_set1_epi8('\n')),
+-                             _mm_cmpeq_epi8(v, _mm_set1_epi8('\r'))));
+-            if (Key || !literal)
+-                events = _mm_or_si128(events, _mm_cmpeq_epi8(v, _mm_set1_epi8(':')));
+-            if (!literal)
+-                events = _mm_or_si128(events, _mm_cmpeq_epi8(v, _mm_set1_epi8('\\')));
+-            const unsigned mask = static_cast<unsigned>(_mm_movemask_epi8(events));
+-            if (mask) return p + __builtin_ctz(mask);
+-            p += 16;
+-        }
+-    }
+-#endif
+-    if (B == STOMPTALK_BACKEND_SWAR) {
+-        while (end - p >= 8) {
+-            uint64_t v;
+-            std::memcpy(&v, p, 8);
+-            uint64_t events = has_zero(v) | has_zero(v ^ UINT64_C(0x0a0a0a0a0a0a0a0a)) |
+-                              has_zero(v ^ UINT64_C(0x0d0d0d0d0d0d0d0d));
+-            if (Key || !literal) events |= has_zero(v ^ UINT64_C(0x3a3a3a3a3a3a3a3a));
+-            if (!literal) events |= has_zero(v ^ UINT64_C(0x5c5c5c5c5c5c5c5c));
+-            if (events) {
+-#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+-                // Borrow can mark bytes AFTER a real match. On little-endian,
+-                // the least significant marked byte is therefore always exact.
+-                return p + (__builtin_ctzll(events) >> 3);
+-#else
+-                break; // presence is portable; locate the exact byte below
+-#endif
+-            }
+-            p += 8;
+-        }
+-    }
+-    while (p < end && !header_event(static_cast<unsigned char>(*p), Key, literal)) ++p;
+-    return p;
+-}
+-// Compile-time backend selection; no indirect scanner call per header.
+-template<stomptalk_backend B>
+-struct header_scanner {
+-    template<bool Key>
+-    STOMPTALK_FORCE_INLINE static const char *scan(
+-        const char *p, const char *end, bool literal) noexcept {
+-        return scan_header<B, Key>(p, end, literal);
+-    }
+-};
+-} }
+--- before/src/stomptalk.cpp
++++ src/stomptalk.cpp
+@@ -1,7 +1,7 @@
+ #include "parser_impl.hpp"
+ #include "methods.hpp"
+ #include "headers.hpp"
+-#include "parser_dispatch.hpp"
++#include "backend/config.hpp"
+ #include <algorithm>
+ #include <cstdint>
+ #include <cstring>
+@@ -83,11 +83,10 @@
+     auto headers = reinterpret_cast<stomptalk_header_view *>(base + l.headers);
+     for (size_t i = 0; i < c.frame_capacity; ++i) new (frames + i) stomptalk_frame_view;
+     for (size_t i = 0; i < c.header_capacity; ++i) new (headers + i) stomptalk_header_view;
+-    // Full-parser measurements select SSE2; unmeasured architectures keep the
+-    // scalar fallback. SWAR remains available explicitly for comparison.
++    // Keep AVX2 opt-in; configurations without SIMD fall back to SWAR.
+     auto backend = c.backend;
+     if (!backend) backend = (stomptalk_available_backends() & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2))
+-        ? stomptalk_backend(STOMPTALK_BACKEND_SSE2) : stomptalk_backend(STOMPTALK_BACKEND_SCALAR);
++        ? stomptalk_backend(STOMPTALK_BACKEND_SSE2) : stomptalk_backend(STOMPTALK_BACKEND_SWAR);
+     *result = new (memory) stomptalk_parser(c, frames, headers, base + l.bytes, backend);
+     return STOMPTALK_ERROR_NONE;
+ }
+@@ -132,7 +131,7 @@
+ uint32_t stomptalk_compiled_backends(void) {
+     return STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SCALAR) |
+            STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SWAR)
+-#if defined(__SSE2__)
++#if STOMPTALK_SSE2
+            | STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2)
+ #endif
+ #if STOMPTALK_PARSER_AVX2
+--- before/include/stomptalk/parser.h
++++ include/stomptalk/parser.h
+@@ -96,7 +96,7 @@
+ 
+ /* CPU features include OS support; available backends also require a build.
+  * Explicit unsupported requests fail at initialization; AUTO selects SSE2
+- * when available, otherwise scalar. AVX2 is opt-in for measured workloads. */
++ * when available, otherwise SWAR. AVX2 is opt-in for measured workloads. */
+ STOMPTALK_EXPORT uint32_t stomptalk_cpu_features(void);
+ STOMPTALK_EXPORT uint32_t stomptalk_compiled_backends(void);
+ STOMPTALK_EXPORT uint32_t stomptalk_available_backends(void);

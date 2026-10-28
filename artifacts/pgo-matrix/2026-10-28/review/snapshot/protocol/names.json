@@ -1,0 +1,321 @@
+{
+  "methods": [
+    {
+      "id": 1,
+      "name": "ABORT",
+      "wire": "ABORT"
+    },
+    {
+      "id": 2,
+      "name": "ACK",
+      "wire": "ACK"
+    },
+    {
+      "id": 3,
+      "name": "BEGIN",
+      "wire": "BEGIN"
+    },
+    {
+      "id": 4,
+      "name": "COMMIT",
+      "wire": "COMMIT"
+    },
+    {
+      "id": 5,
+      "name": "CONNECT",
+      "wire": "CONNECT"
+    },
+    {
+      "id": 6,
+      "name": "CONNECTED",
+      "wire": "CONNECTED"
+    },
+    {
+      "id": 7,
+      "name": "DISCONNECT",
+      "wire": "DISCONNECT"
+    },
+    {
+      "id": 8,
+      "name": "ERROR",
+      "wire": "ERROR"
+    },
+    {
+      "id": 9,
+      "name": "MESSAGE",
+      "wire": "MESSAGE"
+    },
+    {
+      "id": 10,
+      "name": "NACK",
+      "wire": "NACK"
+    },
+    {
+      "id": 11,
+      "name": "RECEIPT",
+      "wire": "RECEIPT"
+    },
+    {
+      "id": 12,
+      "name": "SEND",
+      "wire": "SEND"
+    },
+    {
+      "id": 13,
+      "name": "STOMP",
+      "wire": "STOMP"
+    },
+    {
+      "id": 14,
+      "name": "SUBSCRIBE",
+      "wire": "SUBSCRIBE"
+    },
+    {
+      "id": 15,
+      "name": "UNSUBSCRIBE",
+      "wire": "UNSUBSCRIBE"
+    }
+  ],
+  "headers": [
+    {
+      "id": 1,
+      "name": "ACCEPT_VERSION",
+      "wire": "accept-version"
+    },
+    {
+      "id": 2,
+      "name": "ACK",
+      "wire": "ack"
+    },
+    {
+      "id": 3,
+      "name": "AMQP_MESSAGE_ID",
+      "wire": "amqp-message-id"
+    },
+    {
+      "id": 4,
+      "name": "AMQP_TYPE",
+      "wire": "amqp_type"
+    },
+    {
+      "id": 5,
+      "name": "APP_ID",
+      "wire": "app-id"
+    },
+    {
+      "id": 6,
+      "name": "AUTO_DELETE",
+      "wire": "auto_delete"
+    },
+    {
+      "id": 7,
+      "name": "CLUSTER_ID",
+      "wire": "cluster-id"
+    },
+    {
+      "id": 8,
+      "name": "CONTENT_ENCODING",
+      "wire": "content-encoding"
+    },
+    {
+      "id": 9,
+      "name": "CONTENT_LENGTH",
+      "wire": "content-length"
+    },
+    {
+      "id": 10,
+      "name": "CONTENT_TYPE",
+      "wire": "content-type"
+    },
+    {
+      "id": 11,
+      "name": "CORRELATION_ID",
+      "wire": "correlation-id"
+    },
+    {
+      "id": 12,
+      "name": "DELIVERY_MODE",
+      "wire": "delivery-mode"
+    },
+    {
+      "id": 13,
+      "name": "DESTINATION",
+      "wire": "destination"
+    },
+    {
+      "id": 14,
+      "name": "DURABLE",
+      "wire": "durable"
+    },
+    {
+      "id": 15,
+      "name": "EXPIRATION",
+      "wire": "expiration"
+    },
+    {
+      "id": 16,
+      "name": "EXPIRES",
+      "wire": "expires"
+    },
+    {
+      "id": 17,
+      "name": "HEART_BEAT",
+      "wire": "heart-beat"
+    },
+    {
+      "id": 18,
+      "name": "HOST",
+      "wire": "host"
+    },
+    {
+      "id": 19,
+      "name": "ID",
+      "wire": "id"
+    },
+    {
+      "id": 20,
+      "name": "LOGIN",
+      "wire": "login"
+    },
+    {
+      "id": 21,
+      "name": "MESSAGE",
+      "wire": "message"
+    },
+    {
+      "id": 22,
+      "name": "MESSAGE_ID",
+      "wire": "message-id"
+    },
+    {
+      "id": 23,
+      "name": "PASSCODE",
+      "wire": "passcode"
+    },
+    {
+      "id": 24,
+      "name": "PERSISTENT",
+      "wire": "persistent"
+    },
+    {
+      "id": 25,
+      "name": "PREFETCH_COUNT",
+      "wire": "prefetch-count"
+    },
+    {
+      "id": 26,
+      "name": "PRIORITY",
+      "wire": "priority"
+    },
+    {
+      "id": 27,
+      "name": "RECEIPT",
+      "wire": "receipt"
+    },
+    {
+      "id": 28,
+      "name": "RECEIPT_ID",
+      "wire": "receipt-id"
+    },
+    {
+      "id": 29,
+      "name": "REDELIVERED",
+      "wire": "redelivered"
+    },
+    {
+      "id": 30,
+      "name": "REPLY_TO",
+      "wire": "reply-to"
+    },
+    {
+      "id": 31,
+      "name": "REQUEUE",
+      "wire": "requeue"
+    },
+    {
+      "id": 32,
+      "name": "SERVER",
+      "wire": "server"
+    },
+    {
+      "id": 33,
+      "name": "SESSION",
+      "wire": "session"
+    },
+    {
+      "id": 34,
+      "name": "SUBSCRIPTION",
+      "wire": "subscription"
+    },
+    {
+      "id": 35,
+      "name": "TIMESTAMP",
+      "wire": "timestamp"
+    },
+    {
+      "id": 36,
+      "name": "TRANSACTION",
+      "wire": "transaction"
+    },
+    {
+      "id": 37,
+      "name": "USER_ID",
+      "wire": "user-id"
+    },
+    {
+      "id": 38,
+      "name": "VERSION",
+      "wire": "version"
+    },
+    {
+      "id": 39,
+      "name": "DEAD_LETTER_EXCHANGE",
+      "wire": "x-dead-letter-exchange"
+    },
+    {
+      "id": 40,
+      "name": "DEAD_LETTER_ROUTING_KEY",
+      "wire": "x-dead-letter-routing-key"
+    },
+    {
+      "id": 41,
+      "name": "MAX_LENGTH",
+      "wire": "x-max-length"
+    },
+    {
+      "id": 42,
+      "name": "MAX_LENGTH_BYTES",
+      "wire": "x-max-length-bytes"
+    },
+    {
+      "id": 43,
+      "name": "MAX_PRIORITY",
+      "wire": "x-max-priority"
+    },
+    {
+      "id": 44,
+      "name": "MESSAGE_TTL",
+      "wire": "x-message-ttl"
+    },
+    {
+      "id": 45,
+      "name": "ORIGINAL_EXCHANGE",
+      "wire": "x-original-exchange"
+    },
+    {
+      "id": 46,
+      "name": "ORIGINAL_ROUTING_KEY",
+      "wire": "x-original-routing-key"
+    },
+    {
+      "id": 47,
+      "name": "QUEUE_NAME",
+      "wire": "x-queue-name"
+    },
+    {
+      "id": 48,
+      "name": "QUEUE_TYPE",
+      "wire": "x-queue-type"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/backend-redesign/2026-10-28/build/clang23-Os-before/probe  :
+section                size    addr
+.interp                  28     792
+.gnu.hash                36     824
+.dynsym                 864     864
+.dynstr                1151    1728
+.gnu.version             72    2880
+.gnu.version_r          256    2952
+.rela.dyn               264    3208
+.rela.plt               648    3472
+.init                    27    8192
+.plt                    448    8224
+.plt.got                 16    8672
+.plt.sec                432    8688
+.text                 30376    9120
+.fini                    13   39496
+.rodata                2336   40960
+.eh_frame_hdr           788   43296
+.eh_frame              4152   44088
+.gcc_except_table       196   48240
+.note.gnu.property       48   48440
+.note.ABI-tag            32   48488
+.init_array              16   52392
+.fini_array               8   52408
+.dynamic                544   52416
+.got                    288   52960
+.data                    24   53248
+.bss                     48   53280
+.comment                 52       0
+.debug_aranges           48       0
+.debug_info           27659       0
+.debug_abbrev           667       0
+.debug_line            7829       0
+.debug_str             4108       0
+.debug_line_str         403       0
+.debug_loclists       27441       0
+.debug_rnglists         524       0
+Total                111842
+
+

@@ -1,0 +1,28 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 589  of event 'cpu_core/cycles/u'
+# Event count (approx.): 2773018799
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    22.16%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)          -      -            
+    17.90%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)      -      -            
+    13.34%  [.] stomptalk::parser::append(char const*, unsigned long) [clone .part.0]             -      -            
+     9.96%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     6.87%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     6.54%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -            
+     6.01%  [.] char const* stomptalk::parser::frame_end<3u>(char const*, char const*)            -      -            
+     5.81%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     3.78%  [.] main                                                                              -      -            
+     2.63%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     2.20%  [.] stomptalk::parser::own_metadata()                                                 -      -            
+     1.03%  [.] char const* stomptalk::parser::done<3u>(char const*, char const*)                 -      -            
+
+
+#
+# (Tip: To measure approximate function latency with Processor Trace use perf record -e intel_pt// ... ; perf script --call-ret-trace)
+#

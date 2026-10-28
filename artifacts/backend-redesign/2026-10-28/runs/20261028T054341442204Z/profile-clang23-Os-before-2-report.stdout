@@ -1,0 +1,31 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 829  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3882024848
+#
+# Overhead  Symbol                                                                                        IPC   [IPC Coverage]
+# ........  ............................................................................................  ....................
+#
+    24.48%  [.] char const* stomptalk::parser::hdrline_hdr_key<2u>(char const*, char const*)              -      -            
+    14.47%  [.] char const* stomptalk::parser::hdrline_val<2u>(char const*, char const*)                  -      -            
+    12.04%  [.] stomptalk::parser::append(char const*, unsigned long)                                     -      -            
+    10.53%  [.] stomptalk::parser::publish(bool)                                                          -      -            
+     8.05%  [.] stomptalk::parser::finish_value(char const*)                                              -      -            
+     6.40%  [.] char const* stomptalk::parser::method_state<2u>(char const*, char const*)                 -      -            
+     4.24%  [.] stomptalk::parser::reserve(unsigned long, char const*)                                    -      -            
+     3.23%  [.] main                                                                                      -      -            
+     2.26%  [.] stomptalk::parser::own(stomptalk_view&)                                                   -      -            
+     1.71%  [.] char const* stomptalk::parser::hdrline_almost_done<2u>(char const*, char const*)          -      -            
+     1.58%  [.] char const* stomptalk::parser::start_state<2u>(char const*, char const*)                  -      -            
+     1.57%  [.] char const* stomptalk::parser::hdrline_done<2u>(char const*, char const*)                 -      -            
+     1.34%  [.] stomptalk::parser::own_token()                                                            -      -            
+     1.22%  [.] char const* stomptalk::parser::body_read_no_length<2u>(char const*, char const*)          -      -            
+     1.10%  [.] char const* stomptalk::parser::frame_end<2u>(char const*, char const*)                    -      -            
+
+
+#
+# (Tip: For a higher level overview, try: perf report --sort comm,dso)
+#

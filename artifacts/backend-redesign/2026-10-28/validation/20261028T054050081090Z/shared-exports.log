@@ -1,0 +1,16 @@
+stomptalk_available_backends
+stomptalk_compiled_backends
+stomptalk_cpu_features
+stomptalk_detect_header
+stomptalk_detect_method
+stomptalk_find_header
+stomptalk_header_name
+stomptalk_method_name
+stomptalk_parser_backend
+stomptalk_parser_config_default
+stomptalk_parser_destroy
+stomptalk_parser_execute
+stomptalk_parser_get_memory_requirements
+stomptalk_parser_init
+stomptalk_parser_reset
+stomptalk_version

@@ -1,0 +1,29 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 820  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3889460288
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    25.53%  [.] char const* stomptalk::parser::hdrline_hdr_key<2u>(char const*, char const*)      -      -            
+    14.05%  [.] char const* stomptalk::parser::hdrline_val<2u>(char const*, char const*)          -      -            
+    11.96%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+     9.92%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     7.01%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     6.14%  [.] char const* stomptalk::parser::method_state<2u>(char const*, char const*)         -      -            
+     4.83%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     4.41%  [.] main                                                                              -      -            
+     3.06%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     2.20%  [.] char const* stomptalk::parser::hdrline_done<2u>(char const*, char const*)         -      -            
+     1.96%  [.] char const* stomptalk::parser::start_state<2u>(char const*, char const*)          -      -            
+     1.58%  [.] char const* stomptalk::parser::body_read_no_length<2u>(char const*, char const*)  -      -            
+     1.48%  [.] char const* stomptalk::parser::hdrline_almost_done<2u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: Treat branches as callchains: perf record -b ... ; perf report --branch-history)
+#

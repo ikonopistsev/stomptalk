@@ -1,0 +1,9 @@
+[1/9] Building CXX object CMakeFiles/stomptalk.dir/src/names.cpp.o
+[2/9] Building CXX object CMakeFiles/stomptalk.dir/src/names_avx2.cpp.o
+[3/9] Building C object CMakeFiles/purestomp.dir/test/purestomp.c.o
+[4/9] Building CXX object CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o
+[5/9] Linking CXX static library libstomptalk.a
+[6/9] Linking CXX executable purestomp
+[7/9] Building CXX object CMakeFiles/stomptalk_unit_test.dir/test/unit_backend_avx2.cpp.o
+[8/9] Building CXX object CMakeFiles/stomptalk_unit_test.dir/test/unit_v2.cpp.o
+[9/9] Linking CXX executable stomptalk_unit_test

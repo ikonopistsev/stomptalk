@@ -1,0 +1,9 @@
+Test project /home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/header-line-study/2026-10-28/runs/20261028T061404564350Z/build/clang23-Os-line
+    Start 1: stomptalk_unit_test
+1/2 Test #1: stomptalk_unit_test ..............   Passed    0.31 sec
+    Start 2: stomptalk_c99_smoke
+2/2 Test #2: stomptalk_c99_smoke ..............   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.31 sec

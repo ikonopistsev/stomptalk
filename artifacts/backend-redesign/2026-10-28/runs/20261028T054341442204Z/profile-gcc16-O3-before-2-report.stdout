@@ -1,0 +1,27 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 694  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3255066404
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    25.74%  [.] char const* stomptalk::parser::hdrline_hdr_key<2u>(char const*, char const*)      -      -            
+    22.48%  [.] char const* stomptalk::parser::hdrline_val<2u>(char const*, char const*)          -      -            
+    10.47%  [.] stomptalk::parser::append(char const*, unsigned long) [clone .part.0]             -      -            
+     9.00%  [.] char const* stomptalk::parser::start_state<2u>(char const*, char const*)          -      -            
+     6.62%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     4.76%  [.] char const* stomptalk::parser::method_state<2u>(char const*, char const*)         -      -            
+     4.64%  [.] char const* stomptalk::parser::body_read_no_length<2u>(char const*, char const*)  -      -            
+     3.90%  [.] main                                                                              -      -            
+     3.49%  [.] char const* stomptalk::parser::frame_end<2u>(char const*, char const*)            -      -            
+     2.62%  [.] char const* stomptalk::parser::hdrline_done<2u>(char const*, char const*)         -      -            
+     2.03%  [.] stomptalk::parser::own_metadata()                                                 -      -            
+
+
+#
+# (Tip: Add -I to perf record to sample register values, which will be visible in perf report sample context.)
+#

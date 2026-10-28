@@ -1,0 +1,28 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 780  of event 'cpu_core/cycles/u'
+# Event count (approx.): 3702014967
+#
+# Overhead  Symbol                                                                                IPC   [IPC Coverage]
+# ........  ....................................................................................  ....................
+#
+    18.35%  [.] char const* stomptalk::parser::hdrline_hdr_key<3u>(char const*, char const*)      -      -            
+    16.14%  [.] char const* stomptalk::parser::hdrline_val<3u>(char const*, char const*)          -      -            
+    12.17%  [.] stomptalk::parser::publish(bool)                                                  -      -            
+    11.12%  [.] stomptalk::parser::append(char const*, unsigned long)                             -      -            
+     9.69%  [.] stomptalk::parser::finish_value(char const*)                                      -      -            
+     7.09%  [.] char const* stomptalk::parser::method_state<3u>(char const*, char const*)         -      -            
+     6.02%  [.] stomptalk::parser::reserve(unsigned long, char const*)                            -      -            
+     3.74%  [.] char const* stomptalk::parser::hdrline_done<3u>(char const*, char const*)         -      -            
+     3.62%  [.] main                                                                              -      -            
+     2.34%  [.] stomptalk::parser::own(stomptalk_view&)                                           -      -            
+     1.81%  [.] char const* stomptalk::parser::start_state<3u>(char const*, char const*)          -      -            
+     1.03%  [.] char const* stomptalk::parser::body_read_no_length<3u>(char const*, char const*)  -      -            
+
+
+#
+# (Tip: To compare scalability of two workload samples use perf diff -c ratio file1 file2)
+#

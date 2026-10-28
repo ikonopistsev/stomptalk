@@ -1,0 +1,19 @@
+[
+  "src/scan.hpp",
+  "src/backend/scan_avx2.hpp",
+  "src/parser_dispatch.hpp",
+  "test/main.cpp",
+  "test/unit_test.cpp",
+  "include/stomptalk/_parser_hook.hpp",
+  "include/stomptalk/_hashval.hpp",
+  "include/stomptalk/_antoull.hpp",
+  "include/stomptalk/_fnv1a.hpp",
+  "include/stomptalk/_antoull.h",
+  "include/stomptalk/_hook_base.hpp",
+  "include/stomptalk/_perf.hpp",
+  "test/unit_names_avx2.cpp",
+  "test/unit_scan_avx2.cpp",
+  "fuzz/fuzz_stomp_parser.c",
+  "fuzz/fuzz_stomp_chunked.c",
+  "fuzz/fuzz_stomp_large_header.c"
+]
