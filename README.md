@@ -117,34 +117,74 @@ uppercase ASCII letters receive `UNKNOWN` plus their complete string.
 Scalar, 8-byte SWAR, SSE2, and AVX2 header scanners can be selected at initialization.
 `stomptalk_cpu_features`, `stomptalk_compiled_backends`, and
 `stomptalk_available_backends` distinguish hardware/OS support and compiled code.
-AUTO selects SSE2 when available and scalar otherwise. SWAR can be selected
-explicitly. AVX2 is opt-in (`config.backend = STOMPTALK_BACKEND_AVX2`); check
-`stomptalk_available_backends()` before selecting it. AVX2 scans 32 bytes with
-SSE2/scalar tails, with no padding requirement. Its state functions share the
-same tailcall tree and use a separate target context, without global `-mavx2`.
-`STOMPTALK_BUILD_AVX2_PARSER=OFF` removes this parser backend independently of
-`STOMPTALK_BUILD_AVX2_NAMES`. Short names use exact constant-length
-comparisons. Wide loads stay within the input range.
+AUTO selects SSE2 when available and SWAR otherwise. Explicit unsupported requests
+fail. AVX2 remains opt-in (`config.backend = STOMPTALK_BACKEND_AVX2`).
+The header scanner is an ordinary inline function in each backend: AVX2 consumes
+32-byte blocks, SSE2 consumes 16-byte blocks, SWAR consumes 8-byte words, and the
+last 0..7 bytes use the byte loop. Every load stays within `[p,end)`; no padding
+or input alignment is required. CPU dispatch happens once at initialization.
+The parser keeps its existing named tailcall states.
 
-The parser includes only the method groups in `src/methods.hpp` and the dedicated
-`content-length` check in `src/content_length.hpp`. Methods use constant-sized
-`memcmp`; SSE2 parsing checks `content-length` with two overlapping eight-byte
-loads and one vector equality comparison against a prepacked `alignas(16)`
-constant. The two input loads cover exactly 14 bytes; input alignment is unrestricted.
-No other header is classified by the parser.
+Build controls (no global `-mavx2` is needed):
 
-`src/is_header.hpp` provides `is_header<Backend>(name, expected)` for exact
-comparison of two `stomptalk_view` values, including unknown names. SWAR uses
-`memcmp`, SSE2 compares 16-byte blocks, and AVX2 compares 32-byte blocks with
-bounded SSE2/word tails. These inline helpers select their backend at compilation;
-The AVX2 helper and its includes belong in a separate AVX2 compilation context;
-callers must check CPU/OS support before entering it.
-`is_content_length<Backend>` is a separate specialization for the parser's known
-14-byte name. Its aligned constant contains the first and last eight bytes,
-prepared by the generator. AVX2 uses the same 128-bit layout for this short name.
-Internal comparison helpers require a valid view (`data != nullptr` when
-`size != 0`); debug builds assert this precondition. Public C functions keep
-their argument checks. Empty views remain valid.
+| CMake option | Effect |
+| --- | --- |
+| `STOMPTALK_BUILD_AVX2=OFF` | SSE2 + SWAR; removes both AVX2 implementations |
+| `STOMPTALK_BUILD_SSE2=OFF` | SWAR fallback; also removes AVX2, which requires the SSE2 tail |
+| `STOMPTALK_BUILD_AVX2_PARSER=OFF` | Disable only the AVX2 parser |
+| `STOMPTALK_BUILD_AVX2_NAMES=OFF` | Disable only the optional AVX2 classifier |
+
+Direct compiler defines `STOMPTALK_DISABLE_AVX2` and `STOMPTALK_DISABLE_SSE2`
+have the same global effects. These disable our intrinsics, not compiler/libc
+optimizations. The scalar backend remains available for correctness comparisons.
+
+Comparison and scanning share the backend headers `src/backend/{swar,sse2,avx2}.hpp`.
+For comparison, `equal<N>` expands known-length SIMD blocks at compilation; the
+runtime overload loops over complete blocks. Both descend AVX2 -> SSE2 -> one
+`memcmp` for the remaining length. **The portable comparison is memcmp, not a
+hand-written SWAR equality algorithm.** SWAR refers to the 8-byte scanner, which
+uses integer loads through `memcpy` and bit arithmetic to find the first event.
+Its borrow-based mask is not an exact per-byte equality mask and is never used
+to decide whether two strings are equal.
+
+`src/is_header.hpp` provides an internal functor with a templated literal overload
+and an overload for two runtime views:
+
+```cpp
+using namespace stomptalk::detail;
+is_header<backend::sse2> match;
+bool known = match(name, "content-length"); // equal<14>
+bool dynamic = match(name, expected);       // two stomptalk_view values
+```
+
+The backend is a compile-time choice; AVX2 helpers must be included/called in an
+AVX2 target context after checking CPU/OS support. Valid views require non-null
+data for nonzero size (asserted internally); empty views are supported. These
+internal C++ helpers do not add templates or C++ types to the public C ABI.
+
+The parser checks only `content-length`. `src/content_length.hpp` generates
+one aligned wire constant, `\ncontent-length:` (16 bytes plus an unused C-string
+terminator). When the LF, name and colon are all in the
+current input range, SSE2 compares one unaligned input vector against that
+constant; AVX2 inherits the SSE2 path. The portable backend compares the same
+16 bytes. A fragmented name uses one `memcmp(name, content_length_wire + 1, 14)`;
+there is no separate name constant. The offset affects the constant only.
+The caller proves the preceding LF and following colon are readable; there is
+no load before the start of an input packet. No extra parser flag is added.
+Generic `is_header` continues to compare ordinary names.
+Methods keep their length groups and constant-sized comparisons. Known-length
+payloads are skipped by length; unknown-length payloads use `memchr` for NUL.
+
+The header state `hdrline` consumes
+`scan_header_line` results containing a separator and a stopping position.
+The scanner continues through the first colon using the same SIMD block, then
+stops at EOL, an escape or an invalid byte. The backend cascade remains
+32 → 16 → 8 → bytes. SWAR uses an exact byte mask here, since the first colon is
+removed from the mask; the old presence-only mask cannot safely be reused.
+Existing key/token views and the escape state preserve progress across packets.
+No persistent cursor/mask cache, arena expansion or C ABI change is introduced.
+The old split key/value states and their scanners have been removed.
+[Experiment and measurements](artifacts/header-line-study/2026-10-28/README.md).
 
 `include/stomptalk/antoull.hpp` restores the original length-dispatched template
 converter for `content-length`. Its checked overload also accepts 19/20-digit
@@ -152,6 +192,10 @@ values through `UINT64_MAX` and leading zeroes, without allocating or changing
 the error contract. Invalid digits and overflow are checked at runtime.
 
 `stomptalk_detect_header` is an optional client utility, implemented separately
+from the parser. Name classifiers require readable input for nonzero size;
+invalid views violate a precondition checked by `assert` in debug builds.
+`{NULL, 0}` is valid and returns UNKNOWN. UNKNOWN describes an unrecognized
+name, not an invalid nonempty pointer. The implementation lives
 in `src/names.cpp` and `src/headers.hpp`. Length selects a template group; larger
 groups use one or two distinguishing characters chosen at compile time, followed
 by exact equality. Pairs of names use direct comparisons. The comparison backends
@@ -160,19 +204,26 @@ are in `src/backend/{swar,sse2,avx2}.hpp`; the portable backend uses constant-si
 AVX2 code is compiled in its own translation unit without a global `-mavx2` flag.
 Disable it with `-DSTOMPTALK_BUILD_AVX2_NAMES=OFF` when configuring CMake.
 
-These name-comparison backends are separate from the parser's scanning backends.
-The longest current known name
-is 25 bytes, so even the AVX2 name backend uses its short SSE2/word path for this
-dictionary; its 32-byte path is exercised separately by the backend tests.
+The classifier and parser now use the same backend headers, with separate
+initialization choices. The longest known name is 25 bytes; the AVX2 classifier
+therefore uses its SSE2/portable path. Tests also cover longer strings.
 
-Headers prefixed with `_` in `include/stomptalk` are unused 1.8.0 helpers. They are
-kept for reference and are neither compiled into v2 nor installed.
+Unused 1.8.0 helpers prefixed with `_`, old callback tests/harnesses, and superseded
+scanner headers have been removed from this branch. Original code remains in
+Git history and the adjacent `stomptalk-1.8.0` checkout.
 
 State functions retain the original `tailcall` style. Optimized GCC/Clang builds
 use tail transitions; debug and the configured fuzz/sanitizer builds use the same
 functions through the outer dispatch loop. For custom instrumentation or flags
 that disable tail-call elimination, define `STOMPTALK_TRAMPOLINE`. Initial validation targets Linux x86-64 with GCC and
 Clang; other targets are not yet validated.
+
+The baseline parser and C entry points compile together in `src/stomptalk.cpp`.
+`src/parser_impl.hpp` contains the private implementation, with helpers defined
+before the state tree. Internal symbols have hidden visibility; the C API is
+explicitly exported. The optional name classifier remains a separate archive
+object, so parser-only static clients do not pull it in. Optional AVX2 code
+retains its separate target context.
 
 ## Tests and measurements
 
@@ -224,3 +275,10 @@ Install CMake: <https://www.cmake.org>
 $ cmake -S . -B build -G "Visual Studio 17 2022" -A x64
 $ cmake --build build --config Release
 ```
+
+## Clang PGO and server handoff
+
+[PGO.md](PGO.md) documents the ready-to-use profile and the complete
+`ctest -S cmake/ClangPGO.cmake -VV` generate/train/merge/use/test workflow.
+The library alone receives PGO flags; an optional trainer can exercise a server.
+[SERVER_HANDOFF.md](SERVER_HANDOFF.md) defines integration and server A/B checks.

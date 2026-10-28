@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../src/is_header.hpp"
-#include "../src/content_length.hpp"
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
@@ -93,7 +92,8 @@ std::size_t check_name_backend()
     page = mapping + page_size;
     name_check(mprotect(page, page_size, PROT_READ | PROT_WRITE) == 0, 0, 0);
 #endif
-    const auto checks = check_name_sizes<Backend>(page, page_size, std::make_index_sequence<66>{});
+    const auto checks = check_name_sizes<Backend>(page, page_size, std::make_index_sequence<66>{}) +
+        check_name_sizes<Backend>(page, page_size, std::index_sequence<97, 128, 257>{});
 #if defined(__unix__)
     name_check(munmap(page - page_size, page_size * 3) == 0, 0, 0);
 #endif
@@ -108,7 +108,18 @@ struct header_matcher
     {
         // Exercise the runtime-length paths, including SIMD loop boundaries.
         volatile std::size_t size = Size;
-        return stomptalk::detail::is_header<Backend>({data, size}, {text, size});
+        return stomptalk::detail::is_header<stomptalk::detail::backend::engine<Backend>>{}({data, size}, {text, size});
+    }
+};
+
+template<stomptalk_backend Backend>
+struct wire_length_matcher
+{
+    template<std::size_t Size>
+    static bool equal(const char* data, const char*)
+    {
+        static_assert(Size == 16, "LF + content-length + colon");
+        return stomptalk::detail::is_content_length<Backend>({data + 1, 14}, data);
     }
 };
 
@@ -118,10 +129,17 @@ std::size_t check_header_backend()
     using namespace stomptalk::detail;
     auto checks = check_name_backend<header_matcher<Backend>>();
     auto check = [&](bool ok) { name_check(ok, 14, Backend); ++checks; };
-    check(is_header<Backend>({nullptr, 0}, {nullptr, 0}));
-    check(!is_header<Backend>({nullptr, 0}, {"content-length", 14}));
-    check(!is_header<Backend>({"content-length", 14}, {nullptr, 0}));
-    check(!is_header<Backend>({"content-length", 13}, {"content-length", 14}));
+    check(is_header<backend::engine<Backend>>{}({nullptr, 0}, {nullptr, 0}));
+    check(!is_header<backend::engine<Backend>>{}({nullptr, 0}, {"content-length", 14}));
+    check(!is_header<backend::engine<Backend>>{}({"content-length", 14}, {nullptr, 0}));
+    check(!is_header<backend::engine<Backend>>{}({"content-length", 13}, {"content-length", 14}));
+    const is_header<backend::engine<Backend>> match{};
+    check(match({"content-length", 14}, "content-length"));
+    check(!match({"content-lengtH", 14}, "content-length"));
+    check(!match({"content-length", 13}, "content-length"));
+    check(match({nullptr, 0}, ""));
+    check(match({"a\0b", 3}, "a\0b")); // known size includes embedded NUL
+    check(!match({"a\0c", 3}, "a\0b"));
     check(!is_content_length<Backend>({nullptr, 0}));
     check(!is_content_length<Backend>({"content-length?", 15}));
     check(!is_content_length<Backend>({"content-lengt", 13}));
@@ -143,6 +161,20 @@ std::size_t check_header_backend()
     };
     for (std::size_t offset = 0; offset < 32; ++offset)
         content_length(storage + offset);
+    auto wire_length = [&](char* data)
+    {
+        std::memcpy(data, "\ncontent-length:", 16);
+        check(wire_length_matcher<Backend>::template equal<16>(data, data));
+        for (std::size_t at = 0; at < 16; ++at)
+        {
+            data[at] ^= 1;
+            check(!wire_length_matcher<Backend>::template equal<16>(data, data));
+            data[at] ^= 1;
+        }
+    };
+    char wire_storage[16 + 32];
+    for (std::size_t offset = 0; offset < 32; ++offset)
+        wire_length(wire_storage + offset);
 #if defined(__unix__)
     const auto page_size = static_cast<std::size_t>(sysconf(_SC_PAGESIZE));
     auto mapping = static_cast<char*>(mmap(nullptr, page_size * 3, PROT_NONE,
@@ -152,6 +184,8 @@ std::size_t check_header_backend()
     check(mprotect(page, page_size, PROT_READ | PROT_WRITE) == 0);
     content_length(page);
     content_length(page + page_size - 14);
+    wire_length(page);
+    wire_length(page + page_size - 16);
     checks += check_name_size<header_matcher<Backend>, 97>(page, page_size);
     checks += check_name_size<header_matcher<Backend>, 128>(page, page_size);
     checks += check_name_size<header_matcher<Backend>, 257>(page, page_size);

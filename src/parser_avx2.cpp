@@ -1,20 +1,30 @@
-#include "parser_dispatch.hpp"
+#include "backend/config.hpp"
 
 #if STOMPTALK_PARSER_AVX2
 #include "stomptalk/parser.hpp"
-#include "methods.hpp"
-#include "content_length.hpp"
-#include "backend/scan_avx2.hpp"
 #include <algorithm>
 #include <cassert>
 
-// Only the AVX2 state instantiations get this target. Shared helpers and the
-// dispatcher retain the baseline ISA; no global -mavx2 or per-field dispatch.
+#if defined(__clang__)
+#pragma clang attribute push(__attribute__((target("avx2"))), apply_to = function)
+#else
+#pragma GCC push_options
+#pragma GCC target("avx2")
+#endif
+
+#include "backend/avx2.hpp"
+#include "methods.hpp"
+#include "is_header.hpp"
+
 namespace stomptalk {
 
-#define STOMPTALK_STATE_TARGET __attribute__((target("avx2")))
 #include "parser_states.hpp"
-#undef STOMPTALK_STATE_TARGET
+
+#if defined(__clang__)
+#pragma clang attribute pop
+#else
+#pragma GCC pop_options
+#endif
 
 parser::state_type parser::avx2_state() noexcept {
     return &parser::start_state<STOMPTALK_BACKEND_AVX2>;

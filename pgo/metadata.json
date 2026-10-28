@@ -1,0 +1,27 @@
+{
+  "compiler": "clang version 23.1.4\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm/23/bin\nConfiguration file: /etc/clang/23/x86_64-pc-linux-gnu-clang++.cfg\n",
+  "llvm_profdata": "LLVM (http://llvm.org/):\n  LLVM version 23.1.4\n  Optimized build.\n",
+  "target": "x86_64-pc-linux-gnu",
+  "library": "static PIC; SSE2, AVX2 parser/names compiled; AUTO selects SSE2",
+  "normalization": "-mllvm -static-func-full-module-prefix=false (generate and use)",
+  "instrumentation": "Clang IR PGO, library sources only; atomic counters",
+  "training": "CTest unit suite (all available backends), C99 smoke (100 frames), purestomp AUTO 500000 x 10 frames; no server traffic",
+  "flags": "-O2/-O3 -DNDEBUG; no LTO, no -march=native; see options files",
+  "profiles": {
+    "O2": {
+      "file": "clang23.profdata",
+      "sha256": "ab73d8001b447b3623cb6569990321e3760a01cc776c63548776a6225094025d",
+      "bytes": 21856,
+      "summary": "Instrumentation level: IR  entry_first = 0  instrument_loop_entries = 0\nTotal functions: 88\nMaximum function count: 41955756\nMaximum internal block count: 41537141\nTotal number of blocks: 1268\nTotal count: 807653261\n",
+      "options": "-DCMAKE_BUILD_TYPE=Release;-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang;-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++;-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG;-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG;-DSTOMPTALK_BUILD_TESTS=ON;-DSTOMPTALK_LIBRARY_INSTALL=ON;-DSTOMPTALK_PGO_ITERATIONS=500000"
+    },
+    "O3": {
+      "file": "clang23.profdata",
+      "sha256": "ab73d8001b447b3623cb6569990321e3760a01cc776c63548776a6225094025d",
+      "bytes": 21856,
+      "summary": "Instrumentation level: IR  entry_first = 0  instrument_loop_entries = 0\nTotal functions: 88\nMaximum function count: 41955756\nMaximum internal block count: 41537141\nTotal number of blocks: 1268\nTotal count: 807653261\n",
+      "options": "-DCMAKE_BUILD_TYPE=Release;-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang;-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++;-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG;-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG;-DSTOMPTALK_BUILD_TESTS=ON;-DSTOMPTALK_LIBRARY_INSTALL=ON;-DSTOMPTALK_PGO_ITERATIONS=500000"
+    }
+  },
+  "note": "O2 and O3 were generated independently. Their IR profiles are byte-identical for this training; one file is shipped, validated with both optimization levels."
+}

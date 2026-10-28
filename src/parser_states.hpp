@@ -2,7 +2,6 @@
 #pragma once
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::start_state(pointer curr, pointer end) noexcept {
     while (curr < end) {
         const unsigned char ch = static_cast<unsigned char>(*curr);
@@ -26,14 +25,12 @@ parser::pointer parser::start_state(pointer curr, pointer end) noexcept {
 }
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::start_cr(pointer curr, pointer end) noexcept {
     if (*curr != '\n') return fail(STOMPTALK_ERROR_EOL, curr);
     return tailcall(&parser::start_state<B>, curr + 1, end);
 }
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::method_state(pointer curr, pointer end) noexcept {
     pointer p = curr;
     // Short commands stay scalar; SIMD header scanning does not imply SIMD IDs.
@@ -51,7 +48,6 @@ parser::pointer parser::method_state(pointer curr, pointer end) noexcept {
 }
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::hdrline_done(pointer curr, pointer end) noexcept {
     if (*curr == '\n') return tailcall(&parser::done<B>, curr + 1, end);
     if (*curr == '\r') return tailcall(&parser::almost_done<B>, curr + 1, end);
@@ -62,13 +58,13 @@ parser::pointer parser::hdrline_done(pointer curr, pointer end) noexcept {
         status_ = STOMPTALK_PARSE_OUTPUT_FULL;
         return curr;
     }
-    // The first byte goes through exactly the same decoder as all others.
-    return tailcall(&parser::hdrline_hdr_key<B>, curr, end);
+    return tailcall(&parser::hdrline<B>, curr, end);
 }
 
+// One scan supplies both key/value ranges. Existing
+// views and state keep progress across execute; no cursor or mask cache is added.
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
-parser::pointer parser::hdrline_hdr_key(pointer curr, pointer end) noexcept {
+parser::pointer parser::hdrline(pointer curr, pointer end) noexcept {
     while (curr < end) {
         if (escape_) {
             char ch = *curr;
@@ -84,8 +80,18 @@ parser::pointer parser::hdrline_hdr_key(pointer curr, pointer end) noexcept {
             ++curr;
             continue;
         }
-        const pointer p = detail::header_scanner<B>::template scan<true>(curr, end, literal_);
-        // Copy/borrow the entire clean range, including all preceding SIMD blocks.
+        const auto line = detail::backend::engine<B>::scan_header_line(curr, end, !key_.size, literal_);
+        if (line.separator) {
+            if (!append(curr, static_cast<size_t>(line.separator - curr))) return stop_;
+            if (!token_.size) return fail(STOMPTALK_ERROR_HEADER, line.separator);
+            key_ = finish_token();
+            length_header_ = !(current_.parsed.flags & STOMPTALK_FRAME_HAS_CONTENT_LENGTH) &&
+                key_.size == sizeof(detail::backend::content_length_wire) - 3 &&
+                detail::is_content_length<B>(key_,
+                    curr > begin_ && line.separator - curr == static_cast<ptrdiff_t>(key_.size) ? curr - 1 : nullptr);
+            curr = line.separator + 1;
+        }
+        const pointer p = line.stop;
         if (!append(curr, static_cast<size_t>(p - curr))) return stop_;
         if (p == end) return p;
         if (*p == '\\' && !literal_) {
@@ -94,67 +100,27 @@ parser::pointer parser::hdrline_hdr_key(pointer curr, pointer end) noexcept {
             curr = p + 1;
             continue;
         }
-        if (*p != ':' || !token_.size) return fail(STOMPTALK_ERROR_HEADER, p);
-        key_ = finish_token();
-        length_header_ = !(current_.parsed.flags & STOMPTALK_FRAME_HAS_CONTENT_LENGTH) &&
-            detail::is_content_length<B == STOMPTALK_BACKEND_AVX2 ? STOMPTALK_BACKEND_SSE2 : B>(key_);
-        return tailcall(&parser::hdrline_val<B>, p + 1, end);
-    }
-    return curr;
-}
-
-template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
-parser::pointer parser::hdrline_val(pointer curr, pointer end) noexcept {
-    while (curr < end) {
-        if (escape_) {
-            char ch = *curr;
-            switch (ch) {
-            case 'n': ch = '\n'; break;
-            case 'r': ch = '\r'; break;
-            case 'c': ch = ':'; break;
-            case '\\': break;
-            default: return fail(STOMPTALK_ERROR_ESCAPE, curr);
-            }
-            if (!append(ch, curr)) return stop_;
-            escape_ = false;
-            ++curr;
-            continue;
-        }
-        const pointer p = detail::header_scanner<B>::template scan<false>(curr, end, literal_);
-        if (!append(curr, static_cast<size_t>(p - curr))) return stop_;
-        if (p == end) return p;
-        if (*p == '\\' && !literal_) {
-            own_token();
-            escape_ = true;
-            curr = p + 1;
-            continue;
-        }
-        const char ch = *p;
-        if (ch != '\r' && ch != '\n') return fail(STOMPTALK_ERROR_HEADER, p);
+        if (!key_.size || (*p != '\r' && *p != '\n')) return fail(STOMPTALK_ERROR_HEADER, p);
         if (!finish_value(p)) return stop_;
-        return ch == '\n' ? tailcall(&parser::hdrline_done<B>, p + 1, end)
-                         : tailcall(&parser::hdrline_almost_done<B>, p + 1, end);
+        return *p == '\n' ? tailcall(&parser::hdrline_done<B>, p + 1, end)
+                          : tailcall(&parser::hdrline_almost_done<B>, p + 1, end);
     }
     return curr;
 }
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::hdrline_almost_done(pointer curr, pointer end) noexcept {
     if (*curr != '\n') return fail(STOMPTALK_ERROR_EOL, curr);
     return tailcall(&parser::hdrline_done<B>, curr + 1, end);
 }
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::almost_done(pointer curr, pointer end) noexcept {
     if (*curr != '\n') return fail(STOMPTALK_ERROR_EOL, curr);
     return tailcall(&parser::done<B>, curr + 1, end);
 }
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::done(pointer curr, pointer end) noexcept {
     // A leading NUL is data when a positive content-length is present.
     if (current_.parsed.flags & STOMPTALK_FRAME_HAS_CONTENT_LENGTH)
@@ -163,7 +129,6 @@ parser::pointer parser::done(pointer curr, pointer end) noexcept {
 }
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::body_read(pointer curr, pointer end) noexcept {
     const uint64_t left = current_.parsed.content_length - current_.parsed.payload_offset;
     const size_t count = static_cast<size_t>((std::min)(left, uint64_t(end - curr)));
@@ -175,7 +140,6 @@ parser::pointer parser::body_read(pointer curr, pointer end) noexcept {
 }
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::body_read_no_length(pointer curr, pointer end) noexcept {
     if (*curr == '\0') return tailcall(&parser::frame_end<B>, curr, end);
     const pointer nul = static_cast<pointer>(std::memchr(curr, 0, size_t(end - curr)));
@@ -188,7 +152,6 @@ parser::pointer parser::body_read_no_length(pointer curr, pointer end) noexcept 
 }
 
 template<stomptalk_backend B>
-STOMPTALK_STATE_TARGET
 parser::pointer parser::frame_end(pointer curr, pointer end) noexcept {
     if (*curr != '\0') return fail(STOMPTALK_ERROR_TERMINATOR, curr);
     publish(true);

@@ -57,8 +57,7 @@ private:
     template<stomptalk_backend B> pointer start_cr(pointer, pointer) noexcept;
     template<stomptalk_backend B> pointer method_state(pointer, pointer) noexcept;
     template<stomptalk_backend B> pointer hdrline_done(pointer, pointer) noexcept;
-    template<stomptalk_backend B> pointer hdrline_hdr_key(pointer, pointer) noexcept;
-    template<stomptalk_backend B> pointer hdrline_val(pointer, pointer) noexcept;
+    template<stomptalk_backend B> pointer hdrline(pointer, pointer) noexcept;
     template<stomptalk_backend B> pointer hdrline_almost_done(pointer, pointer) noexcept;
     template<stomptalk_backend B> pointer almost_done(pointer, pointer) noexcept;
     template<stomptalk_backend B> pointer done(pointer, pointer) noexcept;

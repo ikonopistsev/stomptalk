@@ -624,9 +624,10 @@ stomptalk_header_id detect_header(stomptalk_view name) noexcept
         return headers_22::find<Backend>(name.data);
     case headers_25::size:
         return headers_25::find<Backend>(name.data);
-    default:
-        return STOMPTALK_HEADER_UNKNOWN;
+    default:;
     }
+
+    return STOMPTALK_HEADER_UNKNOWN;
 }
 
 inline stomptalk_view header_name(stomptalk_header_id id) noexcept
@@ -729,9 +730,10 @@ inline stomptalk_view header_name(stomptalk_header_id id) noexcept
         return header::queue_name::text();
     case STOMPTALK_HEADER_QUEUE_TYPE:
         return header::queue_type::text();
-    default:
-        return {nullptr, 0};
+    default:;
     }
+
+    return {nullptr, 0};
 }
 
 } // namespace

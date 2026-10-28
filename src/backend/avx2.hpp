@@ -1,22 +1,27 @@
 #pragma once
 
 #include "sse2.hpp"
+
+#if STOMPTALK_AVX2
 #include <immintrin.h>
 
-// Include/instantiate in an AVX2 compilation context. The dispatcher checks
-// both CPU/OS availability and whether that implementation was compiled.
+// Include in an AVX2 target context. CPU/OS support is checked once at init.
 namespace stomptalk {
 namespace detail {
 namespace backend {
 
-struct avx2
+struct avx2 : sse2
 {
-    template<std::size_t Size>
     STOMPTALK_FORCE_INLINE
-    static bool equal_ends8(const char* data, const char* text) noexcept
+    static __m256i load(const char* data) noexcept
     {
-        // Short names use VEX-encoded XMM operations in this AVX2 context.
-        return sse2::equal_ends8<Size>(data, text);
+        return _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data));
+    }
+
+    STOMPTALK_FORCE_INLINE
+    static unsigned mask(__m256i matches) noexcept
+    {
+        return static_cast<unsigned>(_mm256_movemask_epi8(matches));
     }
 
     STOMPTALK_FORCE_INLINE
@@ -24,10 +29,7 @@ struct avx2
     {
         while (size >= 32)
         {
-            const auto matches = _mm256_cmpeq_epi8(
-                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data)),
-                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(text)));
-            if (_mm256_movemask_epi8(matches) != -1)
+            if (mask(_mm256_cmpeq_epi8(load(data), load(text))) != UINT32_MAX)
                 return false;
             data += 32;
             text += 32;
@@ -38,33 +40,56 @@ struct avx2
 
     template<std::size_t Size>
     STOMPTALK_FORCE_INLINE
-    static bool equal(const char* data, const char* text) noexcept
+    static typename std::enable_if<(Size < 32), bool>::type
+    equal(const char* data, const char* text) noexcept
     {
-        if (Size < 32)
-            return sse2::equal<Size>(data, text);
+        return sse2::equal<Size>(data, text);
+    }
 
-        const auto first = _mm256_cmpeq_epi8(
-            _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data)),
-            _mm256_loadu_si256(reinterpret_cast<const __m256i*>(text)));
+    template<std::size_t Size>
+    STOMPTALK_FORCE_INLINE
+    static typename std::enable_if<(Size >= 32), bool>::type
+    equal(const char* data, const char* text) noexcept
+    {
+        return mask(_mm256_cmpeq_epi8(load(data), load(text))) == UINT32_MAX &&
+            equal<Size - 32>(data + 32, text + 32);
+    }
 
-        if (Size == 32)
-            return _mm256_movemask_epi8(first) == -1;
-
-        if (Size <= 64)
+    // The 16-byte content-length wire check is inherited from SSE2.
+    STOMPTALK_FORCE_INLINE
+    static header_line scan_header_line(const char* p, const char* end, bool key, bool literal) noexcept
+    {
+        const char* separator = nullptr;
+        while (end - p >= 32)
         {
-            const auto last = _mm256_cmpeq_epi8(
-                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data + Size - 32)),
-                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(text + Size - 32)));
-            return _mm256_movemask_epi8(_mm256_and_si256(first, last)) == -1;
+            const auto word = load(p);
+            auto colons = mask(_mm256_cmpeq_epi8(word, _mm256_set1_epi8(':')));
+            auto events = _mm256_or_si256(_mm256_cmpeq_epi8(word, _mm256_setzero_si256()),
+                _mm256_or_si256(_mm256_cmpeq_epi8(word, _mm256_set1_epi8('\n')),
+                                 _mm256_cmpeq_epi8(word, _mm256_set1_epi8('\r'))));
+            if (!literal)
+                events = _mm256_or_si256(events, _mm256_cmpeq_epi8(word, _mm256_set1_epi8('\\')));
+            auto stops = mask(events);
+            if (key && colons && (!stops || __builtin_ctz(colons) < __builtin_ctz(stops)))
+            {
+                separator = p + __builtin_ctz(colons);
+                key = false;
+                colons &= colons - 1;
+            }
+            if (!literal)
+                stops |= colons;
+            if (stops)
+                return {separator, p + __builtin_ctz(stops)};
+            p += 32;
         }
-
-        return _mm256_movemask_epi8(first) == -1 &&
-            swar::equal<Size - (Size >= 32 ? 32 : 0)>(data + 32, text + 32);
+        const auto tail = sse2::scan_header_line(p, end, key, literal);
+        return {separator ? separator : tail.separator, tail.stop};
     }
 };
 
-template<> struct comparison<STOMPTALK_BACKEND_AVX2> : avx2 {};
+template<> struct engine<STOMPTALK_BACKEND_AVX2> : avx2 {};
 
 } // namespace backend
 } // namespace detail
 } // namespace stomptalk
+#endif

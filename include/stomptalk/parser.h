@@ -87,6 +87,9 @@ STOMPTALK_EXPORT void stomptalk_parser_reset(stomptalk_parser *);
  * A repeated call after an error returns consumed=0 and error_offset=0. */
 STOMPTALK_EXPORT stomptalk_parse_result stomptalk_parser_execute(
     stomptalk_parser *, const char *, size_t);
+/* Name classifiers require a readable [data, data + size) for nonzero size.
+ * NULL/0 is valid and returns UNKNOWN. Invalid views violate a precondition
+ * (asserted in debug builds); UNKNOWN denotes an unrecognized name. */
 STOMPTALK_EXPORT stomptalk_method_id stomptalk_detect_method(stomptalk_view);
 STOMPTALK_EXPORT stomptalk_view stomptalk_method_name(stomptalk_method_id);
 STOMPTALK_EXPORT stomptalk_header_id stomptalk_detect_header(stomptalk_view);
@@ -96,7 +99,7 @@ STOMPTALK_EXPORT const stomptalk_header_view *stomptalk_find_header(
 
 /* CPU features include OS support; available backends also require a build.
  * Explicit unsupported requests fail at initialization; AUTO selects SSE2
- * when available, otherwise scalar. AVX2 is opt-in for measured workloads. */
+ * when available, otherwise SWAR. AVX2 is opt-in for measured workloads. */
 STOMPTALK_EXPORT uint32_t stomptalk_cpu_features(void);
 STOMPTALK_EXPORT uint32_t stomptalk_compiled_backends(void);
 STOMPTALK_EXPORT uint32_t stomptalk_available_backends(void);

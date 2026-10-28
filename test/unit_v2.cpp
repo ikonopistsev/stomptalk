@@ -1,10 +1,10 @@
 #include "stomptalk/parser.h"
 #include "stomptalk/stackbuf.hpp"
 #include "stomptalk/antoull.hpp"
-#include "../src/scan.hpp"
 #include "../src/name_dispatch.hpp"
 #include "../src/backend/sse2.hpp"
 #include "name_backend_checks.hpp"
+#include "scan_backend_checks.hpp"
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
@@ -252,7 +252,7 @@ static void api() {
     CHECK(c.max_headers_per_frame == 64);
     instance automatic(c);
     const auto automatic_backend = (stomptalk_available_backends() & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2))
-        ? STOMPTALK_BACKEND_SSE2 : STOMPTALK_BACKEND_SCALAR;
+        ? STOMPTALK_BACKEND_SSE2 : STOMPTALK_BACKEND_SWAR;
     CHECK(stomptalk_parser_backend(automatic.p) == unsigned(automatic_backend));
     stomptalk_memory_requirements r{};
     CHECK(stomptalk_parser_get_memory_requirements(nullptr, &r) == 0);
@@ -268,10 +268,18 @@ static void api() {
     c.header_capacity = 1;
     CHECK(stomptalk_parser_get_memory_requirements(&c, &r) == STOMPTALK_ERROR_CONFIG);
     stomptalk_parser_config_default(&c);
-    c.backend = STOMPTALK_BACKEND_AVX2;
-    CHECK(stomptalk_parser_get_memory_requirements(&c, &r) ==
-        ((stomptalk_available_backends() & STOMPTALK_BACKEND_BIT(c.backend))
-            ? STOMPTALK_ERROR_NONE : STOMPTALK_ERROR_BACKEND));
+    for (unsigned b = STOMPTALK_BACKEND_SCALAR; b <= STOMPTALK_BACKEND_AVX2; ++b) {
+        c.backend = b;
+        CHECK(stomptalk_parser_get_memory_requirements(&c, &r) ==
+            ((stomptalk_available_backends() & STOMPTALK_BACKEND_BIT(b))
+                ? STOMPTALK_ERROR_NONE : STOMPTALK_ERROR_BACKEND));
+    }
+#if !STOMPTALK_SSE2
+    CHECK(!(stomptalk_compiled_backends() & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2)));
+#endif
+#if !STOMPTALK_PARSER_AVX2
+    CHECK(!(stomptalk_compiled_backends() & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2)));
+#endif
     c.backend = STOMPTALK_BACKEND_SCALAR;
     instance good(c);
     auto bad = stomptalk_parser_execute(good.p, nullptr, 1);
@@ -290,14 +298,11 @@ static void api() {
     CHECK(stomptalk_detect_method({"SEND", 4}) == STOMPTALK_METHOD_SEND);
     CHECK(stomptalk_detect_method({"SUBSCRIBX", 9}) == STOMPTALK_METHOD_UNKNOWN);
     CHECK(stomptalk_detect_method({"RUBSCRIBD", 9}) == STOMPTALK_METHOD_UNKNOWN);
-    CHECK(stomptalk_detect_method({nullptr, 99}) == STOMPTALK_METHOD_UNKNOWN);
-    CHECK(stomptalk_detect_method({nullptr, 4}) == STOMPTALK_METHOD_UNKNOWN);
     CHECK(stomptalk_detect_method({nullptr, 0}) == STOMPTALK_METHOD_UNKNOWN);
     CHECK(!stomptalk_method_name(STOMPTALK_METHOD_UNKNOWN).size);
     CHECK(stomptalk_detect_header({"content-length", 14}) == STOMPTALK_HEADER_CONTENT_LENGTH);
     CHECK(text(stomptalk_header_name(STOMPTALK_HEADER_MAX_LENGTH)) == "x-max-length");
     CHECK(stomptalk_detect_header({"Content-length", 14}) == STOMPTALK_HEADER_UNKNOWN);
-    CHECK(stomptalk_detect_header({nullptr, 14}) == STOMPTALK_HEADER_UNKNOWN);
     CHECK(stomptalk_detect_header({nullptr, 0}) == STOMPTALK_HEADER_UNKNOWN);
 }
 
@@ -353,7 +358,7 @@ static void names_and_accumulator() {
     CHECK(!stomptalk::detail::select_header_detector(UINT32_MAX));
     checks += check_name_backend<stomptalk::detail::backend::swar>();
     checks += check_header_backend<STOMPTALK_BACKEND_SWAR>();
-#if defined(__SSE2__)
+#if STOMPTALK_SSE2
     if (stomptalk_cpu_features() & STOMPTALK_CPU_SSE2)
     {
         checks += check_name_backend<stomptalk::detail::backend::sse2>();
@@ -438,6 +443,19 @@ static void suite(stomptalk_backend backend) {
         const headers h{{std::string(n, 'k'), std::string(n, 'v')}};
         variants({"long-fields", wire("SEND", h), {{"SEND", h, {}, true}}}, config, n < 100);
     }
+    for (size_t n : {1u, 7u, 8u, 15u, 16u, 31u, 32u, 33u}) {
+        const auto k = std::string(n, 'k');
+        for (const char *nl : {"\n", "\r\n"}) {
+            const headers h{{k, ";\x0b"}, {"z", ""}};
+            variants({"line-mask-neighbours", wire("SEND", h, "", nl), {{"SEND", h, {}, true}}}, config);
+            const headers literal{{k, ":\\bad:;"}};
+            variants({"line-literal-colons", wire("CONNECT", literal, "", nl), {{"CONNECT", literal, {}, true}}}, config);
+            const headers encoded{{k + "\\c", "\\c;\\n"}};
+            const headers decoded_line{{k + ":", ":;\n"}};
+            variants({"line-escapes", wire("SEND", encoded, "", nl), {{"SEND", decoded_line, {}, true}}}, config);
+            variants({"line-extra-colon", wire("SEND", {{k, ":;"}}, "", nl), {}, STOMPTALK_ERROR_HEADER}, config);
+        }
+    }
     for (size_t n : {63u, 64u, 65u}) {
         headers h(n, {"x", "v"});
         case_data c{"header-limit", wire("SEND", h), {}};
@@ -456,6 +474,26 @@ static void suite(stomptalk_backend backend) {
     small = config; small.byte_capacity = 10;
     variants({"byte-output-full", wire("SEND", {{"k", "a\\nb"}}) + wire(),
         {{"SEND", {{"k", "a\nb"}}, {}, true}, {"SEND", {}, {}, true}}}, small);
+    const auto exact = wire("SEND", {{"k", "1\\n2\\n3"}});
+    const expected decoded_exact{"SEND", {{"k", "1\n2\n3"}}, {}, true};
+    variants({"byte-owned-exact-batch", exact + exact + exact,
+        {decoded_exact, decoded_exact, decoded_exact}}, small);
+    small.byte_capacity = 9;
+    variants({"byte-owned-over", exact, {}, STOMPTALK_ERROR_BYTE_LIMIT}, small);
+    // Both limits fail in one append: keep BYTE_LIMIT and its exact offset,
+    // even when completed records could otherwise be reclaimed for a retry.
+    context = "byte-limit-before-output-full";
+    small.byte_capacity = 16;
+    {
+        instance parser(small);
+        const auto first = wire("SEND", {{"k", "a\\nb"}});
+        const auto input = first + wire("SEND", {{"k", std::string(12, 'v')}});
+        const auto r = stomptalk_parser_execute(parser.p, input.data(), input.size());
+        CHECK(r.status == STOMPTALK_PARSE_ERROR && r.error == STOMPTALK_ERROR_BYTE_LIMIT);
+        CHECK(r.error_offset == first.size() + 7 + 11);
+        CHECK(r.consumed == r.error_offset + 1 && r.frame_count == 1);
+        CHECK(text(r.frames[0].headers[0].value) == "a\nb");
+    }
     small = config; small.header_capacity = small.max_headers_per_frame = 2;
     const auto many = wire("SEND", {{"x", "1"}}) + wire("SEND", {{"a", "2"}, {"b", "3"}});
     const std::vector<expected> exp{{"SEND", {{"x", "1"}}, {}, true},
@@ -501,42 +539,15 @@ static void suite(stomptalk_backend backend) {
     CHECK(r.status == STOMPTALK_PARSE_OK && r.frame_count == 100000);
 }
 
-template<bool Key>
-static void scanner_first_match() {
-    context = "first event, SWAR/SSE2 and narrow tails";
-#if defined(__SSE2__)
-    const bool sse2 = (stomptalk_cpu_features() & STOMPTALK_CPU_SSE2) != 0;
-#endif
-    char data[48];
-    std::memset(data, 'a', sizeof(data));
-    for (bool literal : {false, true}) {
-        for (size_t at = 0; at < 32; ++at) {
-            for (unsigned value = 0; value < 256; ++value) {
-                data[at] = char(value);
-                data[at + 1] = char(value ^ 1); // exercises borrow into a neighbour
-                for (const char *end : {data + at + 1, data + sizeof(data)}) {
-                    const char *expected = stomptalk::detail::scan_header<STOMPTALK_BACKEND_SCALAR, Key>(data, end, literal);
-                    const char *actual = stomptalk::detail::scan_header<STOMPTALK_BACKEND_SWAR, Key>(data, end, literal);
-                    CHECK(actual == expected);
-#if defined(__SSE2__)
-                    if (sse2) {
-                        const char *simd = stomptalk::detail::scan_header<STOMPTALK_BACKEND_SSE2, Key>(data, end, literal);
-                        CHECK(simd == expected);
-                    }
-#endif
-                }
-            }
-            data[at] = data[at + 1] = 'a';
-        }
-    }
-}
-
 int main() {
     numeric_values();
     api();
     names_and_accumulator();
-    scanner_first_match<false>();
-    scanner_first_match<true>();
+    checks += check_scanner_backend<stomptalk::detail::backend::swar>();
+#if STOMPTALK_SSE2
+    if (stomptalk_available_backends() & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2))
+        checks += check_scanner_backend<stomptalk::detail::backend::sse2>();
+#endif
     if (stomptalk_available_backends() & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_AVX2))
         checks += check_avx2_scanner();
     const auto available = stomptalk_available_backends();

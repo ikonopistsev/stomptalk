@@ -217,9 +217,10 @@ stomptalk_method_id detect_method(stomptalk_view name) noexcept
         return methods_10::find<Backend>(name.data);
     case methods_11::size:
         return methods_11::find<Backend>(name.data);
-    default:
-        return STOMPTALK_METHOD_UNKNOWN;
+    default:;
     }
+
+    return STOMPTALK_METHOD_UNKNOWN;
 }
 
 inline stomptalk_view method_name(stomptalk_method_id id) noexcept
@@ -256,9 +257,10 @@ inline stomptalk_view method_name(stomptalk_method_id id) noexcept
         return method::subscribe::text();
     case STOMPTALK_METHOD_UNSUBSCRIBE:
         return method::unsubscribe::text();
-    default:
-        return {nullptr, 0};
+    default:;
     }
+
+    return {nullptr, 0};
 }
 
 } // namespace

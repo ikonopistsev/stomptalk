@@ -9,11 +9,24 @@ option(STOMPTALK_LIBRARY_STATIC "Set library type to STATIC" ON)
 option(STOMPTALK_LIBRARY_INSTALL "make install" OFF)
 option(STOMPTALK_BUILD_TESTS "Build tests" OFF)
 option(STOMPTALK_BUILD_FUZZ "Build OSS-Fuzz targets (requires Clang + libFuzzer)" OFF)
+
+option(STOMPTALK_BUILD_SSE2 "Build SSE2 (required for the AVX2 tail)" ON)
+option(STOMPTALK_BUILD_AVX2 "Build optional AVX2 implementations" ON)
 option(STOMPTALK_BUILD_AVX2_NAMES "Build the optional AVX2 name classifier" ON)
 option(STOMPTALK_BUILD_AVX2_PARSER "Build the optional AVX2 parser scanner" ON)
 
-if (NOT STOMPTALK_BUILD_AVX2_NAMES)
+include(cmake/StomptalkPGO.cmake)
+
+if (NOT STOMPTALK_BUILD_SSE2)
+    add_definitions(-DSTOMPTALK_DISABLE_SSE2)
+endif()
+
+if (NOT STOMPTALK_BUILD_AVX2)
     add_definitions(-DSTOMPTALK_DISABLE_AVX2)
+endif()
+
+if (NOT STOMPTALK_BUILD_AVX2_NAMES)
+    add_definitions(-DSTOMPTALK_DISABLE_AVX2_NAMES)
 endif()
 
 if (NOT STOMPTALK_BUILD_AVX2_PARSER)
@@ -30,12 +43,17 @@ if (WIN32)
 endif()
 
 set(source
-    src/parser.cpp
-    src/parser_avx2.cpp
     src/stomptalk.cpp
     src/names.cpp
-    src/names_avx2.cpp
 )
+
+# Keep optional ISA code isolated from the baseline core compilation target.
+if (STOMPTALK_BUILD_SSE2 AND STOMPTALK_BUILD_AVX2 AND STOMPTALK_BUILD_AVX2_PARSER)
+    list(APPEND source src/parser_avx2.cpp)
+endif()
+if (STOMPTALK_BUILD_SSE2 AND STOMPTALK_BUILD_AVX2 AND STOMPTALK_BUILD_AVX2_NAMES)
+    list(APPEND source src/names_avx2.cpp)
+endif()
 
 set(pub_header
     include/stomptalk/type.h
@@ -61,8 +79,13 @@ else()
 endif()
 
 add_library(stomptalk::stomptalk ALIAS stomptalk)
+stomptalk_enable_pgo(stomptalk)
 
-set_target_properties(stomptalk PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(stomptalk PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN YES
+)
 
 target_include_directories(stomptalk
     PUBLIC
@@ -72,15 +95,41 @@ target_include_directories(stomptalk
 
 if (STOMPTALK_BUILD_TESTS)
     enable_testing()
-    add_executable(stomptalk_unit_test test/unit_v2.cpp test/unit_names_avx2.cpp test/unit_scan_avx2.cpp)
-    target_link_libraries(stomptalk_unit_test PRIVATE stomptalk)
-    add_test(NAME stomptalk_unit_test COMMAND stomptalk_unit_test)
+    add_executable(stomptalk_unit_test test/unit_v2.cpp test/unit_backend_avx2.cpp)
+    # Internal selector checks must not require exporting C++ implementation
+    # symbols from the shared library. The C99 smoke still links the real DSO.
+    set(unit_library stomptalk)
+    if (NOT STOMPTALK_LIBRARY_STATIC)
+        add_library(stomptalk_test_impl STATIC ${source})
+        stomptalk_enable_pgo(stomptalk_test_impl)
+        target_compile_definitions(stomptalk_test_impl PUBLIC STOMPTALK_STATIC)
+        target_include_directories(stomptalk_test_impl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        set_target_properties(stomptalk_test_impl PROPERTIES
+            POSITION_INDEPENDENT_CODE ON
+            CXX_VISIBILITY_PRESET hidden
+            VISIBILITY_INLINES_HIDDEN YES
+        )
+        set(unit_library stomptalk_test_impl)
+    endif()
+    target_link_libraries(stomptalk_unit_test PRIVATE ${unit_library})
+    if (STOMPTALK_PGO_GENERATE AND UNIX)
+        # Instrumentation can prevent tail calls in the 100,000-frame stress case.
+        # The normal and profile-use tests keep the process's ordinary stack limit.
+        add_test(NAME stomptalk_unit_test COMMAND sh -c
+            "ulimit -s 65536 && exec \"$@\"" stomptalk-pgo $<TARGET_FILE:stomptalk_unit_test>)
+    else()
+        add_test(NAME stomptalk_unit_test COMMAND stomptalk_unit_test)
+    endif()
 
     # The source is C99. CMake supplies the C++ runtime required by the library.
     add_executable(purestomp test/purestomp.c)
     set_target_properties(purestomp PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON)
     target_link_libraries(purestomp PRIVATE stomptalk)
     add_test(NAME stomptalk_c99_smoke COMMAND purestomp 0 10)
+    if (STOMPTALK_PGO_GENERATE AND STOMPTALK_PGO_ITERATIONS GREATER 0)
+        add_test(NAME stomptalk_pgo_train COMMAND purestomp 0 ${STOMPTALK_PGO_ITERATIONS})
+        set_tests_properties(stomptalk_pgo_train PROPERTIES LABELS pgo-training)
+    endif()
 endif()
 
 if (STOMPTALK_BUILD_FUZZ)

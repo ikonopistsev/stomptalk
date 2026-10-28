@@ -14,19 +14,19 @@ typedef unsigned __int64 uint64_t;
 #include <stdint.h>
 #endif
 
-#ifdef STOMPTALK_STATIC
+#if defined(_WIN32)
+# if defined(STOMPTALK_STATIC)
 #  define STOMPTALK_EXPORT
-#else
-#ifdef _WIN32
-#ifdef STOMPTALK_MAKEDLL
+# elif defined(STOMPTALK_MAKEDLL)
 #  define STOMPTALK_EXPORT __declspec(dllexport)
-#else
+# else
 #  define STOMPTALK_EXPORT __declspec(dllimport)
-#endif
+# endif
+#elif defined(__GNUC__) || defined(__clang__)
+# define STOMPTALK_EXPORT __attribute__((visibility("default")))
 #else
-#  define STOMPTALK_EXPORT
-#endif // _WIN32
-#endif // STOMPTALK_STATIC
+# define STOMPTALK_EXPORT
+#endif
 
 #if defined(_MSC_VER)
   #define STOMPTALK_FORCE_INLINE __forceinline

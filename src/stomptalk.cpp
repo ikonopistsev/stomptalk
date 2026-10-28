@@ -1,7 +1,7 @@
-#include "stomptalk/parser.hpp"
+#include "parser_impl.hpp"
 #include "methods.hpp"
 #include "headers.hpp"
-#include "parser_dispatch.hpp"
+#include "backend/config.hpp"
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
@@ -83,11 +83,10 @@ stomptalk_error_code stomptalk_parser_init(const stomptalk_parser_config *config
     auto headers = reinterpret_cast<stomptalk_header_view *>(base + l.headers);
     for (size_t i = 0; i < c.frame_capacity; ++i) new (frames + i) stomptalk_frame_view;
     for (size_t i = 0; i < c.header_capacity; ++i) new (headers + i) stomptalk_header_view;
-    // Full-parser measurements select SSE2; unmeasured architectures keep the
-    // scalar fallback. SWAR remains available explicitly for comparison.
+    // Keep AVX2 opt-in; configurations without SIMD fall back to SWAR.
     auto backend = c.backend;
     if (!backend) backend = (stomptalk_available_backends() & STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2))
-        ? stomptalk_backend(STOMPTALK_BACKEND_SSE2) : stomptalk_backend(STOMPTALK_BACKEND_SCALAR);
+        ? stomptalk_backend(STOMPTALK_BACKEND_SSE2) : stomptalk_backend(STOMPTALK_BACKEND_SWAR);
     *result = new (memory) stomptalk_parser(c, frames, headers, base + l.bytes, backend);
     return STOMPTALK_ERROR_NONE;
 }
@@ -102,7 +101,6 @@ stomptalk_parse_result stomptalk_parser_execute(stomptalk_parser *p, const char 
     return p->impl.run(data, size);
 }
 stomptalk_method_id stomptalk_detect_method(stomptalk_view v) {
-    if (!v.data) return STOMPTALK_METHOD_UNKNOWN;
     return stomptalk::detail::detect_method(v);
 }
 stomptalk_view stomptalk_method_name(stomptalk_method_id id) {
@@ -132,7 +130,7 @@ uint32_t stomptalk_cpu_features(void) {
 uint32_t stomptalk_compiled_backends(void) {
     return STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SCALAR) |
            STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SWAR)
-#if defined(__SSE2__)
+#if STOMPTALK_SSE2
            | STOMPTALK_BACKEND_BIT(STOMPTALK_BACKEND_SSE2)
 #endif
 #if STOMPTALK_PARSER_AVX2

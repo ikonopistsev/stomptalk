@@ -1,10 +1,10 @@
+#pragma once
+// One core TU exposes helpers and tailcall states to the C API optimizer.
 // Derived from 123/backup/parser.cpp: small state functions and tailcall tree.
 #include "stomptalk/parser.hpp"
 #include "stomptalk/antoull.hpp"
 #include "methods.hpp"
-#include "content_length.hpp"
-#include "scan.hpp"
-#include "parser_dispatch.hpp"
+#include "is_header.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -29,7 +29,7 @@ void parser::reset() noexcept {
     begin_ = stop_ = nullptr;
     switch (backend_) {
     case STOMPTALK_BACKEND_SWAR: state_ = &parser::start_state<STOMPTALK_BACKEND_SWAR>; break;
-#if defined(__SSE2__)
+#if STOMPTALK_SSE2
     case STOMPTALK_BACKEND_SSE2: state_ = &parser::start_state<STOMPTALK_BACKEND_SSE2>; break;
 #endif
 #if STOMPTALK_PARSER_AVX2
@@ -205,9 +205,7 @@ bool parser::check_body(size_t count, pointer source) noexcept {
 }
 
 // Baseline states stay usable on CPUs without AVX2.
-#define STOMPTALK_STATE_TARGET
 #include "parser_states.hpp"
-#undef STOMPTALK_STATE_TARGET
 
 stomptalk_parse_result parser::run(pointer data, size_t size) noexcept {
     if (error_) return {0, frames_, 0, STOMPTALK_PARSE_ERROR, error_, 0};
@@ -238,7 +236,7 @@ stomptalk_parse_result parser::run(pointer data, size_t size) noexcept {
     if (status_ == STOMPTALK_PARSE_OK) {
         const bool boundary = state_ == &parser::start_state<STOMPTALK_BACKEND_SCALAR> ||
                               state_ == &parser::start_state<STOMPTALK_BACKEND_SWAR>
-#if defined(__SSE2__)
+#if STOMPTALK_SSE2
                               || state_ == &parser::start_state<STOMPTALK_BACKEND_SSE2>
 #endif
 #if STOMPTALK_PARSER_AVX2
