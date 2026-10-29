@@ -1,0 +1,5 @@
+[1/5] Building C object CMakeFiles/purestomp.dir/test/purestomp.c.o
+[2/5] Building CXX object CMakeFiles/stomptalk.dir/src/parser_avx2.cpp.o
+[3/5] Building CXX object CMakeFiles/stomptalk.dir/src/stomptalk.cpp.o
+[4/5] Linking CXX static library libstomptalk.a
+[5/5] Linking CXX executable purestomp

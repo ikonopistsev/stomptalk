@@ -1,0 +1,12 @@
+{'chunk': '1', 'iterations': '1', 'copy_calls': '625', 'copy_bytes': '625', 'retain_calls': '0', 'retain_nonzero': '0', 'retain_bytes': '0', 'header_calls': '0', 'header_nonzero': '0', 'header_bytes': '0'}
+{'chunk': '2', 'iterations': '1', 'copy_calls': '357', 'copy_bytes': '625', 'retain_calls': '2', 'retain_nonzero': '2', 'retain_bytes': '2', 'header_calls': '2', 'header_nonzero': '0', 'header_bytes': '0'}
+{'chunk': '3', 'iterations': '1', 'copy_calls': '264', 'copy_bytes': '625', 'retain_calls': '8', 'retain_nonzero': '8', 'retain_bytes': '13', 'header_calls': '8', 'header_nonzero': '0', 'header_bytes': '0'}
+{'chunk': '4', 'iterations': '1', 'copy_calls': '224', 'copy_bytes': '625', 'retain_calls': '8', 'retain_nonzero': '8', 'retain_bytes': '18', 'header_calls': '8', 'header_nonzero': '0', 'header_bytes': '0'}
+{'chunk': '8', 'iterations': '1', 'copy_calls': '155', 'copy_bytes': '624', 'retain_calls': '9', 'retain_nonzero': '9', 'retain_bytes': '30', 'header_calls': '9', 'header_nonzero': '0', 'header_bytes': '0'}
+{'chunk': '16', 'iterations': '1', 'copy_calls': '117', 'copy_bytes': '624', 'retain_calls': '9', 'retain_nonzero': '9', 'retain_bytes': '57', 'header_calls': '9', 'header_nonzero': '2', 'header_bytes': '64'}
+{'chunk': '32', 'iterations': '1', 'copy_calls': '93', 'copy_bytes': '610', 'retain_calls': '8', 'retain_nonzero': '8', 'retain_bytes': '115', 'header_calls': '8', 'header_nonzero': '3', 'header_bytes': '96'}
+{'chunk': '64', 'iterations': '1', 'copy_calls': '80', 'copy_bytes': '548', 'retain_calls': '7', 'retain_nonzero': '7', 'retain_bytes': '188', 'header_calls': '7', 'header_nonzero': '4', 'header_bytes': '256'}
+{'chunk': '128', 'iterations': '1', 'copy_calls': '55', 'copy_bytes': '381', 'retain_calls': '5', 'retain_nonzero': '5', 'retain_bytes': '297', 'header_calls': '6', 'header_nonzero': '6', 'header_bytes': '544'}
+{'chunk': '256', 'iterations': '1', 'copy_calls': '31', 'copy_bytes': '217', 'retain_calls': '2', 'retain_nonzero': '2', 'retain_bytes': '105', 'header_calls': '3', 'header_nonzero': '3', 'header_bytes': '288'}
+{'chunk': '512', 'iterations': '1', 'copy_calls': '20', 'copy_bytes': '137', 'retain_calls': '0', 'retain_nonzero': '0', 'retain_bytes': '0', 'header_calls': '1', 'header_nonzero': '1', 'header_bytes': '96'}
+{'chunk': '838', 'iterations': '1', 'copy_calls': '11', 'copy_bytes': '71', 'retain_calls': '0', 'retain_nonzero': '0', 'retain_bytes': '0', 'header_calls': '0', 'header_nonzero': '0', 'header_bytes': '0'}

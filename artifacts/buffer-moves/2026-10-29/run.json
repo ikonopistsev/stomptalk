@@ -1,0 +1,92 @@
+{
+  "base_commit": "fce73851ccd416c97671166716663f26149caa28",
+  "source_sha256": {
+    "src/is_header.hpp": "77551764d2ef34f66e5004cd97bd759eff204fe29dd70b7088928952a26848ae",
+    "src/name_group.hpp": "b2f8a3c1e6eee786c74b7618963c909150b410b9efdc12b434fe66002cd1e1c1",
+    "src/parser_states.hpp": "a3c88f9d1a613ce33de29c84e2b3e35f5a92f1de242a4798c62041e6e62ca49f",
+    "src/name_dispatch.hpp": "e8f46d6a76d313240e3c1b901643c1fcb77168e0c8e31b7c1535c15663fa5a40",
+    "src/headers.hpp": "b80bdb5c5aac4b96a166a36ff6bcb3637e3b1b60cd2d250abf9fda790d070683",
+    "src/names.cpp": "b16d6f5ef83a203c96b0bc687a4c8ddb8c503619d64493828933c48b04d2d8f7",
+    "src/stomptalk.cpp": "0d5bffb46c2d6a277cc1bb5f67bdf9344c253ee628bb9aa86e20803a70927298",
+    "src/names_avx2.cpp": "930bd2466b55fe47064357e98001718f724877fd3c302a5b4853558db468f3d2",
+    "src/methods.hpp": "8ea1a9242a18cd318ff01d01a45de0ea30873a5fa4a21795375c114dc5bb96a6",
+    "src/parser_impl.hpp": "c0637532163de99e735ea0eb6c5ef47bb03df470cee86762bb2cc1490ab5a706",
+    "src/content_length.hpp": "3f15c11a49e9f160526f280cda2c03840a00798b60504f05af83bf8e69759d99",
+    "src/parser_avx2.cpp": "c0b2cacac10f53825a32b0cb642fd8bca75a225919c2e488e9ad9227a5f1d046",
+    "src/backend/avx2.hpp": "0550001f26f3a6f303de021bf15b2f2b1a5ebf6f2560e78fb9222b37682c2e88",
+    "src/backend/config.hpp": "855da9f0a425645dd6fbc0ee59b490e83f1a6cd062e09eb62f0a30f56ee5bf1c",
+    "src/backend/swar.hpp": "85e6df1ee288a70ba536dd822bfefdf8b33a42626beec203e1cd00bb955017e7",
+    "src/backend/sse2.hpp": "6fde811b3895ee9d5b247e68dfbabc9acd0143aa2a8becde44f17ceb30609e0b",
+    "include/stomptalk/parser.hpp": "72759125639d465740ecf48e11e0aa6a4bd34e9f2d069ca1329d6e470fb94c54",
+    "include/stomptalk/method.h": "64a7a30b5f09987b0770e7797acd36c899ca5aebaebfe77c024c8b31b39df530",
+    "include/stomptalk/type.h": "751620bb3c6237962f8c02038411547fea4150aff782866cda0b0eae336db4a3",
+    "include/stomptalk/header.h": "036b0191bac15299d63528d5607181fa9e579d6c675f54a6600ea6abf2e4a6cf",
+    "include/stomptalk/antoull.hpp": "20113fc01ed8cfb0e0d2c6d58a2646293fe9275d16154603a2ba6a2b0f8441a6",
+    "include/stomptalk/stackbuf.hpp": "379349d23866063e609637b91fb42d6872c15d42c411ad30e3ede743437e129a",
+    "include/stomptalk/parser.h": "37388093a8f8b8fe87c767449efed5306f602505086f0b8d8f71cd6d872ef5b0",
+    "test/scan_backend_checks.hpp": "2653580bc131c91bf6ec923e0dba74979d00bef91dc2b075fb6b30e422cd8533",
+    "test/unit_v2.cpp": "18c36eb670914fca65e6fc682d41fabf9f85bbd81e6d8e84c74abb20f1a1d9fa",
+    "test/name_backend_checks.hpp": "c250e87712235edfa05b375f72296ae98fd70097d699110a52d723d4f74f9862",
+    "test/purestomp.c": "38da114a0ca6360aea51e5b0d980630850a322a8c166ed43f56394102b3f1d8b",
+    "test/unit_backend_avx2.cpp": "f50af799d6095931be97d2911306eb266e9c36118f646d451b6f33a6b42f16fa",
+    "cmake/ClangPGO.cmake": "c15d16a5cc7b0036da92b1a31e72fac001724fe40289afb74dfd3554ef524f97",
+    "cmake/stomptalkConfig.cmake.in": "822f1d8ab88917287d7955de38b592b895b369f4193746ebf130b0ff06748d8e",
+    "cmake/StomptalkPGO.cmake": "b807ef51e0ddc442cb6e5dfa8d33e3f034e6ba82bc913f813a895b927b1b209c",
+    "CMakeLists.txt": "3e0e3aa2bbe40225184a61ea8c43736229f41fc860a63daba5c8e45ae83ee7e7"
+  },
+  "commands": [
+    {
+      "label": "configure",
+      "args": [
+        "cmake",
+        "-G",
+        "Ninja",
+        "-S",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/buffer-moves/2026-10-29/build/source",
+        "-B",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/buffer-moves/2026-10-29/build/trace",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_COMPILER=/usr/lib/llvm/23/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/usr/lib/llvm/23/bin/clang++",
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+        "-DSTOMPTALK_BUILD_TESTS=ON"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/buffer-moves/2026-10-29/build/trace",
+        "--target",
+        "purestomp",
+        "-j",
+        "4"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "count-1",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/buffer-moves/2026-10-29/build/trace/purestomp",
+        "3",
+        "1",
+        "all"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "count-3",
+      "args": [
+        "/home/meil/devel/linux/stomptalk-meta/stomptal-smid-2/artifacts/buffer-moves/2026-10-29/build/trace/purestomp",
+        "3",
+        "3",
+        "all"
+      ],
+      "exit": 0
+    }
+  ],
+  "status": "completed"
+}
