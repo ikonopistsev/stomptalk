@@ -53,6 +53,32 @@ inline const char* scan_header(const char* curr, const char* end) noexcept
     return curr;
 }
 
+#if defined(STOMPTALK_SCAN_BLOCK)
+#if defined(__AVX2__)
+inline std::uint64_t block_mask(const char* at) noexcept
+{
+    const auto block = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(at));
+    const auto hits = _mm256_or_si256(
+        _mm256_or_si256(_mm256_cmpeq_epi8(block, _mm256_set1_epi8('\n')),
+            _mm256_cmpeq_epi8(block, _mm256_set1_epi8('\r'))),
+        _mm256_or_si256(_mm256_cmpeq_epi8(block, _mm256_set1_epi8(':')),
+            _mm256_cmpeq_epi8(block, _mm256_set1_epi8('\\'))));
+    return static_cast<std::uint32_t>(_mm256_movemask_epi8(hits));
+}
+#else
+inline std::uint64_t block_mask(const char* at) noexcept
+{
+    const auto block = _mm_loadu_si128(reinterpret_cast<const __m128i*>(at));
+    const auto hits = _mm_or_si128(
+        _mm_or_si128(_mm_cmpeq_epi8(block, _mm_set1_epi8('\n')),
+            _mm_cmpeq_epi8(block, _mm_set1_epi8('\r'))),
+        _mm_or_si128(_mm_cmpeq_epi8(block, _mm_set1_epi8(':')),
+            _mm_cmpeq_epi8(block, _mm_set1_epi8('\\'))));
+    return static_cast<std::uint32_t>(_mm_movemask_epi8(hits));
+}
+#endif
+#endif
+
 // Конец метода, первый байт не из A-Z. Методы короче блока, поэтому длина метода
 // не становится условным переходом.
 inline const char* scan_method(const char* curr, const char* end) noexcept
@@ -73,80 +99,44 @@ inline const char* scan_method(const char* curr, const char* end) noexcept
     return curr;
 }
 
-// Выдаёт разделители строк заголовков по порядку. Блок загружается один раз
-// и обслуживает все токены в нём, поэтому на токен нет своего цикла и перехода.
-// Пока хватает данных на блок, работает AVX2 или SSE2, остаток просматривается по таблице.
-class header_scanner
+// Забывает разделители, которые остались позади curr: тело, метод, побайтовый разбор.
+inline void scan_seek(scan_window& w, const char* curr) noexcept
 {
-    const char* block_;
-    const char* end_;
-    const char* base_{};
-    std::uint64_t mask_{};
-
-#if defined(STOMPTALK_SCAN_BLOCK)
-    static constexpr int block_size = STOMPTALK_SCAN_BLOCK;
-
-#if defined(__AVX2__)
-    static std::uint64_t block_mask(const char* at) noexcept
+    if (w.mask)
     {
-        const auto block = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(at));
-        const auto hits = _mm256_or_si256(
-            _mm256_or_si256(_mm256_cmpeq_epi8(block, _mm256_set1_epi8('\n')),
-                _mm256_cmpeq_epi8(block, _mm256_set1_epi8('\r'))),
-            _mm256_or_si256(_mm256_cmpeq_epi8(block, _mm256_set1_epi8(':')),
-                _mm256_cmpeq_epi8(block, _mm256_set1_epi8('\\'))));
-        return static_cast<std::uint32_t>(_mm256_movemask_epi8(hits));
+        const auto passed = curr - w.base;
+        w.mask = (passed < 64) ? (w.mask & (~std::uint64_t{0} << passed)) : 0;
     }
+}
+
+// Следующий разделитель не раньше curr или end. Окно загружается один раз и обслуживает
+// все токены в нём. Пока хватает данных на блок, работает AVX2 или SSE2, остаток по таблице.
+inline const char* scan_next(scan_window& w, const char* curr, const char* end) noexcept
+{
+#if defined(STOMPTALK_SCAN_BLOCK)
+    constexpr int block_size = STOMPTALK_SCAN_BLOCK;
+    while (!w.mask)
+    {
+        if (end - curr < block_size)
+            return scan_header(curr, end);
+        w.base = curr;
+        for (int bits = 0; (bits < 64) && (end - curr >= block_size); bits += block_size, curr += block_size)
+            w.mask |= block_mask(curr) << bits;
+    }
+    const auto at = w.base + __builtin_ctzll(w.mask);
+    w.mask &= w.mask - 1;
+    return at;
 #else
-    static std::uint64_t block_mask(const char* at) noexcept
-    {
-        const auto block = _mm_loadu_si128(reinterpret_cast<const __m128i*>(at));
-        const auto hits = _mm_or_si128(
-            _mm_or_si128(_mm_cmpeq_epi8(block, _mm_set1_epi8('\n')),
-                _mm_cmpeq_epi8(block, _mm_set1_epi8('\r'))),
-            _mm_or_si128(_mm_cmpeq_epi8(block, _mm_set1_epi8(':')),
-                _mm_cmpeq_epi8(block, _mm_set1_epi8('\\'))));
-        return static_cast<std::uint32_t>(_mm_movemask_epi8(hits));
-    }
+    (void)w;
+    return scan_header(curr, end);
 #endif
-
-    void refill() noexcept
-    {
-        base_ = block_;
-        int bits = 0;
-        for (; (bits < 64) && (end_ - block_ >= block_size); bits += block_size, block_ += block_size)
-            mask_ |= block_mask(block_) << bits;
-    }
-#endif
-
-public:
-    header_scanner(const char* curr, const char* end) noexcept
-        : block_{curr}, end_{end}
-    {   }
-
-    const char* next() noexcept
-    {
-#if defined(STOMPTALK_SCAN_BLOCK)
-        while (!mask_ && (end_ - block_ >= block_size))
-            refill();
-        if (mask_)
-        {
-            const auto at = base_ + __builtin_ctzll(mask_);
-            mask_ &= mask_ - 1;
-            return at;
-        }
-#endif
-        const auto at = scan_header(block_, end_);
-        block_ = (at < end_) ? at + 1 : end_;
-        return at;
-    }
-};
+}
 
 } // namespace detail
 
 template<class H>
 typename parser<H>::pointer parser<H>::start_state(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     do {
         auto ch = *curr++;
@@ -168,7 +158,7 @@ typename parser<H>::pointer parser<H>::start_state(hook_type& hook,
         hook.on_frame(curr - 1);
 
         // метод целиком разберет method_state, начиная с этого байта
-        return tailcall(hook, &parser::method_state, curr - 1, end);
+        return tailcall(hook, &parser::method_state, curr - 1, end, w);
     } while (curr < end);
 
     return curr;
@@ -176,7 +166,7 @@ typename parser<H>::pointer parser<H>::start_state(hook_type& hook,
 
 template<class H>
 typename parser<H>::pointer parser<H>::method_state(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     auto beg = curr;
     curr = detail::scan_method(curr, end);
@@ -187,22 +177,22 @@ typename parser<H>::pointer parser<H>::method_state(hook_type& hook,
         if (*curr == '\n')
         {
             method_done(hook, beg, len);
-            return tailcall(hook, &parser::hdrline_done, curr + 1, end);
+            return tailcall(hook, &parser::hdrline_done, curr + 1, end, w);
         }
         if (*curr == '\r')
         {
             method_done(hook, beg, len);
-            return tailcall(hook, &parser::hdrline_almost_done, curr + 1, end);
+            return tailcall(hook, &parser::hdrline_almost_done, curr + 1, end, w);
         }
     }
 
     // метод не весь в буфере: дальше побайтно
-    return tailcall(hook, &parser::method_state_bytes, beg, end);
+    return tailcall(hook, &parser::method_state_bytes, beg, end, w);
 }
 
 template<class H>
 typename parser<H>::pointer parser<H>::method_state_bytes(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     do {
         auto ch = *curr++;
@@ -228,7 +218,7 @@ typename parser<H>::pointer parser<H>::method_state_bytes(hook_type& hook,
 
             // переходим к поиску конца метода
             return tailcall(hook, (ch == '\n') ? 
-                &parser::hdrline_done : &parser::hdrline_almost_done, curr, end);
+                &parser::hdrline_done : &parser::hdrline_almost_done, curr, end, w);
         }
 
     } while (curr < end);
@@ -238,21 +228,21 @@ typename parser<H>::pointer parser<H>::method_state_bytes(hook_type& hook,
 
 template<class H>
 typename parser<H>::pointer parser<H>::hdrline_hdr_key(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     // Блок заголовков целиком: ключ и значение каждой строки разбираются здесь,
     // без переходов между состояниями. Всё необычное уходит в побайтный разбор.
-    detail::header_scanner scanner(curr, end);
+    detail::scan_seek(w, curr);
     for (;;)
     {
         auto beg = curr;
-        curr = scanner.next();
+        curr = detail::scan_next(w, curr, end);
 
         auto len = static_cast<std::size_t>(curr - beg);
         if ((curr >= end) || (*curr != ':') || (len > STOMPTALK_PARSER_STACK_SIZE))
         {
             // ключ разорван, с escape или ошибочный: дальше побайтно
-            return tailcall(hook, &parser::hdrline_hdr_key_bytes, beg, end);
+            return tailcall(hook, &parser::hdrline_hdr_key_bytes, beg, end, w);
         }
 
         hook.on_hdr_key(beg, len);
@@ -264,30 +254,30 @@ typename parser<H>::pointer parser<H>::hdrline_hdr_key(hook_type& hook,
         }
 
         beg = curr;
-        curr = scanner.next();
+        curr = detail::scan_next(w, curr, end);
 
         len = static_cast<std::size_t>(curr - beg);
         if ((curr >= end) || (len > STOMPTALK_PARSER_STACK_SIZE) ||
             ((*curr != '\n') && (*curr != '\r')))
         {
             // значение разорвано, с escape или ошибочное: дальше побайтно
-            return tailcall(hook, &parser::hdrline_val_bytes, beg, end);
+            return tailcall(hook, &parser::hdrline_val_bytes, beg, end, w);
         }
 
         hook.on_hdr_val(beg, len);
         if (*curr == '\r')
-            return tailcall(hook, &parser::hdrline_almost_done, curr + 1, end);
+            return tailcall(hook, &parser::hdrline_almost_done, curr + 1, end, w);
 
         ++curr;
         // конец блока, пустой ключ, конец куска или ошибка каллбека решает hdrline_done
         if ((curr >= end) || !hook.ok() || (*curr == '\n') || (*curr == '\r') || (*curr == ':'))
-            return tailcall(hook, &parser::hdrline_done, curr, end);
+            return tailcall(hook, &parser::hdrline_done, curr, end, w);
     }
 }
 
 template<class H>
 typename parser<H>::pointer parser<H>::hdrline_hdr_key_bytes(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     do {
         unsigned char ch = static_cast<unsigned char>(*curr++);
@@ -331,7 +321,7 @@ typename parser<H>::pointer parser<H>::hdrline_hdr_key_bytes(hook_type& hook,
                 // конец ключа → в значение
                 hook.on_hdr_key(sbuf_.pop());
                 escape_ = false;  // на всякий случай
-                return tailcall(hook, &parser::hdrline_val, curr, end);
+                return tailcall(hook, &parser::hdrline_val, curr, end, w);
 
             case '\n':
             case '\r':
@@ -352,7 +342,7 @@ typename parser<H>::pointer parser<H>::hdrline_hdr_key_bytes(hook_type& hook,
 
 template<class H>
 typename parser<H>::pointer parser<H>::hdrline_val(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     auto beg = curr;
     curr = detail::scan_header(curr, end);
@@ -363,22 +353,22 @@ typename parser<H>::pointer parser<H>::hdrline_val(hook_type& hook,
         if (*curr == '\n')
         {
             hook.on_hdr_val(beg, len);
-            return tailcall(hook, &parser::hdrline_done, curr + 1, end);
+            return tailcall(hook, &parser::hdrline_done, curr + 1, end, w);
         }
         if (*curr == '\r')
         {
             hook.on_hdr_val(beg, len);
-            return tailcall(hook, &parser::hdrline_almost_done, curr + 1, end);
+            return tailcall(hook, &parser::hdrline_almost_done, curr + 1, end, w);
         }
     }
 
     // значение разорвано, с escape или ошибочное: дальше побайтно
-    return tailcall(hook, &parser::hdrline_val_bytes, beg, end);
+    return tailcall(hook, &parser::hdrline_val_bytes, beg, end, w);
 }
 
 template<class H>
 typename parser<H>::pointer parser<H>::hdrline_val_bytes(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     do {
         unsigned char ch = static_cast<unsigned char>(*curr++);
@@ -406,13 +396,13 @@ typename parser<H>::pointer parser<H>::hdrline_val_bytes(hook_type& hook,
         if (ch == '\r') {
             hook.on_hdr_val(sbuf_.pop());
             escape_ = false;
-            return tailcall(hook, &parser::hdrline_almost_done, curr, end);
+            return tailcall(hook, &parser::hdrline_almost_done, curr, end, w);
         }
 
         if (ch == '\n') {
             hook.on_hdr_val(sbuf_.pop());
             escape_ = false;
-            return tailcall(hook, &parser::hdrline_done, curr, end);
+            return tailcall(hook, &parser::hdrline_done, curr, end, w);
         }
 
         if (!raw_headers_) {
@@ -438,7 +428,7 @@ typename parser<H>::pointer parser<H>::hdrline_val_bytes(hook_type& hook,
 
 template<class H>
 typename parser<H>::pointer parser<H>::hdrline_done(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     auto ch = *curr++;
 
@@ -446,12 +436,12 @@ typename parser<H>::pointer parser<H>::hdrline_done(hook_type& hook,
     if (ch == '\r')
     {
         // переходим к поиску конца метода
-        return tailcall(hook, &parser::almost_done, curr, end);
+        return tailcall(hook, &parser::almost_done, curr, end, w);
     }
     else if (ch == '\n')
     {
         // переходим к поиску конца метода
-        return tailcall(hook, &parser::done, curr, end);
+        return tailcall(hook, &parser::done, curr, end, w);
     }
 
     // иначе это следующий хидер, имя не может быть пустым
@@ -462,12 +452,12 @@ typename parser<H>::pointer parser<H>::hdrline_done(hook_type& hook,
     }
 
     // ключ целиком разберет hdrline_hdr_key, начиная с этого байта
-    return tailcall(hook, &parser::hdrline_hdr_key, curr - 1, end);
+    return tailcall(hook, &parser::hdrline_hdr_key, curr - 1, end, w);
 }
 
 template<class H>
 typename parser<H>::pointer parser<H>::hdrline_almost_done(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     if (*curr++ != '\n')
     {
@@ -476,34 +466,34 @@ typename parser<H>::pointer parser<H>::hdrline_almost_done(hook_type& hook,
     }
 
     // переходим к поиску конца метода
-    return tailcall(hook, &parser::hdrline_done, curr, end);
+    return tailcall(hook, &parser::hdrline_done, curr, end, w);
 }
 
 template<class H>
 typename parser<H>::pointer parser<H>::done(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     // при заданной длине боди может начинаться с нуля
     if (hook.has_content_length())
     {
         return (hook.content_left() > 0) ?
-            tailcall(hook, &parser::body_read, curr, end) :
-            tailcall(hook, &parser::frame_end, curr, end);
+            tailcall(hook, &parser::body_read, curr, end, w) :
+            tailcall(hook, &parser::frame_end, curr, end, w);
     }
 
     if (*curr == '\0') 
     {
         hook.on_frame_end(curr);
-        return tailcall(hook, &parser::start_state, ++curr, end);
+        return tailcall(hook, &parser::start_state, ++curr, end, w);
     }
 
-    return tailcall(hook, &parser::body_read_no_length, curr, end);
+    return tailcall(hook, &parser::body_read_no_length, curr, end, w);
 }
 
 
 template<class H>
 typename parser<H>::pointer parser<H>::almost_done(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     if (*curr++ != '\n')
     {
@@ -512,12 +502,12 @@ typename parser<H>::pointer parser<H>::almost_done(hook_type& hook,
     }
 
     // переходим к поиску конца метода
-    return tailcall(hook, &parser::done, curr, end);
+    return tailcall(hook, &parser::done, curr, end, w);
 }
 
 template<class H>
 typename parser<H>::pointer parser<H>::body_read(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     auto avail = static_cast<std::size_t>(end - curr);
     auto left = hook.content_left();
@@ -535,7 +525,7 @@ typename parser<H>::pointer parser<H>::body_read(hook_type& hook,
     curr += to_read;
 
     if (left == 0)
-        return tailcall(hook, &parser::frame_end, curr, end);
+        return tailcall(hook, &parser::frame_end, curr, end, w);
 
     // данных больше нет
     return curr;
@@ -543,7 +533,7 @@ typename parser<H>::pointer parser<H>::body_read(hook_type& hook,
 
 template<class H>
 typename parser<H>::pointer parser<H>::body_read_no_length(hook_type& hook,
-    pointer curr, pointer end) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
     auto beg = curr;
     auto avail = static_cast<std::size_t>(end - curr);
@@ -556,7 +546,7 @@ typename parser<H>::pointer parser<H>::body_read_no_length(hook_type& hook,
         if (to_read > 0) {
             hook.on_body(beg, to_read);
         }
-        return tailcall(hook, &parser::frame_end, nul, end);
+        return tailcall(hook, &parser::frame_end, nul, end, w);
     }
 
     if (avail > 0) {
@@ -568,7 +558,7 @@ typename parser<H>::pointer parser<H>::body_read_no_length(hook_type& hook,
 
 template<class H>
 typename parser<H>::pointer parser<H>::frame_end(hook_type& hook,
-    pointer curr, pointer) noexcept
+    pointer curr, pointer end, window w) noexcept
 {
 
     state_ = &parser::start_state;
@@ -582,7 +572,7 @@ typename parser<H>::pointer parser<H>::frame_end(hook_type& hook,
     // закончили
     hook.on_frame_end(curr - 1);
 
-    return curr;
+    return tailcall(hook, &parser::start_state, curr, end, w);
 }
 
 template<class H>
@@ -595,9 +585,10 @@ std::size_t parser<H>::run(hook_type& hook,
 
     const char* curr = begin;
     const char* end = begin + len;
+    window w{nullptr, 0};
 
     while ((curr < end) && hook.ok())
-        curr = (this->*state_)(hook, curr, end);
+        curr = (this->*state_)(hook, curr, end, w);
 
     // байт с ошибкой не считаем разобранным: иначе ошибка на последнем
     // байте куска дала бы rc == len
