@@ -21,92 +21,47 @@ constexpr method_text method_texts[] = {
     {"RECEIPT", 7}, {"SEND", 4}, {"STOMP", 5}, {"SUBSCRIBE", 9}, {"UNSUBSCRIBE", 11}
 };
 
-// Дерево по буквам, которые различают методы. В ячейке лежит метод
-// или номер следующего узла, считая от first_method_node.
-constexpr std::uint8_t first_method_node = 16;
-
-struct method_node
+template<std::size_t N>
+inline bool same_text(const char* at, const char (&text)[N]) noexcept
 {
-    std::uint8_t position;
-    std::uint8_t next[26];
-};
-
-struct method_tree
-{
-    method_node nodes[4];
-};
-
-constexpr std::uint8_t cell(stomptalk_method m) noexcept
-{
-    return static_cast<std::uint8_t>(m);
+    return std::memcmp(at, text, N - 1) == 0;
 }
-
-constexpr method_tree make_method_tree() noexcept
-{
-    method_tree t{};
-
-    auto& root = t.nodes[0];
-    root.position = 0;
-    root.next['A' - 'A'] = first_method_node + 1;
-    root.next['B' - 'A'] = cell(st_method_begin);
-    root.next['C' - 'A'] = first_method_node + 2;
-    root.next['D' - 'A'] = cell(st_method_disconnect);
-    root.next['E' - 'A'] = cell(st_method_error);
-    root.next['M' - 'A'] = cell(st_method_message);
-    root.next['N' - 'A'] = cell(st_method_nack);
-    root.next['R' - 'A'] = cell(st_method_receipt);
-    root.next['S' - 'A'] = first_method_node + 3;
-    root.next['U' - 'A'] = cell(st_method_unsubscribe);
-
-    auto& a = t.nodes[1];
-    a.position = 1;
-    a.next['B' - 'A'] = cell(st_method_abort);
-    a.next['C' - 'A'] = cell(st_method_ack);
-
-    auto& c = t.nodes[2];
-    c.position = 2;
-    c.next['M' - 'A'] = cell(st_method_commit);
-    c.next['N' - 'A'] = cell(st_method_connect);
-
-    auto& s = t.nodes[3];
-    s.position = 1;
-    s.next['E' - 'A'] = cell(st_method_send);
-    s.next['T' - 'A'] = cell(st_method_stomp);
-    s.next['U' - 'A'] = cell(st_method_subscribe);
-
-    return t;
-}
-
-constexpr method_tree method_tree_table = make_method_tree();
 
 } // namespace detail
 
-// Дерево только выбирает кандидата по нескольким буквам, проверяет его memcmp в конце.
+// Длина почти определяет метод, а memcmp с постоянным размером встраивается в сравнения.
 inline stomptalk_method method_from(const char* at, std::size_t len) noexcept
 {
-    using namespace detail;
+    using detail::same_text;
 
-    // самый короткий метод ACK, поэтому дерево может читать до третьей буквы
-    if (len < 3)
+    switch (len)
+    {
+    case 3:
+        return same_text(at, "ACK") ? st_method_ack : st_method_unknown;
+    case 4:
+        return same_text(at, "SEND") ? st_method_send :
+            same_text(at, "NACK") ? st_method_nack : st_method_unknown;
+    case 5:
+        return same_text(at, "BEGIN") ? st_method_begin :
+            same_text(at, "ABORT") ? st_method_abort :
+            same_text(at, "ERROR") ? st_method_error :
+            same_text(at, "STOMP") ? st_method_stomp : st_method_unknown;
+    case 6:
+        return same_text(at, "COMMIT") ? st_method_commit : st_method_unknown;
+    case 7:
+        return same_text(at, "MESSAGE") ? st_method_message :
+            same_text(at, "RECEIPT") ? st_method_receipt :
+            same_text(at, "CONNECT") ? st_method_connect : st_method_unknown;
+    case 9:
+        return same_text(at, "SUBSCRIBE") ? st_method_subscribe :
+            same_text(at, "CONNECTED") ? st_method_connected : st_method_unknown;
+    case 10:
+        return same_text(at, "DISCONNECT") ? st_method_disconnect : st_method_unknown;
+    case 11:
+        return same_text(at, "UNSUBSCRIBE") ? st_method_unsubscribe : st_method_unknown;
+    default:
         return st_method_unknown;
-
-    std::uint8_t found = first_method_node;
-    do {
-        const auto& node = method_tree_table.nodes[found - first_method_node];
-        auto letter = static_cast<unsigned>(static_cast<unsigned char>(at[node.position])) - 'A';
-        if (letter >= 26)
-            return st_method_unknown;
-        found = node.next[letter];
-    } while (found >= first_method_node);
-
-    // CONNECT и CONNECTED совпадают по всем буквам более короткого
-    auto method = static_cast<stomptalk_method>(found);
-    if ((method == st_method_connect) && (len == method_texts[st_method_connected].size))
-        method = st_method_connected;
-
-    const auto& text = method_texts[method];
-    return ((method != st_method_unknown) && (len == text.size) &&
-        (std::memcmp(at, text.name, len) == 0)) ? method : st_method_unknown;
+    }
 }
 
 // Имя метода, пустое для st_method_unknown.

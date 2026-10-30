@@ -889,8 +889,10 @@ void test_protocol_errors() {
 
     // ошибка в content-length не должна теряться, если дальше идёт другой фрейм
     expect_error("SEND\ncontent-length:x\n\n\0ACK\nid:1\n\n\0"s);
-    // content-length:0 отклоняется сознательно
-    expect_error("SEND\ncontent-length:0\n\n\0"s);
+    // после content-length:0 сразу должен идти NUL
+    expect_error("SEND\ncontent-length:0\n\nx\0"s);
+    // двоеточие в значении должно быть экранировано
+    expect_error("SEND\nk:a:b\n\n\0"s);
     // заголовок без двоеточия и пустое имя
     expect_error("SEND\nnocolon\nid:1\n\n\0"s);
     expect_error("SEND\r\nnocolon\r\n\r\n\0"s);
@@ -1008,6 +1010,38 @@ void test_stackbuf_counts_elements() {
     std::cout << "✓ stackbuf test passed" << std::endl;
 }
 
+void test_syntax_of_the_standard() {
+    std::cout << "Testing what the grammar allows..." << std::endl;
+    using namespace std::string_literals;
+
+    for (std::size_t step : {std::size_t{1}, std::size_t{100}}) {
+        auto r = feed("SEND\ncontent-length:0\n\n\0"s, step);
+        assert(r.ok && (r.frames == 1) && r.body.empty());
+        // первое значение действует, даже если это ноль
+        r = feed("SEND\ncontent-length:0\ncontent-length:9\n\n\0"s, step);
+        assert(r.ok && (r.frames == 1) && r.body.empty());
+
+        for (const auto& data : {
+                "SEND\nk:\xd0\xbf\xd1\x80\xd0\xb8\n\n\0"s,
+                "SEND\n\xd0\xba\xd0\xbb:v\n\n\0"s,
+                "SEND\na b:v\n\n\0"s,
+                "SEND\nk:a\x01""b\n\n\0"s,
+                "SEND\nk:a\0b\n\n\0"s,
+                "SEND\nk:\n\n\0"s,
+                "CONNECT\nhost:a:b\n\n\0"s,
+                "ACK\nid:1\n\n\0\n\r\nACK\nid:2\n\n\0"s,
+                "SEND\r\nid:1\n\r\n\0"s,
+                // CR и NUL между фреймами пропускаются сознательно
+                "\rACK\n\n\0\0ACK\n\n\0"s,
+                // контроль методов и тел на уровень выше
+                "FOO\nid:1\n\n\0"s,
+                "ACK\nid:1\n\nbody\0"s})
+            assert(feed(data, step).ok && (feed(data, step).frames >= 1));
+    }
+
+    std::cout << "✓ Grammar test passed" << std::endl;
+}
+
 void test_method_from() {
     std::cout << "Testing method_from..." << std::endl;
 
@@ -1115,6 +1149,7 @@ int main() {
         test_every_callback_can_stop_parsing();
         test_antoll();
         test_stackbuf_counts_elements();
+        test_syntax_of_the_standard();
         test_method_from();
         test_content_length_is_recognized_by_name();
         test_escaped_headers();

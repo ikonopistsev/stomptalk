@@ -12,16 +12,6 @@ namespace stomptalk {
 #endif
 
 STOMPTALK_FORCE_INLINE
-static bool ch_isprint(unsigned char ch) noexcept { 
-    return ch >= 32 && ch <= 126; 
-}
-
-STOMPTALK_FORCE_INLINE
-static bool ch_isprint_nospace(unsigned char ch) noexcept { 
-    return ch > 32 && ch <= 126; 
-}
-
-STOMPTALK_FORCE_INLINE
 static bool ch_isupper(unsigned char ch) noexcept { 
     return ch >= 'A' && ch <= 'Z';
 }

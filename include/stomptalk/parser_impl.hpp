@@ -4,6 +4,15 @@
 
 #include <cstring>
 #include <algorithm>
+#include <cstdint>
+// Блочный сканер включается флагами сборки: -mavx2 (или -march) даёт AVX2, в x86-64 всегда есть SSE2.
+#if defined(__GNUC__) && defined(__AVX2__)
+#include <immintrin.h>
+#define STOMPTALK_SCAN_BLOCK 32
+#elif defined(__GNUC__) && defined(__SSE2__)
+#include <emmintrin.h>
+#define STOMPTALK_SCAN_BLOCK 16
+#endif
 
 namespace stomptalk {
 
@@ -15,19 +24,12 @@ struct char_table
     bool plain[256];
 };
 
-constexpr char_table make_key_table() noexcept
+// У ключа и значения один набор: всё, кроме разделителей строки и экранирования.
+constexpr char_table make_header_table() noexcept
 {
     char_table t{};
-    for (int ch = 33; ch <= 126; ++ch)
-        t.plain[ch] = (ch != ':') && (ch != '\\');
-    return t;
-}
-
-constexpr char_table make_value_table() noexcept
-{
-    char_table t{};
-    for (int ch = 32; ch <= 126; ++ch)
-        t.plain[ch] = (ch != '\\');
+    for (int ch = 0; ch < 256; ++ch)
+        t.plain[ch] = (ch != '\r') && (ch != '\n') && (ch != ':') && (ch != '\\');
     return t;
 }
 
@@ -39,9 +41,106 @@ constexpr char_table make_method_table() noexcept
     return t;
 }
 
-static constexpr char_table key_chars = make_key_table();
-static constexpr char_table value_chars = make_value_table();
+static constexpr char_table header_chars = make_header_table();
 static constexpr char_table method_chars = make_method_table();
+
+// Первый байт, требующий решения, или end.
+inline const char* scan_header(const char* curr, const char* end) noexcept
+{
+    const auto& t = header_chars.plain;
+    while ((curr < end) && t[static_cast<unsigned char>(*curr)])
+        ++curr;
+    return curr;
+}
+
+// Конец метода, первый байт не из A-Z. Методы короче блока, поэтому длина метода
+// не становится условным переходом.
+inline const char* scan_method(const char* curr, const char* end) noexcept
+{
+#if defined(STOMPTALK_SCAN_BLOCK)
+    if (end - curr >= 16)
+    {
+        const auto block = _mm_loadu_si128(reinterpret_cast<const __m128i*>(curr));
+        // сдвиг ставит A-Z в самый верх знакового диапазона
+        const auto shifted = _mm_add_epi8(block, _mm_set1_epi8(127 - 'Z'));
+        const int upper = _mm_movemask_epi8(_mm_cmpgt_epi8(shifted, _mm_set1_epi8(127 - 26)));
+        if (upper != 0xffff)
+            return curr + __builtin_ctz(~static_cast<unsigned>(upper));
+    }
+#endif
+    while ((curr < end) && method_chars.plain[static_cast<unsigned char>(*curr)])
+        ++curr;
+    return curr;
+}
+
+// Выдаёт разделители строк заголовков по порядку. Блок загружается один раз
+// и обслуживает все токены в нём, поэтому на токен нет своего цикла и перехода.
+// Пока хватает данных на блок, работает AVX2 или SSE2, остаток просматривается по таблице.
+class header_scanner
+{
+    const char* block_;
+    const char* end_;
+    const char* base_{};
+    std::uint64_t mask_{};
+
+#if defined(STOMPTALK_SCAN_BLOCK)
+    static constexpr int block_size = STOMPTALK_SCAN_BLOCK;
+
+#if defined(__AVX2__)
+    static std::uint64_t block_mask(const char* at) noexcept
+    {
+        const auto block = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(at));
+        const auto hits = _mm256_or_si256(
+            _mm256_or_si256(_mm256_cmpeq_epi8(block, _mm256_set1_epi8('\n')),
+                _mm256_cmpeq_epi8(block, _mm256_set1_epi8('\r'))),
+            _mm256_or_si256(_mm256_cmpeq_epi8(block, _mm256_set1_epi8(':')),
+                _mm256_cmpeq_epi8(block, _mm256_set1_epi8('\\'))));
+        return static_cast<std::uint32_t>(_mm256_movemask_epi8(hits));
+    }
+#else
+    static std::uint64_t block_mask(const char* at) noexcept
+    {
+        const auto block = _mm_loadu_si128(reinterpret_cast<const __m128i*>(at));
+        const auto hits = _mm_or_si128(
+            _mm_or_si128(_mm_cmpeq_epi8(block, _mm_set1_epi8('\n')),
+                _mm_cmpeq_epi8(block, _mm_set1_epi8('\r'))),
+            _mm_or_si128(_mm_cmpeq_epi8(block, _mm_set1_epi8(':')),
+                _mm_cmpeq_epi8(block, _mm_set1_epi8('\\'))));
+        return static_cast<std::uint32_t>(_mm_movemask_epi8(hits));
+    }
+#endif
+
+    void refill() noexcept
+    {
+        base_ = block_;
+        int bits = 0;
+        for (; (bits < 64) && (end_ - block_ >= block_size); bits += block_size, block_ += block_size)
+            mask_ |= block_mask(block_) << bits;
+    }
+#endif
+
+public:
+    header_scanner(const char* curr, const char* end) noexcept
+        : block_{curr}, end_{end}
+    {   }
+
+    const char* next() noexcept
+    {
+#if defined(STOMPTALK_SCAN_BLOCK)
+        while (!mask_ && (end_ - block_ >= block_size))
+            refill();
+        if (mask_)
+        {
+            const auto at = base_ + __builtin_ctzll(mask_);
+            mask_ &= mask_ - 1;
+            return at;
+        }
+#endif
+        const auto at = scan_header(block_, end_);
+        block_ = (at < end_) ? at + 1 : end_;
+        return at;
+    }
+};
 
 } // namespace detail
 
@@ -80,8 +179,7 @@ typename parser<H>::pointer parser<H>::method_state(hook_type& hook,
     pointer curr, pointer end) noexcept
 {
     auto beg = curr;
-    while ((curr < end) && detail::method_chars.plain[static_cast<unsigned char>(*curr)])
-        ++curr;
+    curr = detail::scan_method(curr, end);
 
     auto len = static_cast<std::size_t>(curr - beg);
     if ((curr < end) && (len <= STOMPTALK_PARSER_STACK_SIZE))
@@ -142,19 +240,49 @@ template<class H>
 typename parser<H>::pointer parser<H>::hdrline_hdr_key(hook_type& hook,
     pointer curr, pointer end) noexcept
 {
-    auto beg = curr;
-    while ((curr < end) && detail::key_chars.plain[static_cast<unsigned char>(*curr)])
-        ++curr;
-
-    auto len = static_cast<std::size_t>(curr - beg);
-    if ((curr < end) && (*curr == ':') && (len <= STOMPTALK_PARSER_STACK_SIZE))
+    // Блок заголовков целиком: ключ и значение каждой строки разбираются здесь,
+    // без переходов между состояниями. Всё необычное уходит в побайтный разбор.
+    detail::header_scanner scanner(curr, end);
+    for (;;)
     {
-        hook.on_hdr_key(beg, len);
-        return tailcall(hook, &parser::hdrline_val, curr + 1, end);
-    }
+        auto beg = curr;
+        curr = scanner.next();
 
-    // ключ разорван, с escape или ошибочный: дальше побайтно
-    return tailcall(hook, &parser::hdrline_hdr_key_bytes, beg, end);
+        auto len = static_cast<std::size_t>(curr - beg);
+        if ((curr >= end) || (*curr != ':') || (len > STOMPTALK_PARSER_STACK_SIZE))
+        {
+            // ключ разорван, с escape или ошибочный: дальше побайтно
+            return tailcall(hook, &parser::hdrline_hdr_key_bytes, beg, end);
+        }
+
+        hook.on_hdr_key(beg, len);
+        ++curr;
+        if ((curr >= end) || !hook.ok())
+        {
+            state_ = &parser::hdrline_val;
+            return curr;
+        }
+
+        beg = curr;
+        curr = scanner.next();
+
+        len = static_cast<std::size_t>(curr - beg);
+        if ((curr >= end) || (len > STOMPTALK_PARSER_STACK_SIZE) ||
+            ((*curr != '\n') && (*curr != '\r')))
+        {
+            // значение разорвано, с escape или ошибочное: дальше побайтно
+            return tailcall(hook, &parser::hdrline_val_bytes, beg, end);
+        }
+
+        hook.on_hdr_val(beg, len);
+        if (*curr == '\r')
+            return tailcall(hook, &parser::hdrline_almost_done, curr + 1, end);
+
+        ++curr;
+        // конец блока, пустой ключ, конец куска или ошибка каллбека решает hdrline_done
+        if ((curr >= end) || !hook.ok() || (*curr == '\n') || (*curr == '\r') || (*curr == ':'))
+            return tailcall(hook, &parser::hdrline_done, curr, end);
+    }
 }
 
 template<class H>
@@ -213,15 +341,7 @@ typename parser<H>::pointer parser<H>::hdrline_hdr_key_bytes(hook_type& hook,
 
             default:
                 // 3) Обычный символ ключа
-                if (ch_isprint_nospace(ch)) 
-                {
-                    if (!push(hook, ch)) { 
-                        return curr; 
-                    }
-                } 
-                else 
-                {
-                    hook.set(stomptalk_error_inval_frame);
+                if (!push(hook, ch)) {
                     return curr;
                 }
         }
@@ -235,8 +355,7 @@ typename parser<H>::pointer parser<H>::hdrline_val(hook_type& hook,
     pointer curr, pointer end) noexcept
 {
     auto beg = curr;
-    while ((curr < end) && detail::value_chars.plain[static_cast<unsigned char>(*curr)])
-        ++curr;
+    curr = detail::scan_header(curr, end);
 
     auto len = static_cast<std::size_t>(curr - beg);
     if ((curr < end) && (len <= STOMPTALK_PARSER_STACK_SIZE))
@@ -284,29 +403,33 @@ typename parser<H>::pointer parser<H>::hdrline_val_bytes(hook_type& hook,
             continue;
         }
 
-        if (ch_isprint(ch)) 
-        {
-            if ((ch == '\\') && !raw_headers_) {
+        if (ch == '\r') {
+            hook.on_hdr_val(sbuf_.pop());
+            escape_ = false;
+            return tailcall(hook, &parser::hdrline_almost_done, curr, end);
+        }
+
+        if (ch == '\n') {
+            hook.on_hdr_val(sbuf_.pop());
+            escape_ = false;
+            return tailcall(hook, &parser::hdrline_done, curr, end);
+        }
+
+        if (!raw_headers_) {
+            if (ch == '\\') {
                 escape_ = true;
                 continue;
             }
-            if (!sbuf_.push(static_cast<char>(ch))) {
-                hook.set(stomptalk_error_too_big);
-                return curr;
-            }
-        } else {
-            if (ch == '\r') {
-                hook.on_hdr_val(sbuf_.pop());
-                escape_ = false;
-                return tailcall(hook, &parser::hdrline_almost_done, curr, end);
-            } else if (ch == '\n') {
-                hook.on_hdr_val(sbuf_.pop());
-                escape_ = false;
-                return tailcall(hook, &parser::hdrline_done, curr, end);
-            } else {
+            // двоеточие в значении должно быть экранировано
+            if (ch == ':') {
                 hook.set(stomptalk_error_inval_frame);
                 return curr;
             }
+        }
+
+        if (!sbuf_.push(static_cast<char>(ch))) {
+            hook.set(stomptalk_error_too_big);
+            return curr;
         }
     } while (curr < end);
 
@@ -332,7 +455,7 @@ typename parser<H>::pointer parser<H>::hdrline_done(hook_type& hook,
     }
 
     // иначе это следующий хидер, имя не может быть пустым
-    if (!ch_isprint_nospace(ch) || (ch == ':'))
+    if (ch == ':')
     {
         hook.set(stomptalk_error_inval_reqline);
         return curr;
@@ -361,8 +484,12 @@ typename parser<H>::pointer parser<H>::done(hook_type& hook,
     pointer curr, pointer end) noexcept
 {
     // при заданной длине боди может начинаться с нуля
-    if (hook.content_left() > 0)
-        return tailcall(hook, &parser::body_read, curr, end);
+    if (hook.has_content_length())
+    {
+        return (hook.content_left() > 0) ?
+            tailcall(hook, &parser::body_read, curr, end) :
+            tailcall(hook, &parser::frame_end, curr, end);
+    }
 
     if (*curr == '\0') 
     {

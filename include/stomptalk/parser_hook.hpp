@@ -20,6 +20,7 @@ protected:
     // header 'content-length' data
     std::uint64_t content_length_{};
     bool expect_content_length_{};
+    bool has_content_length_{};
     stomptalk_error error_{stomptalk_error_none};
 
 public:
@@ -32,12 +33,19 @@ public:
         content_left_ = 0u;
         content_length_ = 0u;
         expect_content_length_ = false;
+        has_content_length_ = false;
         error_ = stomptalk_error_none;
     }
 
     void set(std::uint64_t content_left) noexcept
     {
         content_left_ = content_left;
+    }
+
+    // content-length:0 тоже считается заданной длиной
+    bool has_content_length() const noexcept
+    {
+        return has_content_length_;
     }
 
     std::uint64_t content_length() const noexcept
@@ -82,7 +90,7 @@ public:
     // http://stomp.github.io/stomp-specification-1.2.html#Repeated_Header_Entries
     // If a client or a server receives repeated frame header entries,
     // only the first header entry SHOULD be used as the value of header entry.
-        if ((len == 14) && !content_length_ &&
+        if ((len == 14) && !has_content_length_ &&
             (std::memcmp(at, "content-length", 14) == 0))
         {
             expect_content_length_ = true;
@@ -104,8 +112,11 @@ public:
         {
             // парсим размер
             auto content_len = stomptalk::antoull(at, len);
-            if (content_len > 0ll)
+            if (content_len >= 0ll)
+            {
                 content_length_ = content_left_ = static_cast<std::uint64_t>(content_len);
+                has_content_length_ = true;
+            }
             else
             {
                 set(stomptalk_error_inval_content_size);
