@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.9.0 LANGUAGES CXX C)
+project(stomptalk VERSION 2.0.0 LANGUAGES CXX C)
 
 # Без типа сборки парсер компилируется совсем без оптимизации.
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -54,7 +54,7 @@ else()
     if (WIN32)
         target_compile_definitions(stomptalk PRIVATE STOMPTALK_MAKEDLL)
     endif()
-    set_target_properties(stomptalk PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
+    set_target_properties(stomptalk PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 2)
 endif()
 
 add_library(stomptalk::stomptalk ALIAS stomptalk)
@@ -205,12 +205,12 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         set(CPACK_DEBIAN_DEV_PACKAGE_SECTION "libdevel")
     else()
         set(CPACK_COMPONENTS_ALL runtime;dev)
-        set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "libstomptalk1")
+        set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "libstomptalk2")
         set(CPACK_DEBIAN_RUNTIME_PACKAGE_SECTION "libs")
         set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
         set(CPACK_DEBIAN_DEV_PACKAGE_NAME "libstomptalk-dev")
         set(CPACK_DEBIAN_DEV_PACKAGE_SECTION "libdevel")
-        set(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS "libstomptalk1 (= ${PROJECT_VERSION})")
+        set(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS "libstomptalk2 (= ${PROJECT_VERSION})")
     endif()
 
     include(CPack)
