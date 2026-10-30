@@ -22,11 +22,11 @@
 static int cb_frame(stomptalk_parser *p, const char *at)
     { (void)p; (void)at; return 0; }
 
-static int cb_method(stomptalk_parser *p, uint64_t id, const char *at, size_t len)
-    { (void)p; (void)id; (void)at; (void)len; return 0; }
+static int cb_method(stomptalk_parser *p, const char *at, size_t len)
+    { (void)p; (void)at; (void)len; return 0; }
 
-static int cb_hdr_key(stomptalk_parser *p, uint64_t id, const char *at, size_t len)
-    { (void)p; (void)id; (void)at; (void)len; return 0; }
+static int cb_hdr_key(stomptalk_parser *p, const char *at, size_t len)
+    { (void)p; (void)at; (void)len; return 0; }
 
 static int cb_hdr_val(stomptalk_parser *p, const char *at, size_t len)
     { (void)p; (void)at; (void)len; return 0; }

@@ -7,58 +7,36 @@ This library does not perform any I/O operations for its own, is designed to be 
 
 ### C++
 
-You must implement the `hook_base` interface inside the `stomptalk` namespace:
+Write a class with the callbacks below and pass it to the `parser` template, so that the callbacks inline into the parser:
 
 ```cpp
 #include "stomptalk/parser.hpp"
 
-namespace stomptalk {
-
-struct hook_base
+struct my_hook
 {
-    virtual void on_frame(parser_hook&, const char *frame_start) noexcept = 0;
+    using hook_type = stomptalk::parser_hook<my_hook>;
 
-    virtual void on_method(parser_hook&,
-        std::uint64_t method_id, const char*, std::size_t) noexcept = 0;
-
-    virtual void on_hdr_key(parser_hook&,
-        std::uint64_t header_id, const char*, std::size_t) noexcept = 0;
-
-    virtual void on_hdr_val(parser_hook&, const char*, std::size_t) noexcept = 0;
-
-    virtual void on_body(parser_hook&, const void*, std::size_t) noexcept = 0;
-
-    virtual void on_frame_end(parser_hook&, const char *frame_end) noexcept = 0;
-
-protected:
-    ~hook_base() = default;
-};
-
-} // namespace stomptalk
-```
-
-> If the request body is large, the `on_body` method will be called multiple times.
-
-Then create a `parser` and `parser_hook`, and call `parser.run()` for each chunk of data received from a socket:
-
-```cpp
-class my_hook : public stomptalk::hook_base
-{
-    void on_frame(stomptalk::parser_hook&, const char*) noexcept override { }
-    void on_method(stomptalk::parser_hook&, std::uint64_t method_id, const char*, std::size_t) noexcept override { }
-    void on_hdr_key(stomptalk::parser_hook&, std::uint64_t header_id, const char*, std::size_t) noexcept override { }
-    void on_hdr_val(stomptalk::parser_hook&, const char*, std::size_t) noexcept override { }
-    void on_body(stomptalk::parser_hook&, const void*, std::size_t) noexcept override { }
-    void on_frame_end(stomptalk::parser_hook&, const char*) noexcept override { }
+    void on_frame(hook_type&, const char *frame_start) noexcept { }
+    void on_method(hook_type&, const char*, std::size_t) noexcept { }
+    void on_hdr_key(hook_type&, const char*, std::size_t) noexcept { }
+    void on_hdr_val(hook_type&, const char*, std::size_t) noexcept { }
+    void on_body(hook_type&, const void*, std::size_t) noexcept { }
+    void on_frame_end(hook_type&, const char *frame_end) noexcept { }
 };
 
 my_hook user_hook;
-stomptalk::parser_hook hook(user_hook);
-stomptalk::parser parser;
+my_hook::hook_type hook(user_hook);
+stomptalk::parser<my_hook> parser;
 
 // parse data from socket
 std::size_t rc = parser.run(hook, data, data_size);
 ```
+
+> If the request body is large, the `on_body` method will be called multiple times.
+
+A method, key or value is valid only during its callback. To turn a method into a number, use `stomptalk::method_from` from `stomptalk/method.hpp`. See `test/inline_bench.cpp` for a complete example.
+
+Use `-O2` or higher for speed: the parser states call each other in tail position, which the compiler turns into jumps. A build without optimization, such as Debug, is detected and runs the states from a loop instead: it is slower, and its stack stays bounded. `-O1` is not safe, because it optimizes but does not enable `-foptimize-sibling-calls`, so a large buffer can overflow the stack. A build without a build type uses `Release`.
 
 You can see example of integration at [stompdemo](https://github.com/ikonopistsev/stompdemo) or [stompconn](https://github.com/ikonopistsev/stompconn).
 
@@ -70,8 +48,8 @@ One `stomptalk_parser` object is used per TCP connection. Initialize the struct 
 #include "stomptalk/parser.h"
 
 int at_frame(stomptalk_parser *parser, const char *at) { return 0; }
-int at_method(stomptalk_parser *parser, uint64_t method_id, const char *at, size_t length) { return 0; }
-int at_hdr_key(stomptalk_parser *parser, uint64_t header_id, const char *at, size_t length) { return 0; }
+int at_method(stomptalk_parser *parser, const char *at, size_t length) { return 0; }
+int at_hdr_key(stomptalk_parser *parser, const char *at, size_t length) { return 0; }
 int at_hdr_val(stomptalk_parser *parser, const char *at, size_t length) { return 0; }
 int at_body(stomptalk_parser *parser, const char *at, size_t length) { return 0; }
 int at_frame_end(stomptalk_parser *parser, const char *at) { return 0; }
@@ -101,6 +79,9 @@ size_t rc = stomptalk_parser_execute(parser, data, data_size);
 
 // cleanup
 stomptalk_parser_free(parser);
+
+// convert the text of a method to its number
+enum stomptalk_method method = stomptalk_method_from(at, length);
 
 // convert text with unsigned number
 // returns negative value on error

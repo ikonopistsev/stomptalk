@@ -1,11 +1,14 @@
-#include "stomptalk/hook_base.hpp"
 #include "stomptalk/antoull.hpp"
 #include "stomptalk/parser.hpp"
+#include "stomptalk/method.hpp"
 #include "stomptalk/parser.h"
 
+// Парсер сам является своим хуком: виртуальных вызовов нет,
+// остаётся только вызов пользовательского каллбека по указателю.
 struct stomptalk_parser final
-    : stomptalk::hook_base
 {
+    using hook_type = stomptalk::parser_hook<stomptalk_parser>;
+
     std::size_t run(const char *begin, std::size_t len) noexcept
     {
         return parser_.run(hook_, begin, len);
@@ -48,45 +51,49 @@ struct stomptalk_parser final
     }
 
 private:
-    stomptalk::parser parser_{};
-    stomptalk::parser_hook hook_{*this};
+    stomptalk::parser<stomptalk_parser> parser_{};
+    hook_type hook_{*this};
     stomptalk_cb on_frame_{};
-    stomptalk_id_cb on_method_{};
-    stomptalk_id_cb on_hdr_key_{};
+    stomptalk_data_cb on_method_{};
+    stomptalk_data_cb on_hdr_key_{};
     stomptalk_data_cb on_hdr_val_{};
     stomptalk_data_cb on_body_{};
     stomptalk_cb on_frame_end_{};
     void* user_arg_{};
 
+public:
     void on_frame(
-        stomptalk::parser_hook&, const char* ptr) noexcept override
+        hook_type& hook, const char* ptr) noexcept
     {
         if (on_frame_)
-            on_frame_(this, ptr);
+        {
+            if (on_frame_(this, ptr))
+                hook.set(stomptalk_error_generic);
+        }
     }
 
-    void on_method(stomptalk::parser_hook& hook, std::uint64_t id,
-        const char *at, std::size_t len) noexcept override
+    void on_method(hook_type& hook,
+        const char *at, std::size_t len) noexcept
     {
         if (on_method_)
         {
-            if (on_method_(this, id, at, len))
+            if (on_method_(this, at, len))
                 hook.set(stomptalk_error_generic);
         }
     }
 
-    void on_hdr_key(stomptalk::parser_hook& hook, std::uint64_t id,
-        const char *at, std::size_t len) noexcept override
+    void on_hdr_key(hook_type& hook,
+        const char *at, std::size_t len) noexcept
     {
         if (on_hdr_key_)
         {
-            if (on_hdr_key_(this, id, at, len))
+            if (on_hdr_key_(this, at, len))
                 hook.set(stomptalk_error_generic);
         }
     }
 
-    void on_hdr_val(stomptalk::parser_hook& hook,
-        const char *at, std::size_t len) noexcept override
+    void on_hdr_val(hook_type& hook,
+        const char *at, std::size_t len) noexcept
     {
         if (on_hdr_val_)
         {
@@ -95,8 +102,8 @@ private:
         }
     }
 
-    void on_body(stomptalk::parser_hook& hook,
-        const void* ptr, std::size_t size) noexcept override
+    void on_body(hook_type& hook,
+        const void* ptr, std::size_t size) noexcept
     {
         if (on_body_)
         {
@@ -106,10 +113,13 @@ private:
     }
 
     void on_frame_end(
-        stomptalk::parser_hook&, const char* ptr) noexcept override
+        hook_type& hook, const char* ptr) noexcept
     {
         if (on_frame_end_)
-            on_frame_end_(this, ptr);
+        {
+            if (on_frame_end_(this, ptr))
+                hook.set(stomptalk_error_generic);
+        }
     }
 };
 
@@ -183,7 +193,7 @@ size_t stomptalk_antoll(int64_t *res, const char *text, size_t len)
         }
 
         auto num = static_cast<int64_t>(stomptalk::antoull(text, len));
-        if (num)
+        if (num >= 0)
         {
             *res = minus ? -num : num;
             return 1;
@@ -221,29 +231,14 @@ const char* stomptalk_trim(const char *text, size_t *len)
     return nullptr;
 }
 
-const char* stomptalk_method_str(uint64_t method)
+stomptalk_method stomptalk_method_from(const char *at, size_t length)
 {
-    switch (method)
-    {
-    case st_method_none: return "none";
-    case st_method_abort: return "ABORT";
-    case st_method_ack: return "ACK";
-    case st_method_begin: return "BEGIN";
-    case st_method_commit: return "COMMIT";
-    case st_method_connect: return "CONNECT";
-    case st_method_connected: return "CONNECTED";
-    case st_method_disconnect: return "DISCONNECT";
-    case st_method_error: return "ERROR";
-    case st_method_message: return "MESSAGE";
-    case st_method_nack: return "NACK";
-    case st_method_receipt: return "RECEIPT";
-    case st_method_send: return "SEND";
-    case st_method_stomp: return "STOMP";
-    case st_method_subscribe: return "SUBSCRIBE";
-    case st_method_unsubscribe: return "UNSUBSCRIBE";
-    default: ;
-    }
-    return "unknown";
+    return stomptalk::method_from(at, length);
+}
+
+const char* stomptalk_method_str(stomptalk_method method)
+{
+    return (method == st_method_unknown) ? "unknown" : stomptalk::method_name(method);
 }
 
 const char* stomptalk_get_error_str(size_t error)

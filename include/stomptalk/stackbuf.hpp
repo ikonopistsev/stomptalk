@@ -1,11 +1,37 @@
 #pragma once
 
-#include <utility>
-#include <iterator>
-#include <cstring>
+#include "stomptalk/type.h"
 #include <algorithm>
+#include <cstddef>
+#include <cstring>
+#include <iterator>
+#include <type_traits>
+#include <utility>
 
 namespace stomptalk {
+
+namespace detail {
+
+// Сколько байт занимают count элементов.
+template<class T>
+struct element_bytes
+{
+    static constexpr std::size_t of(std::size_t count) noexcept
+    {
+        return count * sizeof(T);
+    }
+};
+
+template<>
+struct element_bytes<char>
+{
+    static constexpr std::size_t of(std::size_t count) noexcept
+    {
+        return count;
+    }
+};
+
+} // namespace detail
 
 template<class T, std::size_t Size>
 class stackbuf
@@ -55,7 +81,7 @@ public:
             return false; 
         }
 
-        std::memcpy(curr_, ptr, len);
+        std::memcpy(curr_, ptr, detail::element_bytes<T>::of(len));
         curr_ += len;
         return true;
     }    

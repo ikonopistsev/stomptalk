@@ -52,33 +52,32 @@ long evutil_tv_to_msec(const timeval& tv)
 #endif
 
 class hook
-    : public stomptalk::hook_base
 {
-    virtual void on_frame(stomptalk::parser_hook&, const char*) noexcept
+public:
+    void on_frame(stomptalk::parser_hook<hook>&, const char*) noexcept
     {
         if (do_cout)
             std::cout << "[" << std::endl;
     }
 
-    virtual void on_method(stomptalk::parser_hook&, 
-        std::uint64_t method_id, const char* ptr, std::size_t len) noexcept
+    void on_method(stomptalk::parser_hook<hook>&, const char* ptr, std::size_t len) noexcept
     {
         if (do_cout) {
-            std::cout << "\t" << method_id << " ";
+            std::cout << "\t";
+            std::cout.write(ptr, len);
+            std::cout << " ";
+        }
+    }
+
+    void on_hdr_key(stomptalk::parser_hook<hook>&, const char* ptr, std::size_t len) noexcept
+    {
+        if (do_cout) {
+            std::cout << std::endl << "\t";
             std::cout.write(ptr, len);
         }
     }
 
-    virtual void on_hdr_key(stomptalk::parser_hook&, 
-        std::uint64_t header_id, const char* ptr, std::size_t len) noexcept
-    {
-        if (do_cout) {
-            std::cout << std::endl << "\t" << header_id << " ";
-            std::cout.write(ptr, len);
-        }
-    }
-
-    virtual void on_hdr_val(stomptalk::parser_hook&, const char* ptr, std::size_t len) noexcept
+    void on_hdr_val(stomptalk::parser_hook<hook>&, const char* ptr, std::size_t len) noexcept
     {
         if (do_cout) {
             std::cout << ": ";
@@ -86,7 +85,7 @@ class hook
         }
     }
 
-    virtual void on_body(stomptalk::parser_hook&, const void* ptr, std::size_t size) noexcept
+    void on_body(stomptalk::parser_hook<hook>&, const void* ptr, std::size_t size) noexcept
     {
         if (do_cout)
         {
@@ -95,7 +94,7 @@ class hook
         }
     }
 
-    virtual void on_frame_end(stomptalk::parser_hook&, const char*) noexcept
+    void on_frame_end(stomptalk::parser_hook<hook>&, const char*) noexcept
     {
         if (do_cout)
             std::cout << std::endl << "]" << std::endl;
@@ -167,8 +166,8 @@ int main()
         "\r\n\0";
 
     hook user_hook;
-    stomptalk::parser_hook hook(user_hook);
-    stomptalk::parser parser;
+    stomptalk::parser<::hook> parser;
+    stomptalk::parser_hook<::hook> hook(user_hook);
     const char *data = data_flow;
     std::size_t size = sizeof(data_flow) - 1;
     const char *data_end = data + size;

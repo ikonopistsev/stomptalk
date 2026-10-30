@@ -1,24 +1,29 @@
 #pragma once
 
-#include "stomptalk/hook_base.hpp"
 #include "stomptalk/antoull.hpp"
 #include "stomptalk/parser.h"
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 
 namespace stomptalk {
 
-class parser;
+// Логика вокруг каллбеков H: это прямые вызовы, которые встраиваются в парсер.
+// Метод, ключ и значение действительны только во время своего каллбека: они указывают
+// либо во входной буфер, либо в буфер парсера, который занимает следующий элемент.
+template<class H>
 class parser_hook
 {
 protected:
-    hook_base& hook_;
+    H& hook_;
     std::uint64_t content_left_{};
     // header 'content-length' data
     std::uint64_t content_length_{};
-    std::uint64_t header_id_{};
+    bool expect_content_length_{};
     stomptalk_error error_{stomptalk_error_none};
 
 public:
-    parser_hook(hook_base& hook) noexcept
+    parser_hook(H& hook) noexcept
         : hook_{hook}
     {   }
 
@@ -26,7 +31,7 @@ public:
     {
         content_left_ = 0u;
         content_length_ = 0u;
-        header_id_ = 0u;
+        expect_content_length_ = false;
         error_ = stomptalk_error_none;
     }
 
@@ -50,11 +55,6 @@ public:
         return content_left_;
     }
 
-    std::uint64_t header_id() const noexcept
-    {
-        return header_id_;
-    }
-
     stomptalk_error error() const noexcept
     {
         return error_;
@@ -69,41 +69,38 @@ public:
     {
         hook_.on_frame(*this, frame_start);
     }
-    
-    void on_method(std::uint64_t method_id, const char *at, std::size_t len) noexcept
+
+    void on_method(const char *at, std::size_t len) noexcept
     {
-        hook_.on_method(*this, method_id, at, len);
+        hook_.on_method(*this, at, len);
     }
 
-    template<class P>
-    void on_method(std::uint64_t method_id, P p) noexcept
-    {
-        on_method(method_id, p.first, p.second);
-    }
-
-    void on_hdr_key(std::uint64_t header_id, const char *at, std::size_t len) noexcept
+    void on_hdr_key(const char *at, std::size_t len) noexcept
     {
     // нам важен только размер контента
     // прверяем встречается ли хидер первый раз
     // http://stomp.github.io/stomp-specification-1.2.html#Repeated_Header_Entries
     // If a client or a server receives repeated frame header entries,
     // only the first header entry SHOULD be used as the value of header entry.
-        if ((st_header_content_length == header_id) && !content_length_)
-            header_id_ = header_id;
+        if ((len == 14) && !content_length_ &&
+            (std::memcmp(at, "content-length", 14) == 0))
+        {
+            expect_content_length_ = true;
+        }
 
-        hook_.on_hdr_key(*this, header_id, at, len);
+        hook_.on_hdr_key(*this, at, len);
     }
 
     template<class P>
-    void on_hdr_key(std::uint64_t header_id, P p) noexcept
+    void on_hdr_key(P p) noexcept
     {
-        on_hdr_key(header_id, p.first, p.second);
+        on_hdr_key(p.first, p.second);
     }
 
     void on_hdr_val(const char *at, std::size_t len) noexcept
     {
         // проверяем ожидали ли content_length
-        if (st_header_content_length == header_id_)
+        if (expect_content_length_)
         {
             // парсим размер
             auto content_len = stomptalk::antoull(at, len);
@@ -115,7 +112,7 @@ public:
                 return;
             }
 
-            header_id_ = 0u;
+            expect_content_length_ = false;
         }
 
         hook_.on_hdr_val(*this, at, len);

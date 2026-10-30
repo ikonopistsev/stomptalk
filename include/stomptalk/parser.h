@@ -2,7 +2,6 @@
 #define stomptalk_parser_h
 
 #include "stomptalk/method.h"
-#include "stomptalk/header.h"
 #include "stomptalk/antoull.h"
 
 #ifdef __cplusplus
@@ -13,9 +12,6 @@ typedef struct stomptalk_parser stomptalk_parser;
 typedef struct stomptalk_parser_hook stomptalk_parser_hook;
 
 typedef int (*stomptalk_data_cb) (stomptalk_parser*,
-    const char *at, size_t length);
-
-typedef int (*stomptalk_id_cb) (stomptalk_parser*, uint64_t id,
     const char *at, size_t length);
 
 // result != 0 -> error
@@ -36,8 +32,8 @@ enum stomptalk_error {
 
 struct stomptalk_parser_hook {
     stomptalk_cb        on_frame;
-    stomptalk_id_cb     on_method;
-    stomptalk_id_cb     on_hdr_key;
+    stomptalk_data_cb   on_method;
+    stomptalk_data_cb   on_hdr_key;
     stomptalk_data_cb   on_hdr_val;
     stomptalk_data_cb   on_body;
     stomptalk_cb        on_frame_end;
@@ -62,9 +58,13 @@ void stomptalk_set_hook(stomptalk_parser *parser,
 STOMPTALK_EXPORT
 void *stomptalk_get_hook_arg(stomptalk_parser *parser);
 
+// Converts the text of a method to its number, st_method_unknown if it is not one.
+STOMPTALK_EXPORT
+enum stomptalk_method stomptalk_method_from(const char *at, size_t length);
+
 // Returns a string version of the stomp method.
 STOMPTALK_EXPORT
-const char* stomptalk_method_str(uint64_t method);
+const char* stomptalk_method_str(enum stomptalk_method method);
 
 STOMPTALK_EXPORT
 uint64_t stomptalk_get_content_length(stomptalk_parser *parser);

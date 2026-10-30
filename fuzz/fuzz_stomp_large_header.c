@@ -38,10 +38,10 @@
 /* ---- no-op callbacks -------------------------------------------- */
 static int cb_frame(stomptalk_parser *p, const char *at)
     { (void)p; (void)at; return 0; }
-static int cb_method(stomptalk_parser *p, uint64_t id, const char *at, size_t n)
-    { (void)p; (void)id; (void)at; (void)n; return 0; }
-static int cb_hdr_key(stomptalk_parser *p, uint64_t id, const char *at, size_t n)
-    { (void)p; (void)id; (void)at; (void)n; return 0; }
+static int cb_method(stomptalk_parser *p, const char *at, size_t n)
+    { (void)p; (void)at; (void)n; return 0; }
+static int cb_hdr_key(stomptalk_parser *p, const char *at, size_t n)
+    { (void)p; (void)at; (void)n; return 0; }
 static int cb_hdr_val(stomptalk_parser *p, const char *at, size_t n)
     { (void)p; (void)at; (void)n; return 0; }
 static int cb_body(stomptalk_parser *p, const char *at, size_t n)

@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 1.8.0 LANGUAGES CXX C)
+project(stomptalk VERSION 1.9.0 LANGUAGES CXX C)
+
+# Без типа сборки парсер компилируется совсем без оптимизации.
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -20,7 +25,6 @@ if (WIN32)
 endif()
 
 set(source
-    src/parser.cpp
     src/stomptalk.cpp
 )
 
@@ -28,15 +32,13 @@ set(pub_header
     include/stomptalk/type.h
     include/stomptalk/parser.h
     include/stomptalk/method.h
-    include/stomptalk/header.h
+    include/stomptalk/method.hpp
     include/stomptalk/antoull.h
     include/stomptalk/antoull.hpp
-    include/stomptalk/fnv1a.hpp
-    include/stomptalk/hook_base.hpp
     include/stomptalk/parser_hook.hpp
     include/stomptalk/stackbuf.hpp
-    include/stomptalk/hashval.hpp
     include/stomptalk/parser.hpp
+    include/stomptalk/parser_impl.hpp
 )
 
 set(STOMPTALK_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/stomptalk")
@@ -79,6 +81,12 @@ if (STOMPTALK_BUILD_TESTS)
     add_executable(stomptalk_unit_test test/unit_test.cpp)
     target_link_libraries(stomptalk_unit_test PRIVATE stomptalk)
     target_compile_options(stomptalk_unit_test PRIVATE
+        $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
+            -march=native -fno-plt -fno-semantic-interposition>)
+
+    add_executable(stomptalk_inline_bench test/inline_bench.cpp)
+    target_link_libraries(stomptalk_inline_bench PRIVATE stomptalk)
+    target_compile_options(stomptalk_inline_bench PRIVATE
         $<$<AND:$<CONFIG:Release>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
             -march=native -fno-plt -fno-semantic-interposition>)
 
