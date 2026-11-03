@@ -1,0 +1,72 @@
+# Фаззинг парсера: по расписанию и вручную (Build → Pipelines → Run pipeline или glab ci run).
+# Берётся самый свежий тег v*, а не main: проверяем то, что выпущено.
+# База примеров живёт в артефактах прошлого прогона этой же задачи: скачивается в начале,
+# дополняется, сжимается через -merge=1 и выкладывается снова. Так она не зависит от кэша раннера.
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+
+variables:
+  GIT_DEPTH: "0"
+  FUZZ_SECONDS: "120"   # на одну цель; задачи идут параллельно
+  FUZZ_TAG: ""          # пусто — самый свежий тег v*
+
+.fuzz:
+  image: docker.io/library/debian:trixie-slim
+  stage: test
+  timeout: 20m
+  variables:
+    ASAN_OPTIONS: "abort_on_error=1:detect_leaks=1"
+    UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq --no-install-recommends clang libclang-rt-dev cmake make git curl unzip ca-certificates >/dev/null
+  script:
+    - git fetch -q --tags --force
+    - TAG="${FUZZ_TAG:-$(git tag -l 'v*' --sort=-v:refname | head -1)}"
+    - echo "тег $TAG ($(git rev-parse --short "$TAG^{}"))" | tee tag.txt
+    - git worktree add -q --detach src "$TAG"
+    - SAN="-fsanitize=address,undefined -fno-sanitize-recover=undefined"
+    - CC=clang CXX=clang++ cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSTOMPTALK_BUILD_FUZZ=ON
+      -DCMAKE_C_FLAGS="$SAN" -DCMAKE_CXX_FLAGS="$SAN" -DCMAKE_EXE_LINKER_FLAGS="$SAN" >/dev/null
+    - cmake --build build -j"$(nproc)" --target "fuzz_stomp_$TARGET" >/dev/null
+    # база прошлого прогона; нет её — начинаем с затравки из репозитория
+    - mkdir -p prev corpus/$TARGET crashes
+    - |
+      if curl -sSf --cacert "$CI_SERVER_TLS_CA_FILE" -H "JOB-TOKEN: $CI_JOB_TOKEN" -o prev.zip \
+           "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_DEFAULT_BRANCH/download?job=$CI_JOB_NAME"; then
+        unzip -q prev.zip -d prevzip && cp -r prevzip/corpus/$TARGET/. prev/ 2>/dev/null || true
+      fi
+    - echo "прошлая база $(ls prev | wc -l), затравка $(ls src/fuzz/corpus/$SEEDS | wc -l)"
+    - F=./build/fuzz_stomp_$TARGET
+    - $F -merge=1 corpus/$TARGET prev src/fuzz/corpus/$SEEDS 2>&1 | tail -1
+    - $F -max_total_time=$FUZZ_SECONDS -timeout=10 -rss_limit_mb=2048 -artifact_prefix=crashes/
+      -print_final_stats=1 corpus/$TARGET 2>&1 | tee fuzz.log | grep -E 'INITED|DONE|ERROR|SUMMARY|stat::' || true
+    # сжатие: оставить минимальный набор с тем же покрытием
+    - mkdir min && $F -merge=1 min corpus/$TARGET 2>&1 | tail -1
+    - rm -rf corpus/$TARGET && mv min corpus/$TARGET
+    - echo "база $(ls corpus/$TARGET | wc -l) файлов, $(du -sh corpus/$TARGET | cut -f1)"
+    - if ls crashes/* >/dev/null 2>&1; then echo "найдены падения:"; ls -l crashes; tail -60 fuzz.log; exit 1; fi
+  artifacts:
+    when: always
+    expire_in: 90 days
+    paths:
+      - corpus/
+      - crashes/
+      - fuzz.log
+      - tag.txt
+
+fuzz:parser:
+  extends: .fuzz
+  variables: { TARGET: parser, SEEDS: parser }
+
+fuzz:chunked:
+  extends: .fuzz
+  variables: { TARGET: chunked, SEEDS: chunked }
+
+fuzz:large-header:
+  extends: .fuzz
+  variables: { TARGET: large_header, SEEDS: large_header }
