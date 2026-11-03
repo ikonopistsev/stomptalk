@@ -1,8 +1,10 @@
 # Каждый коммит и тег: сборка библиотеки и её тесты (build).
 # По расписанию и вручную (Build → Pipelines → Run pipeline или glab ci run): фаззинг (fuzz:*).
 # Фаззинг берёт самый свежий тег v*, а не main: проверяем то, что выпущено.
-# База примеров живёт в артефактах прошлого прогона этой же задачи: скачивается в начале,
-# дополняется, сжимается через -merge=1 и выкладывается снова. Так она не зависит от кэша раннера.
+# База примеров живёт в кэше раннера (fuzzdb/, ключ fuzz-<цель>; на oldtux это /srv/gitlab-runner/cache):
+# берётся в начале, дополняется, сжимается через -merge=1 и кладётся обратно, даже если найдено падение.
+# Пустой кэш — база из артефактов последнего удачного конвейера на main, иначе затравка из репозитория.
+# Копия базы и падения остаются в артефактах задачи для скачивания.
 
 workflow:
   rules:
@@ -57,10 +59,11 @@ variables:
     - CC=clang CXX=clang++ cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSTOMPTALK_BUILD_FUZZ=ON
       -DCMAKE_C_FLAGS="$SAN" -DCMAKE_CXX_FLAGS="$SAN" -DCMAKE_EXE_LINKER_FLAGS="$SAN" >/dev/null
     - cmake --build build -j"$(nproc)" --target "fuzz_stomp_$TARGET" >/dev/null
-    # база прошлого прогона; нет её — начинаем с затравки из репозитория
-    - mkdir -p prev corpus/$TARGET crashes
+    # база прошлого прогона: кэш, затем артефакты, затем только затравка
+    - mkdir -p prev corpus/$TARGET crashes fuzzdb/$TARGET
+    - cp -r fuzzdb/$TARGET/. prev/
     - |
-      if curl -sSf --cacert "$CI_SERVER_TLS_CA_FILE" -H "JOB-TOKEN: $CI_JOB_TOKEN" -o prev.zip \
+      if [ -z "$(ls -A prev)" ] && curl -sSf --cacert "$CI_SERVER_TLS_CA_FILE" -H "JOB-TOKEN: $CI_JOB_TOKEN" -o prev.zip \
            "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_DEFAULT_BRANCH/download?job=$CI_JOB_NAME"; then
         unzip -q prev.zip -d prevzip && cp -r prevzip/corpus/$TARGET/. prev/ 2>/dev/null || true
       fi
@@ -73,7 +76,12 @@ variables:
     - mkdir min && $F -merge=1 min corpus/$TARGET 2>&1 | tail -1
     - rm -rf corpus/$TARGET && mv min corpus/$TARGET
     - echo "база $(ls corpus/$TARGET | wc -l) файлов, $(du -sh corpus/$TARGET | cut -f1)"
+    - rm -rf fuzzdb/$TARGET && cp -r corpus/$TARGET fuzzdb/$TARGET
     - if ls crashes/* >/dev/null 2>&1; then echo "найдены падения:"; ls -l crashes; tail -60 fuzz.log; exit 1; fi
+  cache:
+    key: fuzz-$TARGET
+    paths: [fuzzdb/]
+    when: always
   artifacts:
     when: always
     expire_in: 90 days
