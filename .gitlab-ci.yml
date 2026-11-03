@@ -49,6 +49,9 @@ variables:
   script:
     - TAG="${FUZZ_TAG:-$(git tag -l 'v*' --sort=-v:refname | head -1)}"
     - echo "тег $TAG ($(git rev-parse --short "$TAG^{}"))" | tee tag.txt
+    # раннер переиспользует каталог проекта: убрать следы прошлого запуска
+    - git worktree remove --force src 2>/dev/null || true; rm -rf src; git worktree prune
+    - rm -rf build prev prevzip prev.zip corpus crashes min fuzz.log
     - git worktree add -q --detach src "$TAG"
     - SAN="-fsanitize=address,undefined -fno-sanitize-recover=undefined"
     - CC=clang CXX=clang++ cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSTOMPTALK_BUILD_FUZZ=ON
