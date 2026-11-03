@@ -14,6 +14,17 @@ namespace stomptalk {
 template<class H>
 class parser_hook
 {
+private:
+    template<class T>
+    static auto call_head(T& target, parser_hook& self, const char* at, int) noexcept -> decltype(target.on_head(self, at), void())
+    {
+        target.on_head(self, at);
+    }
+
+    template<class T>
+    static void call_head(T&, parser_hook&, const char*, long) noexcept
+    {   }
+
 protected:
     H& hook_;
     std::uint64_t content_left_{};
@@ -133,6 +144,12 @@ public:
     void on_hdr_val(P p) noexcept
     {
         on_hdr_val(p.first, p.second);
+    }
+
+    // Заголовки кончились, тело ещё не начато: at указывает на его первый байт. Необязательный каллбек.
+    void on_head(const char* at) noexcept
+    {
+        call_head(hook_, *this, at, 0);
     }
 
     void on_body(const void* ptr, std::size_t size) noexcept

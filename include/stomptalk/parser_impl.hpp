@@ -450,6 +450,7 @@ typename parser<H>::pointer parser<H>::hdrline_done(hook_type& hook,
     }
     else if (ch == '\n')
     {
+        hook.on_head(curr);
         // переходим к поиску конца метода
         return tailcall(hook, &parser::done, curr, end);
     }
@@ -512,6 +513,7 @@ typename parser<H>::pointer parser<H>::almost_done(hook_type& hook,
     }
 
     // переходим к поиску конца метода
+    hook.on_head(curr);
     return tailcall(hook, &parser::done, curr, end);
 }
 
