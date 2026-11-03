@@ -1,19 +1,24 @@
 /*
  * OSS-Fuzz target: large header stress test
  *
- * The parser accumulates header keys and values into a fixed-size stack
- * buffer (STOMPTALK_PARSER_STACK_SIZE, default 4096 bytes).  When the
- * buffer fills, stackbuf::push() resets its write pointer and returns
- * false, which the parser turns into stomptalk_error_too_big.
+ * The parser accumulates the method, header keys and values into a fixed-size
+ * stack buffer (STOMPTALK_PARSER_STACK_SIZE, default 4096 bytes).  When the
+ * buffer fills, stackbuf::push() returns false, which the parser turns into
+ * stomptalk_error_too_big.
  *
- * This target expands a tiny input into a near-boundary STOMP header.
+ * This target expands a tiny input into a near-boundary STOMP frame.
  * The first byte selects the test variant and the second byte selects
- * the logical header length around STOMPTALK_PARSER_STACK_SIZE:
+ * the logical (decoded) length around STOMPTALK_PARSER_STACK_SIZE:
  *
- *   bit 0 (low): 0 = data goes into header VALUE
+ *   bit 0:       0 = data goes into header VALUE
  *                1 = data goes into header KEY
  *   bit 1:       0 = LF-only line endings
  *                1 = CRLF line endings
+ *   bits 2-3:    0 = plain characters
+ *                1 = escaped: payload bytes with bit 7 set become
+ *                    \c \n \r or \\ (two bytes, one decoded character)
+ *                2 = raw headers: CONNECT keeps '\' and, in the value, ':'
+ *                3 = long METHOD of upper-case letters, no headers
  *
  *   length byte: 0 -> stack_size - 1
  *                1 -> stack_size
@@ -60,55 +65,70 @@ static const stomptalk_parser_hook hook = {
 
 /* ---- helpers ---------------------------------------------------- */
 
-/*
- * Sanitize bytes so they stay in the printable-non-colon range
- * (33-126, no ':') when used as a header key, or printable range
- * (32-126, no '\' and no ':') when used as a header value.
- * This keeps the parser inside the key/val states rather than
- * aborting on invalid characters — we want to reach the overflow.
- */
-static char sanitize_key_byte(uint8_t byte)
-{
-    static const char key_alphabet[] =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-        "0123456789-_";
-    static const size_t alpha_len =
-        sizeof(key_alphabet) - 1;   /* -1 for NUL */
+enum { MODE_PLAIN = 0, MODE_ESCAPED = 1, MODE_RAW = 2, MODE_METHOD = 3 };
 
-    return key_alphabet[byte % alpha_len];
+/*
+ * Characters that keep the parser inside the key/val states rather than
+ * aborting on invalid input — we want to reach the overflow.
+ *   plain/escaped key:   letters, digits, '-', '_'
+ *   plain/escaped value: printable 32-126 without '\' and ':' (since 2.0
+ *                        a ':' in a value is an error, except CONNECT/CONNECTED)
+ *   raw key:             printable 33-126 without ':' ('\' stays as is)
+ *   raw value:           printable 32-126, ':' and '\' included
+ */
+static char key_char(uint8_t byte)
+{
+    static const char alphabet[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    return alphabet[byte % (sizeof(alphabet) - 1)];
 }
 
-static char sanitize_val_byte(uint8_t byte)
+static char val_char(uint8_t byte)
 {
     unsigned char c = byte;
-
-    /* printable ASCII 32-126, map everything else */
     if (c < 32 || c > 126)
         c = 'X';
-    /* avoid backslash (escape sequences complicate length accounting) */
     if (c == '\\')
         c = 'Y';
-    /* с 2.0 двоеточие в значении — ошибка разбора (кроме CONNECT/CONNECTED) */
     if (c == ':')
         c = 'Z';
-
     return (char)c;
 }
 
-static void fill_key(char *dst, size_t len, const uint8_t *src, size_t src_len)
+static char raw_key_char(uint8_t byte)
 {
-    for (size_t i = 0; i < len; ++i) {
-        const uint8_t byte = src_len ? src[i % src_len] : (uint8_t)'K';
-        dst[i] = sanitize_key_byte(byte);
-    }
+    char c = (char)(33 + byte % (127 - 33));
+    return (c == ':') ? 'K' : c;
 }
 
-static void fill_val(char *dst, size_t len, const uint8_t *src, size_t src_len)
+static char raw_val_char(uint8_t byte)
 {
+    return (char)(32 + byte % (127 - 32));
+}
+
+/*
+ * Write `len` decoded characters to dst, return bytes written.
+ * In escaped mode one decoded character may take two bytes.
+ */
+static size_t fill(char *dst, size_t len, int mode, int use_key,
+                   const uint8_t *src, size_t src_len)
+{
+    static const char escapes[4] = { 'c', 'n', 'r', '\\' };
+    char *p = dst;
     for (size_t i = 0; i < len; ++i) {
-        const uint8_t byte = src_len ? src[i % src_len] : (uint8_t)'V';
-        dst[i] = sanitize_val_byte(byte);
+        const uint8_t byte = src_len ? src[i % src_len] : (uint8_t)'K';
+        if (mode == MODE_ESCAPED && (byte & 0x80)) {
+            *p++ = '\\';
+            *p++ = escapes[byte & 3];
+        } else if (mode == MODE_RAW) {
+            *p++ = use_key ? raw_key_char(byte) : raw_val_char(byte);
+        } else if (mode == MODE_METHOD) {
+            *p++ = (char)('A' + byte % 26);
+        } else {
+            *p++ = use_key ? key_char(byte) : val_char(byte);
+        }
     }
+    return (size_t)(p - dst);
 }
 
 /* ----------------------------------------------------------------- */
@@ -119,68 +139,58 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
 
     const uint8_t flags    = data[0];
-    const int     use_key  = flags & 1;   /* 0 = value path, 1 = key path */
-    const int     use_crlf = flags & 2;   /* 0 = LF, 1 = CRLF */
+    const int     use_key  = flags & 1;
+    const int     use_crlf = flags & 2;
+    const int     mode     = (flags >> 2) & 3;
 
     const size_t logical_len =
         STOMPTALK_PARSER_STACK_SIZE - 1 + (size_t)(data[1] % 3);
 
     const uint8_t *payload = data + 2;
-    const size_t   payload_len = (size > 2) ? (size - 2) : 0;
+    const size_t   payload_len = size - 2;
 
-    const char *nl   = use_crlf ? "\r\n" : "\n";
+    const char  *nl  = use_crlf ? "\r\n" : "\n";
     const size_t nll = use_crlf ? 2 : 1;
 
     /*
-     * Build frame in heap:
-     *
-     *   VALUE path:  "SEND<nl>x:<payload><nl><nl>\0"
-     *   KEY path:    "SEND<nl><payload>:v<nl><nl>\0"
+     * Frames:
+     *   METHOD:       "<letters><nl><nl>\0"
+     *   VALUE path:   "SEND<nl>x:<value><nl><nl>\0"    (CONNECT in raw mode)
+     *   KEY path:     "SEND<nl><key>:v<nl><nl>\0"      (CONNECT in raw mode)
+     * The element takes at most 2 * logical_len bytes (escaped mode).
      */
-    /* method + nl + fixed part + payload + nl + nl + \0 */
-    size_t fixed_pre, fixed_post;
-
-    if (!use_key) {
-        /* header value: "SEND<nl>x:" ... "<nl><nl>\0" */
-        fixed_pre  = 4 + nll + 2;          /* "SEND" + nl + "x:" */
-        fixed_post = nll + nll + 1;        /* nl + nl + \0        */
-    } else {
-        /* header key: "SEND<nl>" ... ":v<nl><nl>\0" */
-        fixed_pre  = 4 + nll;              /* "SEND" + nl          */
-        fixed_post = 2 + nll + nll + 1;   /* ":v" + nl + nl + \0  */
-    }
-
-    size_t total = fixed_pre + logical_len + fixed_post;
-    char  *buf   = (char *)malloc(total);
+    const size_t total_max = 16 + 2 * logical_len + 3 * nll;
+    char *buf = (char *)malloc(total_max);
     if (!buf)
         return 0;
 
     char *p = buf;
-
-    /* method */
-    memcpy(p, "SEND", 4); p += 4;
-    memcpy(p, nl, nll);   p += nll;
-
-    if (!use_key) {
-        /* header key literal */
-        *p++ = 'x';
-        *p++ = ':';
-        /* repeated, sanitized header value */
-        fill_val(p, logical_len, payload, payload_len); p += logical_len;
+    if (mode == MODE_METHOD) {
+        p += fill(p, logical_len, mode, 0, payload, payload_len);
+        memcpy(p, nl, nll); p += nll;
     } else {
-        /* repeated, sanitized header key */
-        fill_key(p, logical_len, payload, payload_len); p += logical_len;
-        /* header value literal */
-        *p++ = ':';
-        *p++ = 'v';
+        const char *method = (mode == MODE_RAW) ? "CONNECT" : "SEND";
+        const size_t mlen = strlen(method);
+        memcpy(p, method, mlen); p += mlen;
+        memcpy(p, nl, nll);      p += nll;
+        if (!use_key) {
+            *p++ = 'x';
+            *p++ = ':';
+            p += fill(p, logical_len, mode, 0, payload, payload_len);
+        } else {
+            p += fill(p, logical_len, mode, 1, payload, payload_len);
+            *p++ = ':';
+            *p++ = 'v';
+        }
+        /* end of header line */
+        memcpy(p, nl, nll); p += nll;
     }
-
-    /* end of header line */
-    memcpy(p, nl, nll); p += nll;
     /* empty line = end of headers */
     memcpy(p, nl, nll); p += nll;
     /* frame null terminator */
     *p++ = '\0';
+
+    const size_t total = (size_t)(p - buf);
 
     stomptalk_parser *parser = stomptalk_parser_new();
     if (!parser) {

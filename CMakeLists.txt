@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(stomptalk VERSION 2.1.1 LANGUAGES CXX C)
+project(stomptalk VERSION 2.1.2 LANGUAGES CXX C)
 
 # Без типа сборки парсер компилируется совсем без оптимизации.
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -125,7 +125,7 @@ if (STOMPTALK_BUILD_FUZZ)
         set(STOMPTALK_FUZZER_LDFLAGS "-fsanitize=fuzzer")
     endif()
 
-    foreach(_target fuzz_stomp_parser fuzz_stomp_chunked fuzz_stomp_large_header)
+    foreach(_target fuzz_stomp_parser fuzz_stomp_chunked fuzz_stomp_large_header fuzz_stomp_numbers)
         add_executable(${_target} fuzz/${_target}.c)
         set_target_properties(${_target} PROPERTIES
             LINKER_LANGUAGE C
@@ -140,7 +140,8 @@ if (STOMPTALK_BUILD_FUZZ)
         "Fuzz corpora:\n"
         "  fuzz_stomp_parser: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/parser/\n"
         "  fuzz_stomp_chunked: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/chunked/\n"
-        "  fuzz_stomp_large_header: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/large_header/")
+        "  fuzz_stomp_large_header: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/large_header/\n"
+        "  fuzz_stomp_numbers: ${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus/numbers/")
 endif()
 
 if (STOMPTALK_LIBRARY_INSTALL)

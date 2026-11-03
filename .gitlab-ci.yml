@@ -70,7 +70,7 @@ variables:
     - echo "прошлая база $(ls prev | wc -l), затравка $(ls src/fuzz/corpus/$SEEDS | wc -l)"
     - F=./build/fuzz_stomp_$TARGET
     - $F -merge=1 corpus/$TARGET prev src/fuzz/corpus/$SEEDS 2>&1 | tail -1
-    - $F -max_total_time=$FUZZ_SECONDS -timeout=10 -rss_limit_mb=2048 -artifact_prefix=crashes/
+    - $F -max_total_time=$FUZZ_SECONDS -max_len=$MAX_LEN -timeout=10 -rss_limit_mb=2048 -artifact_prefix=crashes/
       -print_final_stats=1 corpus/$TARGET 2>&1 | tee fuzz.log | grep -E 'INITED|DONE|ERROR|SUMMARY|stat::' || true
     # сжатие: оставить минимальный набор с тем же покрытием
     - mkdir min && $F -merge=1 min corpus/$TARGET 2>&1 | tail -1
@@ -91,14 +91,19 @@ variables:
       - fuzz.log
       - tag.txt
 
+# MAX_LEN больше стека парсера (4096): иначе выход too_big в методе и экранированных заголовках недостижим
 fuzz:parser:
   extends: .fuzz
-  variables: { TARGET: parser, SEEDS: parser }
+  variables: { TARGET: parser, SEEDS: parser, MAX_LEN: "16384" }
 
 fuzz:chunked:
   extends: .fuzz
-  variables: { TARGET: chunked, SEEDS: chunked }
+  variables: { TARGET: chunked, SEEDS: chunked, MAX_LEN: "16384" }
 
 fuzz:large-header:
   extends: .fuzz
-  variables: { TARGET: large_header, SEEDS: large_header }
+  variables: { TARGET: large_header, SEEDS: large_header, MAX_LEN: "4096" }
+
+fuzz:numbers:
+  extends: .fuzz
+  variables: { TARGET: numbers, SEEDS: numbers, MAX_LEN: "64" }
