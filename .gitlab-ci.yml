@@ -1,13 +1,31 @@
-# Фаззинг парсера: по расписанию и вручную (Build → Pipelines → Run pipeline или glab ci run).
-# Берётся самый свежий тег v*, а не main: проверяем то, что выпущено.
+# Каждый коммит и тег: сборка библиотеки и её тесты (build).
+# По расписанию и вручную (Build → Pipelines → Run pipeline или glab ci run): фаззинг (fuzz:*).
+# Фаззинг берёт самый свежий тег v*, а не main: проверяем то, что выпущено.
 # База примеров живёт в артефактах прошлого прогона этой же задачи: скачивается в начале,
 # дополняется, сжимается через -merge=1 и выкладывается снова. Так она не зависит от кэша раннера.
 
 workflow:
   rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_PIPELINE_SOURCE == "web"
     - if: $CI_PIPELINE_SOURCE == "api"
+
+build:
+  image: docker.io/library/debian:trixie-slim
+  stage: build
+  timeout: 10m
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+  variables:
+    GIT_DEPTH: "1"
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq --no-install-recommends g++ cmake make >/dev/null
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSTOMPTALK_BUILD_TESTS=ON >/dev/null
+    - cmake --build build -j"$(nproc)"
+    - ctest --test-dir build --output-on-failure
 
 variables:
   GIT_DEPTH: "0"
@@ -20,6 +38,8 @@ variables:
   image: docker.io/library/debian:trixie-slim
   stage: test
   timeout: 20m
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "push"
   variables:
     ASAN_OPTIONS: "abort_on_error=1:detect_leaks=1"
     UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
