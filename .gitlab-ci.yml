@@ -11,6 +11,8 @@ workflow:
 
 variables:
   GIT_DEPTH: "0"
+  GIT_FETCH_EXTRA_FLAGS: "--prune --quiet --tags --force"  # теги забирает раннер, ему известен корневой сертификат
+  DEBIAN_FRONTEND: noninteractive
   FUZZ_SECONDS: "120"   # на одну цель; задачи идут параллельно
   FUZZ_TAG: ""          # пусто — самый свежий тег v*
 
@@ -25,7 +27,6 @@ variables:
     - apt-get update -qq
     - apt-get install -y -qq --no-install-recommends clang libclang-rt-dev cmake make git curl unzip ca-certificates >/dev/null
   script:
-    - git fetch -q --tags --force
     - TAG="${FUZZ_TAG:-$(git tag -l 'v*' --sort=-v:refname | head -1)}"
     - echo "тег $TAG ($(git rev-parse --short "$TAG^{}"))" | tee tag.txt
     - git worktree add -q --detach src "$TAG"
