@@ -63,7 +63,7 @@ static const stomptalk_parser_hook hook = {
 /*
  * Sanitize bytes so they stay in the printable-non-colon range
  * (33-126, no ':') when used as a header key, or printable range
- * (32-126) when used as a header value.
+ * (32-126, no '\' and no ':') when used as a header value.
  * This keeps the parser inside the key/val states rather than
  * aborting on invalid characters — we want to reach the overflow.
  */
@@ -88,6 +88,9 @@ static char sanitize_val_byte(uint8_t byte)
     /* avoid backslash (escape sequences complicate length accounting) */
     if (c == '\\')
         c = 'Y';
+    /* с 2.0 двоеточие в значении — ошибка разбора (кроме CONNECT/CONNECTED) */
+    if (c == ':')
+        c = 'Z';
 
     return (char)c;
 }
