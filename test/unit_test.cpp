@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstring>
 #include <string>
+#include <type_traits>
 #include <vector>
 #include <unordered_map>
 #include <iostream>
@@ -990,6 +991,53 @@ void test_huge_buffer_uses_bounded_stack() {
     std::cout << "✓ Huge buffer test passed" << std::endl;
 }
 
+// Буфер парсера ссылается сам на себя: копия или перенос указывали бы в исходный объект.
+static_assert(!std::is_copy_constructible<stomptalk::parser<frame_counter>>::value, "parser copy");
+static_assert(!std::is_copy_assignable<stomptalk::parser<frame_counter>>::value, "parser copy");
+static_assert(!std::is_move_constructible<stomptalk::parser<frame_counter>>::value, "parser move");
+static_assert(!std::is_move_assignable<stomptalk::parser<frame_counter>>::value, "parser move");
+static_assert(!std::is_copy_constructible<stomptalk::stackbuf<char, 4>>::value, "stackbuf copy");
+
+// Метод, ключ и значение длиннее STOMPTALK_PARSER_STACK_SIZE дают ошибку, целиком они
+// в буфере или разорваны. На тело лимит не действует.
+void test_element_size_limit() {
+    std::cout << "Testing the method, key and value size limit..." << std::endl;
+    using namespace std::string_literals;
+
+    const std::size_t limit = STOMPTALK_PARSER_STACK_SIZE;
+    const std::string fits(limit, 'v');
+    const std::string over(limit + 1, 'v');
+    for (std::size_t step : {std::size_t{1}, std::size_t{1000}, std::size_t{1} << 20}) {
+        assert(feed("SEND\nk:"s + fits + "\n\n\0"s, step).ok);
+        assert(!feed("SEND\nk:"s + over + "\n\n\0"s, step).ok);
+        assert(feed("SEND\n"s + std::string(limit, 'k') + ":v\n\n\0"s, step).ok);
+        assert(!feed("SEND\n"s + std::string(limit + 1, 'k') + ":v\n\n\0"s, step).ok);
+        assert(!feed(std::string(limit + 1, 'A') + "\n\n\0"s, step).ok);
+        auto big_body = feed("SEND\n\n"s + std::string(4 * limit, 'b') + "\0"s, step);
+        assert(big_body.ok && (big_body.body.size() == 4 * limit));
+    }
+
+    std::cout << "✓ Element size limit test passed" << std::endl;
+}
+
+// После ошибки парсер больше ничего не разбирает: сброса нет, нужен новый parser и hook.
+void test_error_is_sticky() {
+    std::cout << "Testing that an error stays..." << std::endl;
+    using namespace std::string_literals;
+
+    frame_counter counter;
+    frame_counter::hook_type hook(counter);
+    stomptalk::parser<frame_counter> parser;
+    const auto bad = "send\n\n\0"s;
+    const auto good = "SEND\n\n\0"s;
+    assert(parser.run(hook, bad.data(), bad.size()) != bad.size());
+    assert(hook.error() == stomptalk_error_inval_reqline);
+    assert(parser.run(hook, good.data(), good.size()) == 0);
+    assert((counter.frames == 0) && (hook.error() == stomptalk_error_inval_reqline));
+
+    std::cout << "✓ Sticky error test passed" << std::endl;
+}
+
 void test_stackbuf_counts_elements() {
     std::cout << "Testing stackbuf with elements wider than a byte..." << std::endl;
 
@@ -1149,6 +1197,8 @@ int main() {
         test_every_callback_can_stop_parsing();
         test_antoll();
         test_stackbuf_counts_elements();
+        test_element_size_limit();
+        test_error_is_sticky();
         test_syntax_of_the_standard();
         test_method_from();
         test_content_length_is_recognized_by_name();

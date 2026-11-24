@@ -44,8 +44,11 @@ class stackbuf
 
 public:
     stackbuf() = default;
+    // curr_ указывает в собственный buf_: копия указывала бы в чужой объект
+    stackbuf(const stackbuf&) = delete;
+    stackbuf& operator=(const stackbuf&) = delete;
 
-    [[nodiscard]] std::pair<T*, std::size_t> pop() noexcept
+    std::pair<T*, std::size_t> pop() noexcept
     {
         auto len = static_cast<std::size_t>(curr_ - buf_);
         curr_ = buf_;
