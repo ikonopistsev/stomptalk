@@ -64,6 +64,18 @@ The body may arrive in several `on_body` calls, one for each chunk of input.
 
 A callback stops parsing with `hook.set(stomptalk_error_generic)`; `run` then returns early. `hook.ok()` and `hook.error()` report the state, and inside a frame `hook.has_content_length()` and `hook.content_length()` report its `content-length`.
 
+#### Optional `on_head`
+
+A hook may also define
+
+```cpp
+void on_head(hook_type& hook, const char* at) noexcept;
+```
+
+It is called once per frame, after the empty line that ends the headers and before any body byte, so the order is `on_frame`, `on_method`, keys and values, `on_head`, `on_body`, `on_frame_end`. `at` points to where the body starts, or to the terminating NUL when the body is empty. All headers have been delivered by then, and `hook.has_content_length()` and `hook.content_length()` are known. This is the point to decide where the body goes, for example into a pipe for a large body, or to refuse the frame by its declared length, before a single byte of the body is read. Setting an error in `on_head` stops parsing before the body.
+
+A hook without `on_head` works as before: the call is resolved at compile time. The C API has no `on_head`.
+
 `test/inline_bench.cpp` is a complete example.
 
 #### Compiler flags

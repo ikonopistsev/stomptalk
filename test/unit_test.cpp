@@ -1038,6 +1038,101 @@ void test_error_is_sticky() {
     std::cout << "✓ Sticky error test passed" << std::endl;
 }
 
+namespace {
+
+// Порядок событий кадра одной строкой: F M K V H B E. Подряд идущие куски тела дают одну B.
+struct head_recorder
+{
+    using hook_type = stomptalk::parser_hook<head_recorder>;
+
+    std::string events;
+    const char* head_at = nullptr;
+    bool length_known_at_head = false;
+    std::uint64_t length_at_head = 0;
+    bool stop_on_head = false;
+
+    void on_frame(hook_type&, const char*) noexcept { events += 'F'; }
+    void on_method(hook_type&, const char*, std::size_t) noexcept { events += 'M'; }
+    void on_hdr_key(hook_type&, const char*, std::size_t) noexcept { events += 'K'; }
+    void on_hdr_val(hook_type&, const char*, std::size_t) noexcept { events += 'V'; }
+    void on_head(hook_type& hook, const char* at) noexcept
+    {
+        events += 'H';
+        head_at = at;
+        length_known_at_head = hook.has_content_length();
+        length_at_head = hook.content_length();
+        if (stop_on_head)
+            hook.set(stomptalk_error_generic);
+    }
+    void on_body(hook_type&, const void*, std::size_t) noexcept
+    {
+        if (events.empty() || events.back() != 'B')
+            events += 'B';
+    }
+    void on_frame_end(hook_type&, const char*) noexcept { events += 'E'; }
+};
+
+std::string head_events(const std::string& data, std::size_t step) {
+    head_recorder rec;
+    head_recorder::hook_type hook(rec);
+    stomptalk::parser<head_recorder> parser;
+    for (std::size_t off = 0; off < data.size(); off += step) {
+        auto n = (std::min)(step, data.size() - off);
+        // кусок копируется: views не должны пережить свой кусок
+        std::string piece = data.substr(off, n);
+        assert(parser.run(hook, piece.data(), piece.size()) == piece.size());
+    }
+    return rec.events;
+}
+
+} // namespace
+
+// on_head: заголовки кончились, тела ещё нет; длина тела уже известна, at указывает на начало тела.
+void test_on_head() {
+    std::cout << "Testing on_head between headers and body..." << std::endl;
+    using namespace std::string_literals;
+
+    const auto sized = "SEND\nk:v\ncontent-length:3\n\nabc\0"s;
+    const auto crlf_no_length = "SEND\r\nk:v\r\n\r\nabc\0"s;
+    const auto no_headers = "CONNECTED\n\n\0"s;
+    const auto empty_sized = "SEND\ncontent-length:0\n\n\0"s;
+    const auto all = sized + crlf_no_length + no_headers + empty_sized;
+    const auto expected = "FMKVKVHBE"s + "FMKVHBE" + "FMHE" + "FMKVHE";
+    for (std::size_t step = 1; step <= all.size(); ++step)
+        assert(head_events(all, step) == expected);
+
+    // В одном буфере: at указывает на первый байт тела, длина уже известна.
+    {
+        head_recorder rec;
+        head_recorder::hook_type hook(rec);
+        stomptalk::parser<head_recorder> parser;
+        assert(parser.run(hook, sized.data(), sized.size()) == sized.size());
+        assert(rec.head_at == sized.data() + sized.find("abc"));
+        assert(rec.length_known_at_head && rec.length_at_head == 3);
+    }
+    // Пустое тело: at указывает на завершающий NUL.
+    {
+        head_recorder rec;
+        head_recorder::hook_type hook(rec);
+        stomptalk::parser<head_recorder> parser;
+        assert(parser.run(hook, no_headers.data(), no_headers.size()) == no_headers.size());
+        assert(rec.head_at == no_headers.data() + no_headers.size() - 1);
+        assert(!rec.length_known_at_head);
+    }
+    // Ошибка из on_head останавливает разбор до тела и остаётся.
+    {
+        head_recorder rec;
+        rec.stop_on_head = true;
+        head_recorder::hook_type hook(rec);
+        stomptalk::parser<head_recorder> parser;
+        assert(parser.run(hook, sized.data(), sized.size()) < sized.size());
+        assert(rec.events == "FMKVKVH" && hook.error() == stomptalk_error_generic);
+        assert(parser.run(hook, sized.data(), sized.size()) == 0);
+    }
+
+    std::cout << "✓ on_head test passed" << std::endl;
+}
+
 void test_stackbuf_counts_elements() {
     std::cout << "Testing stackbuf with elements wider than a byte..." << std::endl;
 
@@ -1199,6 +1294,7 @@ int main() {
         test_stackbuf_counts_elements();
         test_element_size_limit();
         test_error_is_sticky();
+        test_on_head();
         test_syntax_of_the_standard();
         test_method_from();
         test_content_length_is_recognized_by_name();
