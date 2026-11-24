@@ -113,6 +113,9 @@ private:
 
 public:
     parser() = default;
+    // буфер парсера ссылается сам на себя, поэтому копирования и перемещения нет
+    parser(const parser&) = delete;
+    parser& operator=(const parser&) = delete;
 
     std::size_t run(hook_type& hook,
         const char *ptr, std::size_t len) noexcept;

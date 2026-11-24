@@ -1,7 +1,24 @@
 # stomptalk
 stomp protocol parser http://stomp.github.io
 
-This library does not perform any I/O operations for its own, is designed to be used in performance applications. It does not make any syscalls nor allocations, it does not buffer data, it can be interrupted at anytime. The parser can work with Stomp 1.0, 1.1, 1.2 and supports some of the rabbitmq headers.
+The library does no I/O of its own and is designed for performance applications. Parsing makes no syscalls and no allocations, and it can be interrupted at any point: data may come in chunks of any size. The body is never buffered. A method, header key or header value that is split between chunks or contains escapes is assembled in a fixed buffer inside the parser. The parser works with STOMP 1.0, 1.1 and 1.2.
+
+stomptalk is a tokenizer: it reports methods, header keys and values and body pieces, and leaves their meaning to the caller. The only header it interprets itself is `content-length`.
+
+## Tokenizer rules
+
+- LF, CR and NUL between frames are skipped, so heart-beats need no handling.
+- A method is any `[A-Z]+` word, and a body is allowed on any method. `method_from` returns `st_method_unknown` for a method outside the standard.
+- Header keys and values are unescaped (`\n`, `\r`, `\c`, `\\`); any other escape is an error. A `:` inside a value must be escaped, and a header without a colon or with an empty name is an error.
+- CONNECT and CONNECTED headers are passed raw, without unescaping, for STOMP 1.0 compatibility.
+- `content-length` must be digits only, up to 18 of them. The first one in a frame wins, and `0` is valid. A NUL must follow the body. Without `content-length`, the body ends at the first NUL.
+
+## Limits and errors
+
+- A method, header key or header value may be at most `STOMPTALK_PARSER_STACK_SIZE` bytes long: 4096 by default, and the macro can be redefined before including the parser. A longer one fails with `stomptalk_error_too_big`, whether or not it is split between chunks. The body has no limit.
+- The parser returns the number of bytes it consumed. If that is less than the size passed in, an error occurred.
+- **An error stays.** After an error, every further call returns 0 and parses nothing, and there is no reset. Close the connection, or create a new parser and hook.
+- A parser keeps a pointer into its own buffer, so it cannot be copied or moved.
 
 ## Using
 
@@ -11,13 +28,17 @@ Write a class with the callbacks below and pass it to the `parser` template, so 
 
 ```cpp
 #include "stomptalk/parser.hpp"
+#include "stomptalk/method.hpp"
 
 struct my_hook
 {
     using hook_type = stomptalk::parser_hook<my_hook>;
 
     void on_frame(hook_type&, const char *frame_start) noexcept { }
-    void on_method(hook_type&, const char*, std::size_t) noexcept { }
+    void on_method(hook_type&, const char* at, std::size_t len) noexcept
+    {
+        if (stomptalk::method_from(at, len) == st_method_unknown) { /* ... */ }
+    }
     void on_hdr_key(hook_type&, const char*, std::size_t) noexcept { }
     void on_hdr_val(hook_type&, const char*, std::size_t) noexcept { }
     void on_body(hook_type&, const void*, std::size_t) noexcept { }
@@ -30,28 +51,51 @@ stomptalk::parser<my_hook> parser;
 
 // parse data from socket
 std::size_t rc = parser.run(hook, data, data_size);
+if (rc != data_size)
+{
+    // stomptalk_get_error_str(hook.error()) describes the error;
+    // the parser stays in the error state, close the connection
+}
 ```
 
-> If the request body is large, the `on_body` method will be called multiple times.
+A method, key or value is valid only during its callback: it points either into your data or into the parser's buffer, which the next element reuses. Copy it if you need it later.
 
-A method, key or value is valid only during its callback. To turn a method into a number, use `stomptalk::method_from` from `stomptalk/method.hpp`. See `test/inline_bench.cpp` for a complete example.
+The body may arrive in several `on_body` calls, one for each chunk of input.
 
-Use `-O2` or higher for speed: the parser states call each other in tail position, which the compiler turns into jumps. A build without optimization, such as Debug, is detected and runs the states from a loop instead: it is slower, and its stack stays bounded. `-O1` is not safe, because it optimizes but does not enable `-foptimize-sibling-calls`, so a large buffer can overflow the stack. A build without a build type uses `Release`.
+A callback stops parsing with `hook.set(stomptalk_error_generic)`; `run` then returns early. `hook.ok()` and `hook.error()` report the state, and inside a frame `hook.has_content_length()` and `hook.content_length()` report its `content-length`.
 
-You can see example of integration at [stompdemo](https://github.com/ikonopistsev/stompdemo) or [stompconn](https://github.com/ikonopistsev/stompconn).
+`test/inline_bench.cpp` is a complete example.
+
+#### Compiler flags
+
+Use `-O2` or higher for speed: the parser states call each other in tail position, and the compiler turns those calls into jumps. **`-O1` is not safe**, and neither is `-fno-optimize-sibling-calls`: the code is optimized, but the calls do not become jumps, so a large buffer can overflow the stack. A build without optimization, such as Debug, is detected and runs the states from a loop instead: it is slower, and its stack stays bounded.
+
+With GCC and Clang on x86-64, header lines are scanned with SSE2. With `-mavx2`, or a `-march` that includes AVX2, they are scanned with AVX2. The C++ parser is a template, so it is the flags of **your** code that decide. The C API uses the flags the library was built with.
+
+Other compilers and targets use the portable path: a lookup table instead of SIMD. MSVC does not define `__OPTIMIZE__`, so with MSVC the states also always run from a loop, even in Release.
 
 ### Pure C
 
-One `stomptalk_parser` object is used per TCP connection. Initialize the struct using `stomptalk_parser_new()` and set the callbacks. All callbacks return `int`: `0` means success, any other value stops parsing. That might look something like this:
+One `stomptalk_parser` object is used per TCP connection. Initialize it with `stomptalk_parser_new()` and set the callbacks. All callbacks return `int`: `0` means success, any other value stops parsing. That might look something like this:
 
 ```c
 #include "stomptalk/parser.h"
 
 int at_frame(stomptalk_parser *parser, const char *at) { return 0; }
-int at_method(stomptalk_parser *parser, const char *at, size_t length) { return 0; }
+int at_method(stomptalk_parser *parser, const char *at, size_t length)
+{
+    // convert the text of a method to its number
+    enum stomptalk_method method = stomptalk_method_from(at, length);
+    return 0;
+}
 int at_hdr_key(stomptalk_parser *parser, const char *at, size_t length) { return 0; }
 int at_hdr_val(stomptalk_parser *parser, const char *at, size_t length) { return 0; }
-int at_body(stomptalk_parser *parser, const char *at, size_t length) { return 0; }
+int at_body(stomptalk_parser *parser, const char *at, size_t length)
+{
+    // the pointer passed to stomptalk_set_hook
+    struct my_connection *conn = stomptalk_get_hook_arg(parser);
+    return 0;
+}
 int at_frame_end(stomptalk_parser *parser, const char *at) { return 0; }
 
 // create parser instance
@@ -73,22 +117,25 @@ stomptalk_set_hook(parser, &hook, my_connection_ptr);
 
 // parse some data from socket
 size_t rc = stomptalk_parser_execute(parser, data, data_size);
-// if rc != data_size then an error occurred
+if (rc != data_size)
+{
+    const char *text = stomptalk_get_error_str(stomptalk_get_error(parser));
+    // the parser stays in the error state, close the connection
+}
 
 // ...
 
 // cleanup
 stomptalk_parser_free(parser);
 
-// convert the text of a method to its number
-enum stomptalk_method method = stomptalk_method_from(at, length);
-
-// convert text with unsigned number
-// returns negative value on error
+// convert text with an unsigned number, up to 18 digits
+// returns a negative value on error
 int64_t val = stomptalk_antoull(at, length);
 ```
 
-See the example at [purestomp](https://github.com/ikonopistsev/purestomp).
+Also available: `stomptalk_get_content_length()` for the current frame, `stomptalk_method_str()` and `stomptalk_version()`.
+
+`test/purestomp.c` is a complete example and a speed test. A standalone version is in [purestomp](https://github.com/ikonopistsev/purestomp).
 
 ## Building
 
@@ -99,6 +146,8 @@ $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build
 ```
 
+A single-configuration build without a build type uses `Release`.
+
 To build and install as a shared library:
 
 ```
@@ -106,6 +155,24 @@ $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSTOMPTALK_LIBRARY_STATIC=OFF 
 $ cmake --build build
 $ cmake --install build --prefix /usr/local
 ```
+
+An installed library is found with CMake:
+
+```cmake
+find_package(stomptalk 2 CONFIG REQUIRED)
+target_link_libraries(my_app PRIVATE stomptalk::stomptalk)
+```
+
+Within your own project, `add_subdirectory(stomptalk)` gives the same `stomptalk::stomptalk` target.
+
+Options:
+
+- `STOMPTALK_LIBRARY_STATIC` (`ON`): static or shared library.
+- `STOMPTALK_LIBRARY_INSTALL` (`OFF`): install rules and the CMake package.
+- `STOMPTALK_BUILD_TESTS` (`OFF`): tests, `ctest --test-dir build`.
+- `STOMPTALK_BUILD_FUZZ` (`OFF`): libFuzzer targets, requires Clang.
+
+The library is C++14, and its C examples are C99.
 
 ###### CMake (Windows)
 
@@ -115,3 +182,5 @@ Install CMake: <https://www.cmake.org>
 $ cmake -S . -B build -G "Visual Studio 17 2022" -A x64
 $ cmake --build build --config Release
 ```
+
+With MSVC the parser uses the portable path described in [Compiler flags](#compiler-flags).
